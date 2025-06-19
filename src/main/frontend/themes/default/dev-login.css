@@ -1,0 +1,27 @@
+/* This CSS is used by the development mode login view */
+
+.dev-mode-speech-bubble {
+    position: absolute;
+    background: var(--lumo-success-color);
+    color: var(--lumo-success-contrast-color);
+    border-radius: var(--lumo-border-radius-l);
+    box-shadow: var(--lumo-box-shadow-s);
+    padding: var(--lumo-space-m);
+    right: 10px;
+    bottom: 60px;
+}
+
+.dev-mode-speech-bubble:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 20px solid transparent;
+    border-top-color: var(--lumo-success-color);
+    border-bottom: 0;
+    border-right: 0;
+    margin-left: -10px;
+    margin-bottom: -20px;
+}
