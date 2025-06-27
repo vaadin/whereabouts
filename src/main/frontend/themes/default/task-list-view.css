@@ -1,0 +1,7 @@
+.task-list-view {
+    background-color: var(--lumo-shade-5pct);
+}
+
+.task-list-view vaadin-grid::part(header-cell) {
+    background-color: var(--lumo-shade-5pct);
+}

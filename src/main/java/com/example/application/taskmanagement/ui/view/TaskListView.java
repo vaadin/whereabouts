@@ -1,86 +1,275 @@
 package com.example.application.taskmanagement.ui.view;
 
-import com.example.application.base.ui.component.ViewToolbar;
-import com.example.application.taskmanagement.domain.Task;
-import com.example.application.taskmanagement.service.TaskService;
+import com.example.application.base.ui.component.Badges;
+import com.example.application.base.ui.component.EmptyStateWrapper;
+import com.example.application.base.ui.component.SectionToolbar;
+import com.example.application.security.AppUserInfoLookup;
+import com.example.application.security.CurrentUser;
+import com.example.application.taskmanagement.*;
+import com.example.application.taskmanagement.ui.component.AddTaskDialog;
+import com.example.application.taskmanagement.ui.component.EditTaskDialog;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Main;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.Menu;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.security.AuthenticationContext;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import org.jspecify.annotations.Nullable;
 
-import java.time.Clock;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
 import java.util.Optional;
 
-import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRequest;
-
-@Route("task-list")
-@PageTitle("Task List")
-@Menu(order = 0, icon = "vaadin:clipboard-check", title = "Task List")
+@Route(value = "projects/:projectId", layout = ProjectListView.class)
 @PermitAll // When security is enabled, allow all authenticated users
-public class TaskListView extends Main {
+class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTitle {
 
+    public static final String PARAM_PROJECT_ID = "projectId";
+
+    private final AppUserInfoLookup appUserInfoLookup;
     private final TaskService taskService;
+    private final H2 title;
+    private final EmptyStateWrapper gridWrapper;
+    private final TaskList taskList;
+    private final ZoneId timeZone;
 
-    final TextField description;
-    final DatePicker dueDate;
-    final Button createBtn;
-    final Grid<Task> taskGrid;
+    @Nullable
+    private Project project;
 
-    public TaskListView(AuthenticationContext authenticationContext, TaskService taskService, Clock clock) {
+    TaskListView(CurrentUser currentUser, AppUserInfoLookup appUserInfoLookup, TaskService taskService) {
+        this.appUserInfoLookup = appUserInfoLookup;
         this.taskService = taskService;
+        this.timeZone = currentUser.require().getZoneId();
 
-        description = new TextField();
-        description.setPlaceholder("What do you want to do?");
-        description.setAriaLabel("Task description");
-        description.setMaxLength(Task.DESCRIPTION_MAX_LENGTH);
-        description.setMinWidth("20em");
+        title = new H2("");
 
-        dueDate = new DatePicker();
-        dueDate.setPlaceholder("Due date");
-        dueDate.setAriaLabel("Due date");
+        var addTaskButton = new Button("Add Task", event -> addTask());
+        addTaskButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        createBtn = new Button("Create", event -> createTask());
-        createBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        taskList = new TaskList();
 
-        var dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(clock.getZone())
-                .withLocale(getLocale());
-        var dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
-
-        taskGrid = new Grid<>();
-        taskGrid.setItems(query -> taskService.list(toSpringPageRequest(query)).stream());
-        taskGrid.addColumn(Task::getDescription).setHeader("Description");
-        taskGrid.addColumn(task -> Optional.ofNullable(task.getDueDate()).map(dateFormatter::format).orElse("Never"))
-                .setHeader("Due Date");
-        taskGrid.addColumn(task -> dateTimeFormatter.format(task.getCreationDate())).setHeader("Creation Date");
-        taskGrid.setSizeFull();
+        gridWrapper = new EmptyStateWrapper(new NoTasks(), taskList);
+        gridWrapper.setSizeFull();
 
         setSizeFull();
-        addClassNames(LumoUtility.BoxSizing.BORDER, LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN,
-                LumoUtility.Padding.MEDIUM, LumoUtility.Gap.SMALL);
-
-        add(new ViewToolbar(authenticationContext, "Task List", ViewToolbar.group(description, dueDate, createBtn)));
-        add(taskGrid);
+        addClassNames("task-list-view", LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
+        add(new SectionToolbar(title, addTaskButton), gridWrapper);
     }
 
-    private void createTask() {
-        taskService.createTask(description.getValue(), dueDate.getValue());
-        taskGrid.getDataProvider().refreshAll();
-        description.clear();
-        dueDate.clear();
-        Notification.show("Task added", 3000, Notification.Position.BOTTOM_END)
-                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        event.getRouteParameters().getLong(PARAM_PROJECT_ID)
+                .flatMap(taskService::findProjectById)
+                .ifPresentOrElse(this::setProject, ProjectListView::showProjects);
     }
 
+    private void setProject(Project project) {
+        this.project = project;
+        refresh();
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Tasks - " + Optional.ofNullable(project).map(Project::getName).orElse("No Project");
+    }
+
+    private class NoTasks extends Div {
+
+        NoTasks() {
+            var icon = new SvgIcon("icons/list_alt_check.svg");
+            icon.setSize("60px");
+            var title = new H4("No tasks yet");
+            var instruction = new Span("Add a task to get started");
+            var addProject = new Button("Add Task", VaadinIcon.PLUS.create(), event -> addTask());
+            addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+            setSizeFull();
+            addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.CENTER, LumoUtility.JustifyContent.CENTER);
+            var centerDiv = new Div(icon, title, instruction, addProject);
+            centerDiv.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.CENTER, LumoUtility.Gap.SMALL);
+            add(centerDiv);
+        }
+    }
+
+    private class TaskList extends Div {
+
+        private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
+        private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocale());
+        private final Grid<Task> grid;
+
+        TaskList() {
+            var searchField = new TextField();
+            searchField.setPlaceholder("Search");
+            searchField.setPrefixComponent(VaadinIcon.SEARCH.create()); // TODO Implement search field!
+            searchField.addClassNames(LumoUtility.Flex.GROW);
+            searchField.setValueChangeMode(ValueChangeMode.LAZY);
+            searchField.addValueChangeListener(event -> refresh());
+
+            // TODO Implement filtering!
+
+            //var viewMode = new Select<String>();
+            //viewMode.setItems("Grid View", "Card View"); // TODO Implement view mode!
+
+            grid = new Grid<>();
+            grid.setSelectionMode(Grid.SelectionMode.NONE);
+            grid.setItemsPageable(pageable -> taskService.findTasks(project, searchField.getValue(), pageable));
+            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            grid.addColumn(new ComponentRenderer<>(this::createStatusBadge))
+                    .setHeader("Status")
+                    .setWidth("150px")
+                    .setFlexGrow(0)
+                    .setSortProperty(Task.STATUS_SORT_PROPERTY);
+            grid.addColumn(Task::getDescription)
+                    .setHeader("Description")
+                    .setFlexGrow(1
+                    ).setSortProperty(Task.DESCRIPTION_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createDueDate))
+                    .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
+                    .setWidth("200px")
+                    .setFlexGrow(0)
+                    .setSortProperty(Task.DUE_DATE_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge))
+                    .setHeader("Priority")
+                    .setWidth("150px")
+                    .setFlexGrow(0)
+                    .setSortProperty(Task.PRIORITY_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createAssignees))
+                    .setHeader("Assignees");
+            grid.addColumn(new ComponentRenderer<>(this::createActionMenu))
+                    .setTextAlign(ColumnTextAlign.END)
+                    .setWidth("100px")
+                    .setFlexGrow(0);
+
+            setSizeFull();
+            addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
+            add(new SectionToolbar(searchField), grid);
+        }
+
+        private Component createStatusBadge(Task task) {
+            return switch (task.getStatus()) {
+                case PENDING -> Badges.createContrast(task.getStatus().getDisplayName());
+                case IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
+                case PAUSED -> Badges.createError(task.getStatus().getDisplayName());
+                case DONE -> Badges.createSuccess(task.getStatus().getDisplayName());
+            };
+        }
+
+        private Component createPriorityBadge(Task task) {
+            var badge = new Span(task.getPriority().getDisplayName());
+            var themeList = badge.getElement().getThemeList();
+            themeList.add("badge");
+            switch (task.getPriority()) {
+                case URGENT -> {
+                    themeList.add("error");
+                }
+                case HIGH -> {
+                    themeList.add("warning");
+                }
+                case NORMAL -> {
+                    // Default style
+                }
+                case LOW -> {
+                    themeList.add("success");
+                }
+            }
+            return badge;
+        }
+
+        private Component createDueDate(Task task) {
+            var dueDateTime = task.getDueDateTimeInZone(timeZone);
+            if (dueDateTime == null) {
+                return Badges.createContrast("Never");
+            }
+
+            var dateDiv = new Div();
+            var date = new Div(dateFormatter.format(dueDateTime));
+            var time = new Div(timeFormatter.format(dueDateTime));
+            time.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL);
+            dateDiv.add(date, time);
+            return dateDiv;
+        }
+
+        private Component createAssignees(Task task) {
+            if (task.getAssignees().isEmpty()) {
+                return Badges.createContrast("None");
+            }
+
+            var assignees = new AvatarGroup();
+            task.getAssignees().stream()
+                    .flatMap(userId -> appUserInfoLookup.findUserInfo(userId).stream())
+                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getFullName(), userInfo.getPictureUrl()))
+                    .forEach(assignees::add);
+            return assignees;
+        }
+
+        private Component createActionMenu(Task task) {
+            var menuBar = new MenuBar();
+            menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE, MenuBarVariant.LUMO_END_ALIGNED);
+            var item = menuBar.addItem(new SvgIcon("icons/more_vert.svg"));
+            var subMenu = item.getSubMenu();
+            subMenu.addItem("Edit", event -> editTask(task));
+            var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task));
+            deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+            return menuBar;
+        }
+    }
+
+    private void addTask() {
+        if (project == null) {
+            throw new IllegalStateException("Cannot add task: project is null");
+        }
+
+        var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
+            taskService.saveTask(newTask);
+            refresh();
+        });
+        dialog.open();
+    }
+
+    private void editTask(Task task) {
+        var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
+            taskService.saveTask(editedTask);
+            refresh();
+        });
+        dialog.open();
+    }
+
+    private void deleteTask(Task task) {
+        var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
+            taskService.deleteTask(task);
+            refresh();
+        }, "Cancel", event -> {
+        });
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.open();
+    }
+
+    private void refresh() {
+        if (project == null) {
+            throw new IllegalStateException("Cannot refresh: project is null");
+        }
+        title.setText(project.getName());
+        gridWrapper.setEmpty(!taskService.hasTasks(project));
+        taskList.grid.getDataProvider().refreshAll();
+    }
+
+    public static void showTasksForProjectId(Long projectId) {
+        UI.getCurrent().navigate(TaskListView.class, new RouteParam(PARAM_PROJECT_ID, projectId));
+    }
 }

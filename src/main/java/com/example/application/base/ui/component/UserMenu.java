@@ -30,5 +30,6 @@ public class UserMenu extends Composite<MenuBar> {
                     event -> UI.getCurrent().getPage().open(user.getProfileUrl()));
         }
         userMenuItem.getSubMenu().addItem("Logout", event -> authenticationContext.logout());
+        addClassNames(LumoUtility.Margin.Horizontal.MEDIUM);
     }
 }

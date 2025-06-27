@@ -1,6 +1,6 @@
 package com.example.application.base.ui.view;
 
-import com.example.application.base.ui.component.ViewToolbar;
+import com.example.application.base.ui.component.ViewHeader;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
@@ -21,7 +21,7 @@ public final class MainView extends Main {
 
     MainView(AuthenticationContext authenticationContext) {
         addClassName(LumoUtility.Padding.MEDIUM);
-        add(new ViewToolbar(authenticationContext, "Main"));
+        add(new ViewHeader(authenticationContext, "Main"));
         add(new Div("Please select a view from the menu on the left."));
     }
 

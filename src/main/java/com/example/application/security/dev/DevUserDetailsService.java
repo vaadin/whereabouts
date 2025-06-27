@@ -1,13 +1,13 @@
 package com.example.application.security.dev;
 
+import com.example.application.security.AppUserInfo;
+import com.example.application.security.AppUserInfoLookup;
+import com.example.application.security.domain.UserId;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Implementation of {@link UserDetailsService} for development environments.
@@ -48,9 +48,10 @@ import java.util.Optional;
  * @see DevUser The development user class stored in this service
  * @see UserDetailsService Spring Security's interface for loading user authentication details
  */
-final class DevUserDetailsService implements UserDetailsService {
+final class DevUserDetailsService implements UserDetailsService, AppUserInfoLookup {
 
     private final Map<String, UserDetails> userByUsername;
+    private final Map<UserId, AppUserInfo> userById;
 
     /**
      * Creates a new service with the specified development users.
@@ -63,12 +64,31 @@ final class DevUserDetailsService implements UserDetailsService {
      */
     DevUserDetailsService(Collection<DevUser> users) {
         userByUsername = new HashMap<>();
-        users.forEach(user -> userByUsername.put(user.getAppUser().getPreferredUsername(), user));
+        userById = new HashMap<>();
+        users.forEach(user -> {
+            userByUsername.put(user.getAppUser().getPreferredUsername(), user);
+            userById.put(user.getAppUser().getUserId(), user.getAppUser());
+        });
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(userByUsername.get(username))
                 .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    @Override
+    public Optional<AppUserInfo> findUserInfo(UserId userId) {
+        return Optional.ofNullable(userById.get(userId));
+    }
+
+    @Override
+    public List<AppUserInfo> findUsers(String searchTerm, int limit, int offset) {
+        return userById.values().stream()
+                .filter(user -> user.getPreferredUsername().contains(searchTerm))
+                .sorted(Comparator.comparing(AppUserInfo::getFullName))
+                .skip(offset)
+                .limit(limit)
+                .toList();
     }
 }

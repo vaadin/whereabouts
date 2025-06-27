@@ -1,0 +1,16 @@
+.section-toolbar {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--lumo-space-xs);
+    padding-top: var(--lumo-space-xs);
+    padding-bottom: var(--lumo-space-xs);
+}
+
+.section-toolbar .section-toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--lumo-space-s);
+    padding-left: var(--lumo-space-m);
+    padding-right: var(--lumo-space-m);
+}
