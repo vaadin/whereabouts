@@ -1,7 +1,11 @@
 package com.example.application.security.dev;
 
-import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -15,7 +19,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
  */
 @PageTitle("Login")
 @AnonymousAllowed
-@CssImport("./themes/default/dev-login.css")
 // No @Route annotation - the route is registered dynamically by DevSecurityConfig.
 class DevLoginView extends Main implements BeforeEnterObserver {
 
@@ -30,26 +33,50 @@ class DevLoginView extends Main implements BeforeEnterObserver {
         // Create the components
         login = new LoginForm();
         login.setAction(LOGIN_PATH);
+        login.setForgotPasswordButtonVisible(false);
 
-        var userList = new UnorderedList();
-        SampleUsers.ALL_USERS.forEach(user -> userList.add(new ListItem(user.getAppUser().getPreferredUsername())));
+        var exampleUsers = new Div(new Div("Use the following details to login"));
+        SampleUsers.ALL_USERS.forEach(user -> exampleUsers.add(createSampleUserCard(user)));
 
         // Configure the view
         setSizeFull();
-        var exampleUsers = new Div(new H3("Example users"),
-                new Paragraph("The password for every user is: " + SampleUsers.SAMPLE_PASSWORD), userList);
-        var centerDiv = new Div(login, exampleUsers);
-        add(centerDiv);
+        addClassNames("dev-login-view");
+
+        exampleUsers.addClassNames("dev-users");
+
+        var contentDiv = new Div(login, exampleUsers);
+        contentDiv.addClassNames("dev-content-div");
+        add(contentDiv);
 
         var devModeMenuDiv = new Div("You can also use the Dev Mode Menu here to impersonate any user!");
         devModeMenuDiv.addClassNames("dev-mode-speech-bubble");
         add(devModeMenuDiv);
+    }
 
-        // Style the view
-        addClassNames(LumoUtility.Display.FLEX, LumoUtility.JustifyContent.CENTER, LumoUtility.AlignItems.CENTER,
-                LumoUtility.Background.CONTRAST_5);
-        centerDiv.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.Gap.SMALL);
-        exampleUsers.addClassNames(LumoUtility.Background.BASE, LumoUtility.Padding.LARGE);
+    private Component createSampleUserCard(DevUser user) {
+        var card = new Div();
+        card.addClassNames("dev-user-card");
+
+        var fullName = new H3(user.getAppUser().getFullName());
+
+        var credentials = new DescriptionList();
+        credentials.add(new DescriptionList.Term("Username"), new DescriptionList.Description(user.getUsername()));
+        credentials.add(new DescriptionList.Term("Password"), new DescriptionList.Description(SampleUsers.SAMPLE_PASSWORD));
+
+        // Make it easier to log in while still going through the normal authentication process.
+        var loginButton = new Button(VaadinIcon.SIGN_IN.create(), event -> {
+            login.getElement().executeJs("""
+                    document.getElementById("vaadinLoginUsername").value = $0;
+                    document.getElementById("vaadinLoginPassword").value = $1;
+                    document.forms[0].submit();
+                    """, user.getUsername(), SampleUsers.SAMPLE_PASSWORD);
+        });
+        loginButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+
+        card.add(new Div(fullName, credentials));
+        card.add(loginButton);
+
+        return card;
     }
 
     @Override
