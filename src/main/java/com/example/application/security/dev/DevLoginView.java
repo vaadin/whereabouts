@@ -1,12 +1,15 @@
 package com.example.application.security.dev;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -23,6 +26,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 class DevLoginView extends Main implements BeforeEnterObserver {
 
     static final String LOGIN_PATH = "dev-login";
+    private static final String CALLOUT_HIDDEN_KEY = "walking-skeleton-dev-login-callout-hidden";
 
     private final AuthenticationContext authenticationContext;
     private final LoginForm login;
@@ -50,7 +54,16 @@ class DevLoginView extends Main implements BeforeEnterObserver {
 
         var devModeMenuDiv = new Div("You can also use the Dev Mode Menu here to impersonate any user!");
         devModeMenuDiv.addClassNames("dev-mode-speech-bubble");
+        // Hide the callout when clicked
+        devModeMenuDiv.addClickListener(event -> {
+            WebStorage.setItem(WebStorage.Storage.LOCAL_STORAGE, CALLOUT_HIDDEN_KEY, "1");
+            devModeMenuDiv.setVisible(false);
+        });
+        devModeMenuDiv.setVisible(false);
         add(devModeMenuDiv);
+
+        // Don't show the callout if already hidden once
+        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, CALLOUT_HIDDEN_KEY, value -> devModeMenuDiv.setVisible(value == null));
     }
 
     private Component createSampleUserCard(DevUser user) {

@@ -94,6 +94,7 @@ body {
     padding: var(--lumo-space-m);
     right: 10px;
     bottom: 60px;
+    cursor: default;
 }
 
 .dev-login-view .dev-mode-speech-bubble:after {
