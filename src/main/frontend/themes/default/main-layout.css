@@ -1,0 +1,36 @@
+vaadin-app-layout.main-layout::part(drawer) {
+    background: var(--dark-base-color);
+}
+
+vaadin-app-layout.main-layout {
+    background: var(--lumo-shade-10pct);
+}
+
+vaadin-app-layout.main-layout .app-logo {
+    color: var(--logo-color);
+}
+
+vaadin-app-layout.main-layout .app-name {
+    color: var(--dark-header-text-color);
+}
+
+.main-layout vaadin-side-nav {
+    margin-top: var(--lumo-space-xs);
+    --lumo-header-text-color: var(--dark-header-text-color);
+    --lumo-primary-color-50pct: var(--dark-primary-color-50pct);
+    --lumo-primary-color-10pct: var(--dark-primary-color-10pct);
+    --lumo-primary-text-color: var(--dark-primary-text-color);
+    --lumo-primary-contrast-color: var(--dark-primary-contrast-color);
+    --lumo-body-text-color: var(--dark-body-text-color);
+}
+
+.main-layout vaadin-side-nav-item > vaadin-icon {
+    color: inherit;
+}
+
+.main-layout vaadin-master-detail-layout::part(detail) {
+    z-index: 1;
+    box-shadow: var(--lumo-box-shadow-xs);
+    border-top-left-radius: var(--lumo-border-radius-m);
+    background-color: var(--lumo-base-color);
+}

@@ -3,7 +3,7 @@ package com.example.application.base.ui.view;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
@@ -46,7 +46,7 @@ public final class MainLayout extends AppLayout {
 
     private SideNavItem createSideNavItem(MenuEntry menuEntry) {
         if (menuEntry.icon() != null) {
-            return new SideNavItem(menuEntry.title(), menuEntry.path(), new Icon(menuEntry.icon()));
+            return new SideNavItem(menuEntry.title(), menuEntry.path(), new SvgIcon(menuEntry.icon()));
         } else {
             return new SideNavItem(menuEntry.title(), menuEntry.path());
         }

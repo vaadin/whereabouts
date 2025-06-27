@@ -6,56 +6,21 @@
 @import url("project-list-view.css");
 @import url("task-list-view.css");
 
+/* Layouts */
+@import url("main-layout.css");
+
+/* Global styles */
+
 body {
+    /* Colors from the dark theme used in the navigation bar */
     --dark-base-color: hsl(214, 35%, 21%);
     --dark-header-text-color: hsl(214, 100%, 98%);
+    --dark-primary-color-50pct: hsla(214, 90%, 70%, 0.69);
+    --dark-primary-color-10pct: hsla(214, 90%, 55%, 0.13);
+    --dark-primary-text-color: hsl(214, 90%, 77%);
+    --dark-primary-contrast-color: #fff;
+    --dark-body-text-color: hsla(214, 96%, 96%, 0.9);
+
+    /* Custom colors */
     --logo-color: rgb(20, 164, 236);
 }
-
-vaadin-app-layout.main-layout::part(drawer) {
-    background: var(--dark-base-color);
-}
-
-vaadin-app-layout.main-layout {
-    background: var(--lumo-shade-10pct);
-}
-
-vaadin-app-layout .app-logo {
-    color: var(--logo-color);
-}
-
-vaadin-app-layout .app-name {
-    color: var(--dark-header-text-color);
-}
-
-.main-layout vaadin-side-nav-item[current] {
-    background: var(--lumo-primary-color);
-    color: var(--lumo-primary-contrast-color);
-    border-radius: var(--lumo-border-radius-s);
-}
-
-vaadin-master-detail-layout::part(master) {
-    /*background-color: var(--lumo-shade-10pct);*/
-}
-
-vaadin-master-detail-layout::part(detail) {
-    z-index: 1;
-    box-shadow: var(--lumo-box-shadow-xs);
-    border-top-left-radius: var(--lumo-border-radius-m);
-    background-color: var(--lumo-base-color);
-}
-
-/*
-.view-toolbar {
-    background: linear-gradient(100deg, var(--dark-base-color) 0%, var(--lumo-shade-10pct) 50%);
-}
-
-.view-toolbar h1 {
-    color: var(--dark-header-text-color);
-}
-
-.view-toolbar vaadin-drawer-toggle {
-    --lumo-primary-color-50pct: hsla(214, 90%, 70%, 0.69);
-    --lumo-primary-text-color: hsl(214, 90%, 77%);
-    --lumo-primary-contrast-color: #fff;
-}*/
