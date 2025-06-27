@@ -45,11 +45,14 @@ public final class MainLayout extends AppLayout {
     }
 
     private SideNavItem createSideNavItem(MenuEntry menuEntry) {
+        var item = new SideNavItem(menuEntry.title(), menuEntry.path());
+        item.setMatchNested(true);
+
         if (menuEntry.icon() != null) {
-            return new SideNavItem(menuEntry.title(), menuEntry.path(), new SvgIcon(menuEntry.icon()));
-        } else {
-            return new SideNavItem(menuEntry.title(), menuEntry.path());
+            item.setPrefixComponent(new SvgIcon(menuEntry.icon()));
         }
+
+        return item;
     }
 
 }
