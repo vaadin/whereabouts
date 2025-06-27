@@ -20,9 +20,10 @@ public final class MainView extends Main {
     // TODO Replace with your own main view.
 
     MainView(AuthenticationContext authenticationContext) {
-        addClassName(LumoUtility.Padding.MEDIUM);
         add(new ViewHeader(authenticationContext, "Main"));
-        add(new Div("Please select a view from the menu on the left."));
+        var instruction = new Div("Please select a view from the menu on the left");
+        instruction.addClassNames(LumoUtility.Padding.MEDIUM);
+        add(instruction);
     }
 
     /**
