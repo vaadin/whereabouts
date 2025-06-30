@@ -253,7 +253,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
             taskService.saveTask(newTask);
-            Notifications.createNotification(new SvgIcon("icons/check.svg"), "Task created successfully", NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully", NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -261,7 +261,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void editTask(Task task) {
         var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
             taskService.saveTask(editedTask);
-            Notifications.createNotification(new SvgIcon("icons/check.svg"), "Task updated successfully", NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully", NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -269,7 +269,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void deleteTask(Task task) {
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
             taskService.deleteTask(task);
-            Notifications.createNotification(new SvgIcon("icons/delete_sweep.svg"), "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"), "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {
         });
         dialog.setConfirmButtonTheme("error primary");
