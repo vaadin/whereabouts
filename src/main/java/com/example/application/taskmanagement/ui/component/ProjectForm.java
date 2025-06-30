@@ -24,8 +24,7 @@ public class ProjectForm extends Composite<FormLayout> {
         formLayout.add(nameField);
 
         binder = new Binder<>(Project.class);
-        binder.forField(nameField)
-                .asRequired()
+        binder.forField(nameField).asRequired()
                 .withValidator(new StringLengthValidator("Project name is too long", 0, Project.NAME_MAX_LENGTH))
                 .bind(Project::getName, Project::setName);
     }

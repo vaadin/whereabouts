@@ -52,35 +52,26 @@ public class TaskForm extends Composite<FormLayout> {
         formLayout.add(assigneesField, 2);
 
         binder = new Binder<>();
-        binder.forField(descriptionField)
-                .asRequired()
+        binder.forField(descriptionField).asRequired()
                 .withValidator(new StringLengthValidator("Description is too long", 0, Task.DESCRIPTION_MAX_LENGTH))
                 .bind(Task::getDescription, Task::setDescription);
         binder.forField(dueDateField) // TODO Validator
                 .bind(Task::getDueDate, Task::setDueDate);
         binder.forField(dueTimeField) // TODO Validator
                 .bind(Task::getDueTime, Task::setDueTime);
-        binder.forField(statusField)
-                .asRequired()
-                .bind(Task::getStatus, Task::setStatus);
-        binder.forField(priorityField)
-                .asRequired()
-                .bind(Task::getPriority, Task::setPriority);
-        binder.forField(assigneesField)
-                .bind(Task::getAssignees, Task::setAssignees);
+        binder.forField(statusField).asRequired().bind(Task::getStatus, Task::setStatus);
+        binder.forField(priorityField).asRequired().bind(Task::getPriority, Task::setPriority);
+        binder.forField(assigneesField).bind(Task::getAssignees, Task::setAssignees);
 
         setFormDataObject(initialFormDataObject);
     }
 
     private static MultiSelectComboBox<UserId> createAssigneesField(AppUserInfoLookup appUserInfoLookup) {
         var assigneesField = new MultiSelectComboBox<UserId>("Assignees");
-        assigneesField.setItemLabelGenerator(userId -> appUserInfoLookup.findUserInfo(userId).map(AppUserInfo::getFullName).orElse("N/A"));
-        assigneesField.setItems(query -> query.getFilter()
-                .map(searchTerm ->
-                        appUserInfoLookup.findUsers(searchTerm, query.getLimit(), query.getOffset())
-                                .stream()
-                                .map(AppUserInfo::getUserId)
-                )
+        assigneesField.setItemLabelGenerator(
+                userId -> appUserInfoLookup.findUserInfo(userId).map(AppUserInfo::getFullName).orElse("N/A"));
+        assigneesField.setItems(query -> query.getFilter().map(searchTerm -> appUserInfoLookup
+                .findUsers(searchTerm, query.getLimit(), query.getOffset()).stream().map(AppUserInfo::getUserId))
                 .orElse(Stream.empty()));
         return assigneesField;
     }

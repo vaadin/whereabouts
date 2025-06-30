@@ -79,7 +79,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         add(new SectionToolbar(title, addTaskButton), gridWrapper);
 
         // Refresh the grid when any user creates, updates, or deletes a task.
-        ApplicationListenerUtil.<TaskEvent>handleEventsWhileAttached(this, taskEvent -> {
+        ApplicationListenerUtil.<TaskEvent> handleEventsWhileAttached(this, taskEvent -> {
             if (taskEvent instanceof TaskUpdatedEvent) {
                 refreshTask(taskEvent.getTask());
             } else {
@@ -90,8 +90,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        event.getRouteParameters().getLong(PARAM_PROJECT_ID)
-                .flatMap(taskService::findProjectById)
+        event.getRouteParameters().getLong(PARAM_PROJECT_ID).flatMap(taskService::findProjectById)
                 .ifPresentOrElse(this::setProject, ProjectListView::showProjects);
     }
 
@@ -116,17 +115,21 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
             setSizeFull();
-            addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.CENTER, LumoUtility.JustifyContent.CENTER);
+            addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.CENTER,
+                    LumoUtility.JustifyContent.CENTER);
             var centerDiv = new Div(icon, title, instruction, addProject);
-            centerDiv.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.CENTER, LumoUtility.Gap.SMALL);
+            centerDiv.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN,
+                    LumoUtility.AlignItems.CENTER, LumoUtility.Gap.SMALL);
             add(centerDiv);
         }
     }
 
     private class TaskList extends Div {
 
-        private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
-        private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocale());
+        private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                .withLocale(getLocale());
+        private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+                .withLocale(getLocale());
         private final Grid<Task> grid;
 
         TaskList() {
@@ -146,31 +149,18 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             grid.setSelectionMode(Grid.SelectionMode.NONE);
             grid.setItemsPageable(pageable -> taskService.findTasks(project, searchField.getValue(), pageable));
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-            grid.addColumn(new ComponentRenderer<>(this::createStatusBadge))
-                    .setHeader("Status")
-                    .setWidth("150px")
-                    .setFlexGrow(0)
-                    .setSortProperty(Task.STATUS_SORT_PROPERTY);
-            grid.addColumn(Task::getDescription)
-                    .setHeader("Description")
-                    .setFlexGrow(1
-                    ).setSortProperty(Task.DESCRIPTION_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
+                    .setFlexGrow(0).setSortProperty(Task.STATUS_SORT_PROPERTY);
+            grid.addColumn(Task::getDescription).setHeader("Description").setFlexGrow(1)
+                    .setSortProperty(Task.DESCRIPTION_SORT_PROPERTY);
             grid.addColumn(new ComponentRenderer<>(this::createDueDate))
                     .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
-                    .setWidth("200px")
-                    .setFlexGrow(0)
-                    .setSortProperty(Task.DUE_DATE_SORT_PROPERTY);
-            grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge))
-                    .setHeader("Priority")
-                    .setWidth("150px")
-                    .setFlexGrow(0)
-                    .setSortProperty(Task.PRIORITY_SORT_PROPERTY);
-            grid.addColumn(new ComponentRenderer<>(this::createAssignees))
-                    .setHeader("Assignees");
-            grid.addColumn(new ComponentRenderer<>(this::createActionMenu))
-                    .setTextAlign(ColumnTextAlign.END)
-                    .setWidth("100px")
-                    .setFlexGrow(0);
+                    .setWidth("200px").setFlexGrow(0).setSortProperty(Task.DUE_DATE_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge)).setHeader("Priority").setWidth("150px")
+                    .setFlexGrow(0).setSortProperty(Task.PRIORITY_SORT_PROPERTY);
+            grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
+            grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
+                    .setWidth("100px").setFlexGrow(0);
 
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
@@ -179,10 +169,10 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         private Component createStatusBadge(Task task) {
             return switch (task.getStatus()) {
-                case PENDING -> Badges.createContrast(task.getStatus().getDisplayName());
-                case IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
-                case PAUSED -> Badges.createError(task.getStatus().getDisplayName());
-                case DONE -> Badges.createSuccess(task.getStatus().getDisplayName());
+            case PENDING -> Badges.createContrast(task.getStatus().getDisplayName());
+            case IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
+            case PAUSED -> Badges.createError(task.getStatus().getDisplayName());
+            case DONE -> Badges.createSuccess(task.getStatus().getDisplayName());
             };
         }
 
@@ -191,18 +181,18 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             var themeList = badge.getElement().getThemeList();
             themeList.add("badge");
             switch (task.getPriority()) {
-                case URGENT -> {
-                    themeList.add("error");
-                }
-                case HIGH -> {
-                    themeList.add("warning");
-                }
-                case NORMAL -> {
-                    // Default style
-                }
-                case LOW -> {
-                    themeList.add("success");
-                }
+            case URGENT -> {
+                themeList.add("error");
+            }
+            case HIGH -> {
+                themeList.add("warning");
+            }
+            case NORMAL -> {
+                // Default style
+            }
+            case LOW -> {
+                themeList.add("success");
+            }
             }
             return badge;
         }
@@ -227,8 +217,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             }
 
             var assignees = new AvatarGroup();
-            task.getAssignees().stream()
-                    .flatMap(userId -> appUserInfoLookup.findUserInfo(userId).stream())
+            task.getAssignees().stream().flatMap(userId -> appUserInfoLookup.findUserInfo(userId).stream())
                     .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getFullName(), userInfo.getPictureUrl()))
                     .forEach(assignees::add);
             return assignees;
@@ -236,7 +225,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         private Component createActionMenu(Task task) {
             var menuBar = new MenuBar();
-            menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE, MenuBarVariant.LUMO_END_ALIGNED);
+            menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE,
+                    MenuBarVariant.LUMO_END_ALIGNED);
             var item = menuBar.addItem(new SvgIcon("icons/more_vert.svg"));
             var subMenu = item.getSubMenu();
             subMenu.addItem("Edit", event -> editTask(task));
@@ -253,7 +243,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
             taskService.saveTask(newTask);
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully", NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully",
+                    NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -261,7 +252,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void editTask(Task task) {
         var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
             taskService.saveTask(editedTask);
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully", NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully",
+                    NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -269,7 +261,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void deleteTask(Task task) {
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
             taskService.deleteTask(task);
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"), "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
+            Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"),
+                    "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {
         });
         dialog.setConfirmButtonTheme("error primary");

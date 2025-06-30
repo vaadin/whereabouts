@@ -120,9 +120,7 @@ public class Task extends AbstractEntity<Long> {
             return;
         }
 
-        var time = (dueTime != null)
-                ? dueTime
-                : LocalTime.of(23, 59, 59); // end of day
+        var time = (dueTime != null) ? dueTime : LocalTime.of(23, 59, 59); // end of day
 
         dueDateTime = dueDate.atTime(time).atZone(timeZone);
     }

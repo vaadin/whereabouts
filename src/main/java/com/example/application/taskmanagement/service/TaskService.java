@@ -28,7 +28,7 @@ public class TaskService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, CurrentUser currentUser,
-                ApplicationEventPublisher applicationEventPublisher) {
+            ApplicationEventPublisher applicationEventPublisher) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.currentUser = currentUser;
@@ -71,7 +71,8 @@ public class TaskService {
         if (searchTerm == null || searchTerm.isEmpty()) {
             return taskRepository.findAllByProject(project, pageable).toList();
         } else {
-            return taskRepository.findAllByProjectAndDescriptionContainingIgnoreCase(project, searchTerm, pageable).toList();
+            return taskRepository.findAllByProjectAndDescriptionContainingIgnoreCase(project, searchTerm, pageable)
+                    .toList();
         }
     }
 }

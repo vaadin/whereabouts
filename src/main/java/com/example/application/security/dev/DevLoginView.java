@@ -59,7 +59,8 @@ class DevLoginView extends Main implements BeforeEnterObserver {
         add(devModeMenuDiv);
 
         // Don't show the callout if already hidden once
-        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, CALLOUT_HIDDEN_KEY, value -> devModeMenuDiv.setVisible(value == null));
+        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, CALLOUT_HIDDEN_KEY,
+                value -> devModeMenuDiv.setVisible(value == null));
     }
 
     private Component createSampleUserCard(DevUser user) {
@@ -70,7 +71,8 @@ class DevLoginView extends Main implements BeforeEnterObserver {
 
         var credentials = new DescriptionList();
         credentials.add(new DescriptionList.Term("Username"), new DescriptionList.Description(user.getUsername()));
-        credentials.add(new DescriptionList.Term("Password"), new DescriptionList.Description(SampleUsers.SAMPLE_PASSWORD));
+        credentials.add(new DescriptionList.Term("Password"),
+                new DescriptionList.Description(SampleUsers.SAMPLE_PASSWORD));
 
         // Make it easier to log in while still going through the normal authentication process.
         var loginButton = new Button(VaadinIcon.SIGN_IN.create(), event -> {

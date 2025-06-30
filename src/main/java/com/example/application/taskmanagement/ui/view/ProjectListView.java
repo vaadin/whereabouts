@@ -52,8 +52,8 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         add(masterDetailLayout);
 
         // Refresh the project panel whenever tasks are created, updated or deleted.
-        ApplicationListenerUtil.<TaskEvent>handleEventsWhileAttached(this, taskEvent ->
-                refreshProject(taskEvent.getTask().getProject().requireId()));
+        ApplicationListenerUtil.<TaskEvent> handleEventsWhileAttached(this,
+                taskEvent -> refreshProject(taskEvent.getTask().getProject().requireId()));
     }
 
     @Override
@@ -73,11 +73,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             masterDetailLayout.setMasterSize(300, Unit.PIXELS);
             refresh();
             event.getRouteParameters().getLong(TaskListView.PARAM_PROJECT_ID)
-                    .flatMap(projectService::findProjectListItemById)
-                    .ifPresentOrElse(
-                            this::select,
-                            this::deselectAll
-                    );
+                    .flatMap(projectService::findProjectListItemById).ifPresentOrElse(this::select, this::deselectAll);
         } else {
             masterDetailLayout.setMaster(new NoProjects());
             masterDetailLayout.setMasterSize(null);
@@ -99,8 +95,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
     private void refreshProject(long projectId) {
         projectService.findProjectListItemById(projectId).ifPresentOrElse(
-                projectList.grid.getDataProvider()::refreshItem,
-                projectList.grid.getDataProvider()::refreshAll);
+                projectList.grid.getDataProvider()::refreshItem, projectList.grid.getDataProvider()::refreshAll);
     }
 
     private void addProject() {
@@ -169,20 +164,13 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> projectService.findProjectListItems(
-                    searchField.getValue(),
-                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())
-            ));
+            grid.setItemsPageable(pageable -> projectService.findProjectListItems(searchField.getValue(),
+                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())));
             grid.addColumn(new ComponentRenderer<>(ProjectListItemPanel::new));
             grid.setSizeFull();
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-            grid.addSelectionListener(event ->
-                    event.getFirstSelectedItem()
-                            .map(ProjectListItem::projectId)
-                            .ifPresentOrElse(
-                                    TaskListView::showTasksForProjectId,
-                                    ProjectListView::showProjects
-                            ));
+            grid.addSelectionListener(event -> event.getFirstSelectedItem().map(ProjectListItem::projectId)
+                    .ifPresentOrElse(TaskListView::showTasksForProjectId, ProjectListView::showProjects));
 
             setSizeFull();
             addClassNames("project-list", Display.FLEX, FlexDirection.COLUMN);
@@ -218,9 +206,12 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
         public ProjectListItemPanel(ProjectListItem projectListItem) {
             var name = new H4(projectListItem.projectName());
-            var tasks = new Span(projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
+            var tasks = new Span(
+                    projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
             tasks.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
-            var assignees = new Span(projectListItem.assignees() == 1 ? "1 assignee" : "%d assignees".formatted(projectListItem.assignees()));
+            var assignees = new Span(projectListItem.assignees() == 1
+                    ? "1 assignee"
+                    : "%d assignees".formatted(projectListItem.assignees()));
             assignees.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
             var footer = new Div(tasks, assignees);
             footer.addClassNames(Display.FLEX, FlexDirection.ROW, JustifyContent.BETWEEN);

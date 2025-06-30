@@ -3,7 +3,8 @@ package com.example.application.base.ui.component;
 import com.vaadin.flow.component.html.Span;
 
 public final class Badges {
-    private Badges() {}
+    private Badges() {
+    }
 
     public static Span createContrast(String text) {
         var badge = new Span(text);

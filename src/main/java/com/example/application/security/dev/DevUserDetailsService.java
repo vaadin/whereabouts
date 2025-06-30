@@ -84,11 +84,7 @@ final class DevUserDetailsService implements UserDetailsService, AppUserInfoLook
 
     @Override
     public List<AppUserInfo> findUsers(String searchTerm, int limit, int offset) {
-        return userById.values().stream()
-                .filter(user -> user.getPreferredUsername().contains(searchTerm))
-                .sorted(Comparator.comparing(AppUserInfo::getFullName))
-                .skip(offset)
-                .limit(limit)
-                .toList();
+        return userById.values().stream().filter(user -> user.getPreferredUsername().contains(searchTerm))
+                .sorted(Comparator.comparing(AppUserInfo::getFullName)).skip(offset).limit(limit).toList();
     }
 }

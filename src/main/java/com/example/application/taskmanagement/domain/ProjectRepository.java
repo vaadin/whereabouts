@@ -34,7 +34,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                 from Project p
                 left join Task t on t.project = p
                 left join t.assignees a
-                where p.id = :projectId 
+                where p.id = :projectId
                 group by p.id, p.name
             """)
     Optional<ProjectListItem> findProjectListItemById(Long projectId);

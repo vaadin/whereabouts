@@ -6,7 +6,8 @@ public record ProjectListItem(Long projectId, String projectName, long tasks, lo
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProjectListItem that = (ProjectListItem) o;
         return Objects.equals(projectId, that.projectId);
     }

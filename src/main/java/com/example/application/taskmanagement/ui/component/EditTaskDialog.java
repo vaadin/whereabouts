@@ -16,7 +16,8 @@ public class EditTaskDialog extends Dialog {
     private final SerializableConsumer<Task> onSaveCallback;
     private final TaskForm form;
 
-    public EditTaskDialog(AppUserInfoLookup appUserInfoLookup, Task formDataObject, SerializableConsumer<Task> onSaveCallback) {
+    public EditTaskDialog(AppUserInfoLookup appUserInfoLookup, Task formDataObject,
+            SerializableConsumer<Task> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
         form = new TaskForm(appUserInfoLookup, formDataObject);
@@ -38,7 +39,9 @@ public class EditTaskDialog extends Dialog {
                 onSaveCallback.accept(project);
                 close();
             } catch (OptimisticLockingFailureException ex) {
-                Notifications.createCriticalNotification(new SvgIcon("icons/person_play.svg"), "Another user has edited the task. Please refresh and try again.", NotificationVariant.LUMO_WARNING).open();
+                Notifications.createCriticalNotification(new SvgIcon("icons/person_play.svg"),
+                        "Another user has edited the task. Please refresh and try again.",
+                        NotificationVariant.LUMO_WARNING).open();
             }
         });
     }
