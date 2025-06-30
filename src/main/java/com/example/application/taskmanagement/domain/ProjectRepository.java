@@ -1,4 +1,4 @@
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.domain;
 
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import org.springframework.data.domain.Pageable;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-interface ProjectRepository extends JpaRepository<Project, Long> {
+public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select p.id, p.name, count(t) from Project p left join Task t on t.project = p group by p")
     List<ProjectListItem> findAllProjectListItems(Pageable pageable);

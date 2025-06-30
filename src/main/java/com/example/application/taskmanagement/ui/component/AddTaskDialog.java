@@ -1,7 +1,7 @@
 package com.example.application.taskmanagement.ui.component;
 
 import com.example.application.security.AppUserInfoLookup;
-import com.example.application.taskmanagement.Task;
+import com.example.application.taskmanagement.domain.Task;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;

@@ -1,4 +1,4 @@
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.domain;
 
 import com.example.application.base.domain.AbstractEntity;
 import jakarta.persistence.*;
@@ -11,7 +11,8 @@ public class Project extends AbstractEntity<Long> {
     public static final int MAX_NAME_LENGTH = 200;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_id_seq")
+    @SequenceGenerator(name = "project_id_seq", sequenceName = "project_id_seq")
     @Column(name = "project_id")
     private Long id;
 

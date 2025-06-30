@@ -1,10 +1,14 @@
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.service;
 
 import com.example.application.security.CurrentUser;
+import com.example.application.taskmanagement.domain.Project;
+import com.example.application.taskmanagement.domain.ProjectRepository;
+import com.example.application.taskmanagement.domain.Task;
+import com.example.application.taskmanagement.domain.TaskRepository;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,33 +28,32 @@ public class TaskService {
         this.currentUser = currentUser;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+    @Transactional(readOnly = true)
     public Optional<Project> findProjectById(Long projectId) {
         return projectRepository.findById(projectId);
     }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Task createTask(Project project) {
         return new Task(project, currentUser.require().getZoneId());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+    @Transactional(readOnly = true)
     public boolean hasTasks(Project project) {
         return taskRepository.countAllByProject(project) > 0;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void saveTask(Task task) {
         taskRepository.saveAndFlush(task);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void deleteTask(Task task) {
         taskRepository.delete(task);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    public List<Task> findTasks(Project project, String searchTerm, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public List<Task> findTasks(Project project, @Nullable String searchTerm, Pageable pageable) {
         if (searchTerm == null || searchTerm.isEmpty()) {
             return taskRepository.findAllByProject(project, pageable).toList();
         } else {

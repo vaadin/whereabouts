@@ -3,7 +3,7 @@ package com.example.application.taskmanagement.ui.view;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.ui.component.ViewHeader;
 import com.example.application.base.ui.view.MainLayout;
-import com.example.application.taskmanagement.ProjectService;
+import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
 import com.vaadin.flow.component.HasElement;

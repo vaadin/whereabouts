@@ -1,4 +1,4 @@
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.domain;
 
 public enum TaskPriority {
     URGENT("Urgent"), HIGH("High"), NORMAL("Normal"), LOW("Low");

@@ -1,8 +1,8 @@
 package com.example.application.taskmanagement.dto;
 
 import com.example.application.security.domain.UserId;
-import com.example.application.taskmanagement.TaskPriority;
-import com.example.application.taskmanagement.TaskStatus;
+import com.example.application.taskmanagement.domain.TaskPriority;
+import com.example.application.taskmanagement.domain.TaskStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;

@@ -11,5 +11,5 @@
  * directly to the application package.
  * </p>
  */
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.domain;
 // TODO Remove this package once you have added real features

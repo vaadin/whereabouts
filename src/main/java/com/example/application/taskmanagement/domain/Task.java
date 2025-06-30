@@ -1,4 +1,4 @@
-package com.example.application.taskmanagement;
+package com.example.application.taskmanagement.domain;
 
 import com.example.application.base.domain.AbstractEntity;
 import com.example.application.security.domain.UserId;
@@ -25,12 +25,13 @@ public class Task extends AbstractEntity<Long> {
     public static final String PRIORITY_SORT_PROPERTY = "priority";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id_seq")
+    @SequenceGenerator(name = "task_id_seq", sequenceName = "task_id_seq")
     @Column(name = "task_id")
     private Long id;
 
     @Version
-    @Column(name = "version")
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne

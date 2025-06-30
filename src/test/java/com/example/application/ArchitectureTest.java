@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 class ArchitectureTest {
@@ -17,7 +17,6 @@ class ArchitectureTest {
     private final JavaClasses importedClasses = new ClassFileImporter().importPackages(BASE_PACKAGE);
 
     // TODO Add your own rules and remove those that don't apply to your project
-    // TODO If there is no service package, these rules must change
 
     @Test
     void domain_model_should_not_depend_on_application_services() {
@@ -38,9 +37,9 @@ class ArchitectureTest {
     }
 
     @Test
-    void repositories_should_only_be_accessed_by_transactional_classes() {
-        classes().that().areAssignableTo(Repository.class).should().onlyBeAccessed().byClassesThat()
-                .areAnnotatedWith(Transactional.class).check(importedClasses);
+    void repositories_should_only_be_called_by_transactional_methods() {
+        methods().that().areDeclaredInClassesThat().areAssignableTo(Repository.class).should().onlyBeCalled()
+                .byMethodsThat(annotatedWith(Transactional.class)).check(importedClasses);
     }
 
     @Test
