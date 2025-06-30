@@ -2,12 +2,10 @@ package com.example.application.taskmanagement.service;
 
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
-import com.example.application.taskmanagement.dto.ProjectFormDataObject;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -43,9 +41,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public Long createProject(ProjectFormDataObject projectFormDataObject) {
-        var project = new Project(projectFormDataObject.name());
-        projectRepository.saveAndFlush(project);
-        return project.requireId();
+    public Project saveProject(Project project) {
+        return projectRepository.saveAndFlush(project);
     }
 }

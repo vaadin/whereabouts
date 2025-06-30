@@ -213,7 +213,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
     private void addProject() {
         var dialog = new AddProjectDialog(fdo -> {
-            var projectId = projectService.createProject(fdo);
+            var projectId = projectService.saveProject(fdo).requireId();
             TaskListView.showTasksForProjectId(projectId);
         });
         dialog.open();

@@ -1,6 +1,6 @@
 package com.example.application.taskmanagement.ui.component;
 
-import com.example.application.taskmanagement.dto.ProjectFormDataObject;
+import com.example.application.taskmanagement.domain.Project;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -8,10 +8,10 @@ import com.vaadin.flow.function.SerializableConsumer;
 
 public class AddProjectDialog extends Dialog {
 
-    private final SerializableConsumer<ProjectFormDataObject> onSaveCallback;
+    private final SerializableConsumer<Project> onSaveCallback;
     private final ProjectForm form;
 
-    public AddProjectDialog(SerializableConsumer<ProjectFormDataObject> onSaveCallback) {
+    public AddProjectDialog(SerializableConsumer<Project> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
         form = new ProjectForm();
