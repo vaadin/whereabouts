@@ -1,0 +1,86 @@
+/* This CSS is used by the development mode login view */
+
+.dev-login-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--lumo-shade-5pct);
+}
+
+.dev-login-view .dev-content-div {
+    display: flex;
+    box-shadow: var(--lumo-box-shadow-s);
+    border: 1px solid var(--lumo-shade-30pct);
+    border-radius: var(--lumo-border-radius-s);
+    background-color: var(--lumo-base-color);
+    overflow: clip;
+}
+
+.dev-login-view .dev-users {
+    display: flex;
+    padding: var(--lumo-space-m);
+    flex-direction: column;
+    background-color: var(--lumo-shade-5pct);
+    color: var(--lumo-secondary-text-color);
+    row-gap: var(--lumo-space-m);
+    border-left: 1px solid var(--lumo-shade-20pct);
+}
+
+.dev-login-view .dev-user-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--lumo-border-radius-m);
+    padding: var(--lumo-space-m);
+    background-color: var(--lumo-base-color);
+    border: 1px solid var(--lumo-shade-20pct);
+}
+
+.dev-login-view .dev-user-card > div {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--lumo-space-s);
+}
+
+.dev-login-view .dev-user-card h3 {
+    font-size: var(--lumo-font-size-m);
+}
+
+.dev-login-view .dev-user-card dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    margin: 0;
+    font-size: var(--lumo-font-size-s);
+}
+
+.dev-login-view .dev-user-card dd {
+    color: var(--lumo-body-text-color);
+}
+
+.dev-login-view .dev-mode-speech-bubble {
+    position: absolute;
+    background: var(--lumo-success-color);
+    color: var(--lumo-success-contrast-color);
+    border-radius: var(--lumo-border-radius-l);
+    box-shadow: var(--lumo-box-shadow-s);
+    padding: var(--lumo-space-m);
+    right: 10px;
+    bottom: 60px;
+    cursor: default;
+}
+
+.dev-login-view .dev-mode-speech-bubble:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 20px solid transparent;
+    border-top-color: var(--lumo-success-color);
+    border-bottom: 0;
+    border-right: 0;
+    margin-left: -10px;
+    margin-bottom: -20px;
+}
