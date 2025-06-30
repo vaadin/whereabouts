@@ -2,6 +2,7 @@ package com.example.application.taskmanagement.ui.view;
 
 import com.example.application.base.ui.component.Badges;
 import com.example.application.base.ui.component.EmptyStateWrapper;
+import com.example.application.base.ui.component.Notifications;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -240,6 +242,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
             taskService.saveTask(newTask);
             refresh();
+            Notifications.createNotification(new SvgIcon("icons/check.svg"), "Task created successfully", NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -248,6 +251,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
             taskService.saveTask(editedTask);
             refresh();
+            Notifications.createNotification(new SvgIcon("icons/check.svg"), "Task updated successfully", NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
@@ -256,6 +260,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
             taskService.deleteTask(task);
             refresh();
+            Notifications.createNotification(new SvgIcon("icons/delete_sweep.svg"), "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {
         });
         dialog.setConfirmButtonTheme("error primary");
