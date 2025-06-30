@@ -2,7 +2,7 @@ package com.example.application.taskmanagement.dto;
 
 import java.util.Objects;
 
-public record ProjectListItem(Long projectId, String projectName, long tasks) {
+public record ProjectListItem(Long projectId, String projectName, long tasks, long assignees) {
 
     @Override
     public boolean equals(Object o) {

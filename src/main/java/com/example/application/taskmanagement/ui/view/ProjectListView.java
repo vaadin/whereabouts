@@ -199,9 +199,9 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
         public ProjectListItemPanel(ProjectListItem projectListItem) {
             var name = new H4(projectListItem.projectName());
-            var tasks = new Span("No tasks"); // TODO Fix me
+            var tasks = new Span(projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
             tasks.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
-            var assignees = new Span("No assignees"); // TODO Fix me
+            var assignees = new Span(projectListItem.assignees() == 1 ? "1 assignee" : "%d assignees".formatted(projectListItem.assignees()));
             assignees.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
             var footer = new Div(tasks, assignees);
             footer.addClassNames(Display.FLEX, FlexDirection.ROW, JustifyContent.BETWEEN);
