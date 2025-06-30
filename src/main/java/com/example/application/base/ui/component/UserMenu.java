@@ -18,7 +18,8 @@ public class UserMenu extends Composite<MenuBar> {
         var avatar = new Avatar(user.getFullName(), user.getPictureUrl());
         avatar.addThemeVariants(AvatarVariant.LUMO_XSMALL);
         avatar.addClassNames(LumoUtility.Margin.Right.SMALL);
-        avatar.setColorIndex(5);
+        // Make the avatar a little nicer looking if there is no picture URL
+        avatar.setColorIndex(user.getPreferredUsername().hashCode() % 7);
 
         var userMenu = getContent();
         userMenu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
