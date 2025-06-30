@@ -51,7 +51,7 @@ public class Task extends AbstractEntity<Long> {
     private LocalTime dueTime;
 
     @Column(name = "time_zone", nullable = false)
-    private ZoneId timeZone; // TODO Check if an attribute converter is needed here
+    private ZoneId timeZone;
 
     @Column(name = "due_date_time")
     @Nullable
