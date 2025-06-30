@@ -1,8 +1,10 @@
 package com.example.application.taskmanagement.ui.view;
 
+import com.example.application.base.ui.ApplicationListenerUtil;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.ui.component.ViewHeader;
 import com.example.application.base.ui.view.MainLayout;
+import com.example.application.taskmanagement.domain.event.TaskEvent;
 import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
@@ -41,7 +43,6 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
     ProjectListView(AuthenticationContext authenticationContext, ProjectService projectService) {
         this.projectService = projectService;
-
         masterDetailLayout = new MasterDetailLayout();
         projectList = new ProjectList();
 
@@ -49,6 +50,10 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         addClassNames("project-list-view", Display.FLEX, FlexDirection.COLUMN);
         add(new ViewHeader(authenticationContext, "Tasks"));
         add(masterDetailLayout);
+
+        // Refresh the project panel whenever tasks are created, updated or deleted.
+        ApplicationListenerUtil.<TaskEvent>handleEventsWhileAttached(this, taskEvent ->
+                refreshProject(taskEvent.getTask().getProject().requireId()));
     }
 
     @Override
@@ -88,8 +93,22 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         masterDetailLayout.setDetail(new NoProjectSelection());
     }
 
-    void refresh() {
+    private void refresh() {
         projectList.grid.getDataProvider().refreshAll();
+    }
+
+    private void refreshProject(long projectId) {
+        projectService.findProjectListItemById(projectId).ifPresentOrElse(
+                projectList.grid.getDataProvider()::refreshItem,
+                projectList.grid.getDataProvider()::refreshAll);
+    }
+
+    private void addProject() {
+        var dialog = new AddProjectDialog(fdo -> {
+            var projectId = projectService.saveProject(fdo).requireId();
+            TaskListView.showTasksForProjectId(projectId);
+        });
+        dialog.open();
     }
 
     private class NoProjects extends Div {
@@ -209,14 +228,6 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             addClassNames(Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM, Padding.Vertical.MEDIUM);
             add(name, footer);
         }
-    }
-
-    private void addProject() {
-        var dialog = new AddProjectDialog(fdo -> {
-            var projectId = projectService.saveProject(fdo).requireId();
-            TaskListView.showTasksForProjectId(projectId);
-        });
-        dialog.open();
     }
 
     public static void showProjects() {
