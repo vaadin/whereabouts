@@ -6,7 +6,6 @@ import com.example.application.security.domain.UserId;
 import com.example.application.taskmanagement.domain.Task;
 import com.example.application.taskmanagement.domain.TaskPriority;
 import com.example.application.taskmanagement.domain.TaskStatus;
-import com.example.application.taskmanagement.dto.TaskFormDataObject;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
@@ -55,7 +54,7 @@ public class TaskForm extends Composite<FormLayout> {
         binder = new Binder<>();
         binder.forField(descriptionField)
                 .asRequired()
-                .withValidator(new StringLengthValidator("Description is too long", 0, TaskFormDataObject.MAX_DESCRIPTION_LENGTH))
+                .withValidator(new StringLengthValidator("Description is too long", 0, Task.DESCRIPTION_MAX_LENGTH))
                 .bind(Task::getDescription, Task::setDescription);
         binder.forField(dueDateField) // TODO Validator
                 .bind(Task::getDueDate, Task::setDueDate);
