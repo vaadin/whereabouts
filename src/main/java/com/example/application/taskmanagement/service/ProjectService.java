@@ -3,6 +3,7 @@ package com.example.application.taskmanagement.service;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
 import com.example.application.taskmanagement.dto.ProjectListItem;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectListItem> findProjectListItems(String searchTerm, Pageable pageable) {
+    public List<ProjectListItem> findProjectListItems(@Nullable String searchTerm, Pageable pageable) {
         if (searchTerm == null || searchTerm.isEmpty()) {
             return projectRepository.findAllProjectListItems(pageable);
         } else {
