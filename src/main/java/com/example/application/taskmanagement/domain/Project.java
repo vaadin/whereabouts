@@ -24,6 +24,13 @@ public class Project extends AbstractEntity<Long> {
     @Size(max = NAME_MAX_LENGTH)
     private String name = "";
 
+    public Project() {
+    }
+
+    public Project(String name) {
+        setName(name);
+    }
+
     @Override
     public @Nullable Long getId() {
         return id;

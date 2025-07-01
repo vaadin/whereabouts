@@ -33,7 +33,7 @@ public class ProjectService {
         if (searchTerm == null || searchTerm.isEmpty()) {
             return projectRepository.findAllProjectListItems(pageable);
         } else {
-            return projectRepository.findProjectListItemsBySearchTerm("%" + searchTerm + "%", pageable);
+            return projectRepository.findProjectListItemsBySearchTerm(searchTerm, pageable);
         }
     }
 

@@ -24,7 +24,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                 from Project p
                 left join Task t on t.project = p
                 left join t.assignees a
-                where lower(p.name) like lower(:searchTerm)
+                where lower(p.name) like concat('%', lower(:searchTerm), '%')
                 group by p.id, p.name
             """)
     List<ProjectListItem> findProjectListItemsBySearchTerm(String searchTerm, Pageable pageable);
