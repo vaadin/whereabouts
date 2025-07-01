@@ -4,6 +4,7 @@ import com.example.application.base.ui.component.Badges;
 import com.example.application.base.ui.component.EmptyStateWrapper;
 import com.example.application.base.ui.component.Notifications;
 import com.example.application.base.ui.component.SectionToolbar;
+import com.example.application.security.AppRoles;
 import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.Project;
@@ -32,6 +33,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
 import org.jspecify.annotations.Nullable;
@@ -54,11 +56,15 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private final EmptyStateWrapper gridWrapper;
     private final TaskList taskList;
     private final ZoneId timeZone;
+    private final boolean isAdmin;
 
     @Nullable
     private Project project;
 
-    TaskListView(CurrentUser currentUser, AppUserInfoLookup appUserInfoLookup, TaskService taskService) {
+    TaskListView(AuthenticationContext authenticationContext, CurrentUser currentUser,
+            AppUserInfoLookup appUserInfoLookup, TaskService taskService) {
+        isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
+
         this.appUserInfoLookup = appUserInfoLookup;
         this.taskService = taskService;
         this.timeZone = currentUser.require().getZoneId();
@@ -223,8 +229,10 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             var item = menuBar.addItem(new SvgIcon("icons/more_vert.svg"));
             var subMenu = item.getSubMenu();
             subMenu.addItem("Edit", event -> editTask(task));
-            var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task));
-            deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+            if (isAdmin) {
+                var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task));
+                deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+            }
             return menuBar;
         }
 

@@ -3,6 +3,7 @@ package com.example.application.taskmanagement.ui.view;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.ui.component.ViewHeader;
 import com.example.application.base.ui.view.MainLayout;
+import com.example.application.security.AppRoles;
 import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
@@ -38,9 +39,13 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
     private final MasterDetailLayout masterDetailLayout;
     private final ProjectService projectService;
     private final ProjectList projectList;
+    private final boolean isAdmin; // Only admins can add projects
 
     ProjectListView(AuthenticationContext authenticationContext, ProjectService projectService) {
         this.projectService = projectService;
+
+        isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
+
         masterDetailLayout = new MasterDetailLayout();
         projectList = new ProjectList();
 
@@ -110,6 +115,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             var instruction = new Span("Add a project to get started");
             var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
             addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            addProject.setVisible(isAdmin);
 
             setSizeFull();
             addClassNames(Display.FLEX, FlexDirection.COLUMN, AlignItems.CENTER, JustifyContent.CENTER);
@@ -143,6 +149,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
             var addProjectButton = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
             addProjectButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            addProjectButton.setVisible(isAdmin);
 
             var searchField = new TextField();
             searchField.setPlaceholder("Search");

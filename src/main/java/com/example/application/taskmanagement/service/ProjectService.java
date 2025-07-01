@@ -1,5 +1,6 @@
 package com.example.application.taskmanagement.service;
 
+import com.example.application.security.AppRoles;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
 import com.example.application.taskmanagement.dto.ProjectListItem;
@@ -42,6 +43,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
     public Project saveProject(Project project) {
         return projectRepository.saveAndFlush(project);
     }

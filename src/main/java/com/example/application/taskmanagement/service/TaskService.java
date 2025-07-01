@@ -1,5 +1,6 @@
 package com.example.application.taskmanagement.service;
 
+import com.example.application.security.AppRoles;
 import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.*;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,7 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
     public void deleteTask(Task task) {
         taskRepository.delete(task);
     }
