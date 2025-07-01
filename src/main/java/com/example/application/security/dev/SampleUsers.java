@@ -3,6 +3,7 @@ package com.example.application.security.dev;
 import com.example.application.security.AppRoles;
 import com.example.application.security.domain.UserId;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -90,6 +91,7 @@ public final class SampleUsers {
      */
     static DevUser ADMIN = DevUser.builder().preferredUsername(ADMIN_USERNAME).fullName("Alice Administrator")
             .userId(ADMIN_ID).password(SAMPLE_PASSWORD).email("alice@example.com").roles(AppRoles.ADMIN, AppRoles.USER)
+            .zoneInfo(ZoneId.of("EET"))
             .build();
 
     /**
@@ -116,7 +118,8 @@ public final class SampleUsers {
      * </p>
      */
     static final DevUser USER = DevUser.builder().preferredUsername(USER_USERNAME).fullName("Ursula User")
-            .userId(USER_ID).password(SAMPLE_PASSWORD).email("ursula@example.com").roles(AppRoles.USER).build();
+            .userId(USER_ID).password(SAMPLE_PASSWORD).email("ursula@example.com").roles(AppRoles.USER)
+            .zoneInfo(ZoneId.of("UTC")).build();
 
     /**
      * An unmodifiable list containing all sample users.

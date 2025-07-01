@@ -79,6 +79,13 @@ public class Task extends AbstractEntity<Long> {
         this.timeZone = requireNonNull(timeZone);
     }
 
+    public Task(Project project, ZoneId timeZone, String description, TaskStatus status, TaskPriority priority) {
+        this(project, timeZone);
+        setDescription(description);
+        setStatus(status);
+        setPriority(priority);
+    }
+
     @Override
     public @Nullable Long getId() {
         return id;
