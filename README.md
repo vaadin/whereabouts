@@ -1,8 +1,19 @@
-# Walking Skeleton README
+# Task Management CRUD Example
 
-- [ ] TODO Replace or update this README with instructions relevant to your application
+This application demonstrates how to build a Task Management application in Vaadin Flow. It showcases typical 
+features in a real business application, including:
+- Master-detail layouts
+- Handling selections through URL parameters
+- Data pagination
+- Filtering and sorting
+- Forms and validation
+- Dialogs
+- Custom icons and styles
 
-To start the application in development mode, import it into your IDE and run the `Application` class. 
+**Note!** This application uses Testcontainers in development mode. You must have Docker installed and running to
+run the application.
+
+To start the application in development mode, import it into your IDE and run the `TestApplication` class. 
 You can also start the application from the command line by running: 
 
 ```bash
@@ -14,10 +25,3 @@ To build the application in production mode, run:
 ```bash
 ./mvnw -Pproduction package
 ```
-
-## Getting Started
-
-The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will quickly familiarize you with your new
-Walking Skeleton implementation. You'll learn how to set up your development environment, understand the project 
-structure, and find resources to help you add muscles to your skeleton — transforming it into a fully-featured 
-application.
