@@ -1,5 +1,6 @@
 package com.example.application.security.controlcenter;
 
+import com.example.application.security.AppUserInfoLookup;
 import com.vaadin.controlcenter.starter.idm.IdentityManagementConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.cloud.CloudPlatform;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -110,5 +112,13 @@ public class ControlCenterSecurityConfig extends IdentityManagementConfiguration
                 ? new DefaultOidcUser(authorities, userRequest.getIdToken(), userInfo, userNameAttributeName)
                 : new DefaultOidcUser(authorities, userRequest.getIdToken(), userInfo);
         return new OidcUserAdapter(oidcUser);
+    }
+
+    @Bean
+    AppUserInfoLookup appUserInfoLookup(ClientRegistrationRepository clientRegistrationRepository) {
+        var registration = clientRegistrationRepository.findByRegistrationId("control-center");
+        return new KeycloakAppUserInfoLookup(
+                KeycloakAppUserInfoLookup.createCredentials(registration.getProviderDetails().getIssuerUri(),
+                        registration.getClientId(), registration.getClientSecret())); // TODO Caching?
     }
 }
