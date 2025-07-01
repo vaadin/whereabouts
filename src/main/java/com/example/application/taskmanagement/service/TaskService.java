@@ -1,10 +1,7 @@
 package com.example.application.taskmanagement.service;
 
 import com.example.application.security.CurrentUser;
-import com.example.application.taskmanagement.domain.Project;
-import com.example.application.taskmanagement.domain.ProjectRepository;
-import com.example.application.taskmanagement.domain.Task;
-import com.example.application.taskmanagement.domain.TaskRepository;
+import com.example.application.taskmanagement.domain.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,11 +50,11 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<Task> findTasks(Project project, @Nullable String searchTerm, Pageable pageable) {
-        if (searchTerm == null || searchTerm.isEmpty()) {
-            return taskRepository.findAllByProject(project, pageable).toList();
+    public List<Task> findTasks(Project project, @Nullable TaskFilter filter, Pageable pageable) {
+        if (filter == null || filter.isEmpty()) {
+            return taskRepository.findAll(TaskSpecifications.byProject(project), pageable).toList();
         } else {
-            return taskRepository.findAllByProjectAndDescriptionContainingIgnoreCase(project, searchTerm, pageable)
+            return taskRepository.findAll(TaskSpecifications.byProject(project).and(filter.toSpecification()), pageable)
                     .toList();
         }
     }

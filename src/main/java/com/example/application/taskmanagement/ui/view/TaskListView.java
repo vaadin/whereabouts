@@ -8,6 +8,9 @@ import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.Task;
+import com.example.application.taskmanagement.domain.TaskPriority;
+import com.example.application.taskmanagement.domain.TaskStatus;
+import com.example.application.taskmanagement.service.TaskFilter;
 import com.example.application.taskmanagement.service.TaskService;
 import com.example.application.taskmanagement.ui.component.AddTaskDialog;
 import com.example.application.taskmanagement.ui.component.EditTaskDialog;
@@ -118,23 +121,26 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
                 .withLocale(getLocale());
         private final Grid<Task> grid;
+        private final TaskFilter filter;
 
         TaskList() {
+            filter = new TaskFilter();
+
             var searchField = new TextField();
             searchField.setPlaceholder("Search");
-            searchField.setPrefixComponent(VaadinIcon.SEARCH.create()); // TODO Implement search field!
+            searchField.setPrefixComponent(new SvgIcon("icons/search.svg"));
             searchField.addClassNames(LumoUtility.Flex.GROW);
             searchField.setValueChangeMode(ValueChangeMode.LAZY);
-            searchField.addValueChangeListener(event -> refresh());
+            searchField.addValueChangeListener(event -> {
+                filter.setSearchTerm(event.getValue());
+                refresh();
+            });
 
-            // TODO Implement filtering!
-
-            //var viewMode = new Select<String>();
-            //viewMode.setItems("Grid View", "Card View"); // TODO Implement view mode!
+            var filterMenu = createFilterMenu();
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItemsPageable(pageable -> taskService.findTasks(project, searchField.getValue(), pageable));
+            grid.setItemsPageable(pageable -> taskService.findTasks(project, filter, pageable));
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
             grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
                     .setFlexGrow(0).setSortProperty(Task.STATUS_SORT_PROPERTY);
@@ -151,7 +157,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
-            add(new SectionToolbar(searchField), grid);
+            add(new SectionToolbar(searchField, filterMenu), grid);
         }
 
         private Component createStatusBadge(Task task) {
@@ -219,6 +225,36 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             subMenu.addItem("Edit", event -> editTask(task));
             var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task));
             deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+            return menuBar;
+        }
+
+        private Component createFilterMenu() {
+            var menuBar = new MenuBar();
+            menuBar.addThemeVariants(MenuBarVariant.LUMO_DROPDOWN_INDICATORS);
+            var item = menuBar.addItem(new SvgIcon("icons/filter_list.svg"), "Filters");
+            var subMenu = item.getSubMenu();
+
+            for (var status : TaskStatus.values()) {
+                subMenu.addItem(status.getDisplayName(), event -> {
+                    if (event.getSource().isChecked()) {
+                        filter.include(status);
+                    } else {
+                        filter.exclude(status);
+                    }
+                    refresh();
+                }).setCheckable(true);
+            }
+            subMenu.addSeparator();
+            for (var priority : TaskPriority.values()) {
+                subMenu.addItem(priority.getDisplayName(), event -> {
+                    if (event.getSource().isChecked()) {
+                        filter.include(priority);
+                    } else {
+                        filter.exclude(priority);
+                    }
+                    refresh();
+                }).setCheckable(true);
+            }
             return menuBar;
         }
     }
