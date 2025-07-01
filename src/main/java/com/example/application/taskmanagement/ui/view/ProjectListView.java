@@ -31,7 +31,7 @@ import org.springframework.data.domain.Sort;
 @ParentLayout(MainLayout.class)
 @Route(value = "projects", layout = MainLayout.class)
 @PageTitle("Tasks")
-@Menu(order = 0, icon = "icons/list_alt_check.svg", title = "Tasks") // TODO Fix icon
+@Menu(order = 0, icon = "icons/list_alt_check.svg", title = "Tasks")
 @PermitAll
 class ProjectListView extends Div implements RouterLayout, AfterNavigationObserver {
 
@@ -49,7 +49,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         add(new ViewHeader(authenticationContext, "Tasks"));
         add(masterDetailLayout);
 
-        // TODO Refresh the project panel whenever tasks are created, updated or deleted.
+        addListener(ProjectTasksChangedEvent.class, event -> refreshProject(event.getProjectId()));
     }
 
     @Override

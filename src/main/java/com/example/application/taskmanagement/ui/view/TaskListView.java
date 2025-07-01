@@ -11,8 +11,7 @@ import com.example.application.taskmanagement.domain.Task;
 import com.example.application.taskmanagement.service.TaskService;
 import com.example.application.taskmanagement.ui.component.AddTaskDialog;
 import com.example.application.taskmanagement.ui.component.EditTaskDialog;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -232,6 +231,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
             taskService.saveTask(newTask);
             refresh();
+            notifyProjectTasksChanged();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
@@ -241,6 +241,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void editTask(Task task) {
         var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
             refreshTask(taskService.saveTask(editedTask));
+            notifyProjectTasksChanged();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
@@ -251,6 +252,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
             taskService.deleteTask(task);
             refresh();
+            notifyProjectTasksChanged();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"),
                     "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {
@@ -270,6 +272,19 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
     private void refreshTask(Task task) {
         taskList.grid.getDataProvider().refreshItem(task);
+    }
+
+    private void notifyProjectTasksChanged() {
+        if (project == null) {
+            throw new IllegalStateException("Cannot notify: project is null");
+        }
+        var event = new ProjectTasksChangedEvent(this, project.requireId());
+        propagateEvent(this, event);
+    }
+
+    private static void propagateEvent(Component component, ComponentEvent<? extends Component> event) {
+        ComponentUtil.fireEvent(component, event);
+        component.getParent().ifPresent(parent -> propagateEvent(parent, event));
     }
 
     public static void showTasksForProjectId(Long projectId) {
