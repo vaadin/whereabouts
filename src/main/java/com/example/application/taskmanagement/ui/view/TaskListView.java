@@ -1,6 +1,5 @@
 package com.example.application.taskmanagement.ui.view;
 
-import com.example.application.base.ui.ApplicationListenerUtil;
 import com.example.application.base.ui.component.Badges;
 import com.example.application.base.ui.component.EmptyStateWrapper;
 import com.example.application.base.ui.component.Notifications;
@@ -9,8 +8,6 @@ import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.Task;
-import com.example.application.taskmanagement.domain.event.TaskEvent;
-import com.example.application.taskmanagement.domain.event.TaskUpdatedEvent;
 import com.example.application.taskmanagement.service.TaskService;
 import com.example.application.taskmanagement.ui.component.AddTaskDialog;
 import com.example.application.taskmanagement.ui.component.EditTaskDialog;
@@ -77,15 +74,6 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         setSizeFull();
         addClassNames("task-list-view", LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
         add(new SectionToolbar(title, addTaskButton), gridWrapper);
-
-        // Refresh the grid when any user creates, updates, or deletes a task.
-        ApplicationListenerUtil.<TaskEvent> handleEventsWhileAttached(this, taskEvent -> {
-            if (taskEvent instanceof TaskUpdatedEvent) {
-                refreshTask(taskEvent.getTask());
-            } else {
-                refresh();
-            }
-        });
     }
 
     @Override
@@ -243,6 +231,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
             taskService.saveTask(newTask);
+            refresh();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
@@ -251,7 +240,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
     private void editTask(Task task) {
         var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
-            taskService.saveTask(editedTask);
+            refreshTask(taskService.saveTask(editedTask));
             Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
@@ -261,6 +250,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private void deleteTask(Task task) {
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
             taskService.deleteTask(task);
+            refresh();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"),
                     "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {

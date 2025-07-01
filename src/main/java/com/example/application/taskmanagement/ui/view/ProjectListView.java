@@ -1,10 +1,8 @@
 package com.example.application.taskmanagement.ui.view;
 
-import com.example.application.base.ui.ApplicationListenerUtil;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.ui.component.ViewHeader;
 import com.example.application.base.ui.view.MainLayout;
-import com.example.application.taskmanagement.domain.event.TaskEvent;
 import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
@@ -51,9 +49,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         add(new ViewHeader(authenticationContext, "Tasks"));
         add(masterDetailLayout);
 
-        // Refresh the project panel whenever tasks are created, updated or deleted.
-        ApplicationListenerUtil.<TaskEvent> handleEventsWhileAttached(this,
-                taskEvent -> refreshProject(taskEvent.getTask().getProject().requireId()));
+        // TODO Refresh the project panel whenever tasks are created, updated or deleted.
     }
 
     @Override
