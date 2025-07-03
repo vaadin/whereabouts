@@ -21,6 +21,13 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * For this to work, the application's client account must:
+ * <ul>
+ * <li>Be a <strong>service account</strong></li>
+ * <li>Have the following service account roles: {@code view-users}, {@code query-users}</li>
+ * </ul>
+ */
 class KeycloakAppUserInfoLookup implements AppUserInfoLookup, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakAppUserInfoLookup.class);
@@ -30,7 +37,8 @@ class KeycloakAppUserInfoLookup implements AppUserInfoLookup, AutoCloseable {
 
     KeycloakAppUserInfoLookup(KeycloakCredentials credentials) {
         requireNonNull(credentials, "credentials must not be null");
-        log.info("Looking up users from serverUrl '{}' and realm '{}'", credentials.serverUrl, credentials.realm);
+        log.info("Looking up users from serverUrl '{}' and realm '{}' using clientId '{}'", credentials.serverUrl,
+                credentials.realm, credentials.clientId);
         keycloak = KeycloakBuilder.builder().serverUrl(credentials.serverUrl).realm(credentials.realm)
                 .grantType("client_credentials").clientId(credentials.clientId).clientSecret(credentials.clientSecret)
                 .build();
@@ -54,8 +62,15 @@ class KeycloakAppUserInfoLookup implements AppUserInfoLookup, AutoCloseable {
 
     @Override
     public List<AppUserInfo> findUsers(String searchTerm, int limit, int offset) {
-        var users = keycloak.realm(credentials.realm).users().search(searchTerm, limit, offset);
-        return users.stream().map(KeycloakAppUserInfo::new).collect(Collectors.toList());
+        log.debug("Looking up users from searchTerm: {} (limit: {}, offset: {})", searchTerm, limit, offset);
+        var users = keycloak.realm(credentials.realm).users().search(searchTerm, offset, limit);
+        try {
+            log.debug("Found {} users from Keycloak", users.size());
+            return users.stream().map(KeycloakAppUserInfo::new).collect(Collectors.toList());
+        } catch (Exception ex) {
+            log.error("Failed to lookup users from searchTerm: {}", searchTerm, ex);
+            throw new RuntimeException("Failed to retrieve users from Keycloak", ex);
+        }
     }
 
     @Override
