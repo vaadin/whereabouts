@@ -72,10 +72,14 @@ class TaskServiceTest {
     }
 
     private void saveTestTasks(Project project) {
-        taskRepository.save(new Task(project, ZoneId.systemDefault(), "First task", TaskStatus.PENDING, TaskPriority.LOW));
-        taskRepository.save(new Task(project, ZoneId.systemDefault(), "Second task", TaskStatus.IN_PROGRESS, TaskPriority.NORMAL));
-        taskRepository.save(new Task(project, ZoneId.systemDefault(), "Third task", TaskStatus.PAUSED, TaskPriority.HIGH));
-        taskRepository.save(new Task(project, ZoneId.systemDefault(), "Fourth todo", TaskStatus.DONE, TaskPriority.URGENT));
+        taskRepository
+                .save(new Task(project, ZoneId.systemDefault(), "First task", TaskStatus.PENDING, TaskPriority.LOW));
+        taskRepository.save(
+                new Task(project, ZoneId.systemDefault(), "Second task", TaskStatus.IN_PROGRESS, TaskPriority.NORMAL));
+        taskRepository
+                .save(new Task(project, ZoneId.systemDefault(), "Third task", TaskStatus.PAUSED, TaskPriority.HIGH));
+        taskRepository
+                .save(new Task(project, ZoneId.systemDefault(), "Fourth todo", TaskStatus.DONE, TaskPriority.URGENT));
     }
 
     @WithUserDetails(SampleUsers.USER_USERNAME)

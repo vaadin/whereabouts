@@ -91,8 +91,7 @@ public final class SampleUsers {
      */
     static DevUser ADMIN = DevUser.builder().preferredUsername(ADMIN_USERNAME).fullName("Alice Administrator")
             .userId(ADMIN_ID).password(SAMPLE_PASSWORD).email("alice@example.com").roles(AppRoles.ADMIN, AppRoles.USER)
-            .zoneInfo(ZoneId.of("EET"))
-            .build();
+            .zoneInfo(ZoneId.of("EET")).build();
 
     /**
      * The user ID for the regular sample user.
