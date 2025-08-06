@@ -12,7 +12,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <vaadin.version>24.8.1</vaadin.version>
+        <vaadin.version>25.0.0-alpha3</vaadin.version>
         <archunit.version>1.4.1</archunit.version>
         <keycloak.version>26.0.5</keycloak.version>
     </properties>
@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+        <version>3.5.4</version>
         <relativePath/>
     </parent>
 
@@ -29,7 +29,18 @@
             <id>vaadin-directory</id>
             <url>https://maven.vaadin.com/vaadin-addons</url>
         </repository>
+        <repository>
+            <id>vaadin-prereleases</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>vaadin-prereleases</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencyManagement>
         <dependencies>
