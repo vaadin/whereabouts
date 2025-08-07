@@ -4,6 +4,8 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.repository.Repository;
+import org.springframework.modulith.ApplicationModule;
+import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
@@ -15,8 +17,15 @@ class ArchitectureTest {
     static final String BASE_PACKAGE = "com.example.application";
 
     private final JavaClasses importedClasses = new ClassFileImporter().importPackages(BASE_PACKAGE);
+    private final ApplicationModules modules = ApplicationModules.of(Application.class);
 
     // TODO Add your own rules and remove those that don't apply to your project
+
+    @Test
+    void verify_spring_modulith_application_structure() {
+        modules.forEach(System.out::println);
+        modules.verify();
+    }
 
     @Test
     void domain_model_should_not_depend_on_application_services() {
