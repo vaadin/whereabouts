@@ -23,6 +23,7 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -42,6 +43,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
+import java.util.Objects;
 import java.util.Optional;
 
 @Route(value = "projects/:projectId", layout = ProjectListView.class)
@@ -146,7 +148,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItemsPageable(pageable -> taskService.findTasks(project, filter, pageable));
+            grid.setItemsPageable(pageable -> taskService.findTasks(project, filter, pageable)); // TODO project can be null. What to do about it?
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
             grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
                     .setFlexGrow(0).setSortProperty(Task.STATUS_SORT_PROPERTY);
@@ -159,7 +161,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
                     .setFlexGrow(0).setSortProperty(Task.PRIORITY_SORT_PROPERTY);
             grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
             grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
-                    .setWidth("100px").setFlexGrow(0);
+                    .setWidth("60px").setFlexGrow(0).setFrozenToEnd(true);
+            createContextMenu(grid.addContextMenu());
 
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
@@ -225,7 +228,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         private Component createActionMenu(Task task) {
             var menuBar = new MenuBar();
             menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE,
-                    MenuBarVariant.LUMO_END_ALIGNED);
+                    MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_SMALL);
             var item = menuBar.addItem(new SvgIcon("icons/more_vert.svg"));
             var subMenu = item.getSubMenu();
             subMenu.addItem("Edit", event -> editTask(task));
@@ -234,6 +237,17 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
                 deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
             }
             return menuBar;
+        }
+
+        private void createContextMenu(GridContextMenu<Task> contextMenu) {
+            contextMenu.addItem("Edit", event -> event.getItem().ifPresent(TaskListView.this::editTask));
+            if (isAdmin) {
+                var deleteItem = contextMenu.addItem("Delete",
+                        event -> event.getItem().ifPresent(TaskListView.this::deleteTask));
+                deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+            }
+            // Don't show the menu unless opened on a row
+            contextMenu.setDynamicContentHandler(Objects::nonNull);
         }
 
         private Component createFilterMenu() {
