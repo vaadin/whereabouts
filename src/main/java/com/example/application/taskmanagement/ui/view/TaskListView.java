@@ -210,7 +210,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
         private Component createStatusBadge(Task task) {
             return switch (task.getStatus()) {
             case PENDING -> Badges.createContrast(task.getStatus().getDisplayName());
-            case IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
+            case PLANNED, IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
             case PAUSED -> Badges.createError(task.getStatus().getDisplayName());
             case DONE -> Badges.createSuccess(task.getStatus().getDisplayName());
             };
