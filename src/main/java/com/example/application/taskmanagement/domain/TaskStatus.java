@@ -1,7 +1,7 @@
 package com.example.application.taskmanagement.domain;
 
 public enum TaskStatus {
-    PENDING("Pending"), IN_PROGRESS("In progress"), PAUSED("Paused"), DONE("Done");
+    PENDING("Pending"), PLANNED("Planned"), IN_PROGRESS("In progress"), PAUSED("Paused"), DONE("Done");
 
     private final String displayName;
 
