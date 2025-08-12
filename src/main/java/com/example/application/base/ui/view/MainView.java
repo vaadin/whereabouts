@@ -6,7 +6,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
 
@@ -19,8 +18,8 @@ public final class MainView extends Main {
 
     // TODO Replace with your own main view.
 
-    MainView(AuthenticationContext authenticationContext) {
-        add(new ViewHeader(authenticationContext, "Main"));
+    MainView() {
+        add(new ViewHeader("Main"));
         var instruction = new Div("Please select a view from the menu on the left");
         instruction.addClassNames(LumoUtility.Padding.MEDIUM);
         add(instruction);

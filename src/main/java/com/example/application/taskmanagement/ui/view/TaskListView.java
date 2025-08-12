@@ -19,6 +19,8 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.card.Card;
+import com.vaadin.flow.component.card.CardVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -30,7 +32,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
@@ -104,6 +108,9 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
     private class NoTasks extends Div {
 
+        // TODO Would be awesome if this could be used as the empty content of the grid, but then it would also show up
+        //  when the grid is empty because of a filter, not because there are no tasks.
+
         NoTasks() {
             var icon = new SvgIcon("icons/list_alt_check.svg");
             icon.setSize("60px");
@@ -130,6 +137,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
                 .withLocale(getLocale());
         private final Grid<Task> grid;
         private final TaskFilter filter;
+        private final Grid.Column<Task> cardColumn;
 
         TaskList() {
             filter = new TaskFilter();
@@ -161,12 +169,42 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
                     .setFlexGrow(0).setSortProperty(Task.PRIORITY_SORT_PROPERTY);
             grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
             grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
-                    .setWidth("60px").setFlexGrow(0).setFrozenToEnd(true);
+                    .setWidth("60px").setFlexGrow(0);
+            cardColumn = grid.addColumn(new ComponentRenderer<>(this::createTaskCard));
             createContextMenu(grid.addContextMenu());
+
+            // TODO What component should I use to create a card view? VirtualList (it lacks setItemsPageable)?
+            //  How do I sync the state between grid and the card view so that I can switch between them seamlessly
+            //  and keep the selection and scroll position?
 
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
             add(new SectionToolbar(searchField, filterMenu), grid);
+        }
+
+        @Override
+        protected void onAttach(AttachEvent attachEvent) {
+            var page = attachEvent.getUI().getPage();
+            var registration = page.addBrowserWindowResizeListener(event -> adjustVisibleGridColumns(event.getWidth()));
+            page.retrieveExtendedClientDetails(receiver -> {
+                var browserWidth = receiver.getBodyClientWidth();
+                adjustVisibleGridColumns(browserWidth);
+            });
+            addDetachListener(event -> {
+                registration.remove();
+                event.unregisterListener();
+            });
+        }
+
+        private void adjustVisibleGridColumns(int browserWidth) {
+            // TODO The problem here is that the width of the grid depends on what happens with the navbar and whether
+            //  the detail area is displayed as an overlay or not.
+            setCardColumnVisible(browserWidth < 1000);
+        }
+
+        private void setCardColumnVisible(boolean visible) {
+            cardColumn.setVisible(visible);
+            grid.getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!visible));
         }
 
         private Component createStatusBadge(Task task) {
@@ -239,12 +277,32 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             return menuBar;
         }
 
+        private Component createTaskCard(Task task) {
+            var card = new Card();
+            card.addThemeVariants(CardVariant.LUMO_OUTLINED);
+
+            var header = new Div(createStatusBadge(task), createPriorityBadge(task));
+            header.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.ROW, LumoUtility.Gap.SMALL);
+            card.setHeader(header);
+            card.setHeaderSuffix(createActionMenu(task));
+            card.add(task.getDescription());
+            var dueDateTime = task.getDueDateTimeInZone(timeZone);
+            if (dueDateTime != null) {
+                var dueDiv = new Div();
+                dueDiv.setText("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime)));
+                dueDiv.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL, LumoUtility.Padding.Top.MEDIUM);
+                card.add(dueDiv);
+            }
+            card.addToFooter(createAssignees(task));
+            return card;
+        }
+
         private void createContextMenu(GridContextMenu<Task> contextMenu) {
             contextMenu.addItem("Edit", event -> event.getItem().ifPresent(TaskListView.this::editTask));
             if (isAdmin) {
                 var deleteItem = contextMenu.addItem("Delete",
                         event -> event.getItem().ifPresent(TaskListView.this::deleteTask));
-                deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+                deleteItem.addClassName(LumoUtility.TextColor.ERROR);
             }
             // Don't show the menu unless opened on a row
             contextMenu.setDynamicContentHandler(Objects::nonNull);

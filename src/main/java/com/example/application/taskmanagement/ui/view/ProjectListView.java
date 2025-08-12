@@ -47,11 +47,12 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
 
         masterDetailLayout = new MasterDetailLayout();
+        masterDetailLayout.setDetailMinSize(300, Unit.PIXELS);
         projectList = new ProjectList();
 
         setSizeFull();
         addClassNames("project-list-view", Display.FLEX, FlexDirection.COLUMN);
-        add(new ViewHeader(authenticationContext, "Tasks"));
+        add(new ViewHeader("Tasks"));
         add(masterDetailLayout);
 
         addListener(ProjectTasksChangedEvent.class, event -> refreshProject(event.getProjectId()));
@@ -76,6 +77,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             event.getRouteParameters().getLong(TaskListView.PARAM_PROJECT_ID)
                     .flatMap(projectService::findProjectListItemById).ifPresentOrElse(this::select, this::deselectAll);
         } else {
+            // TODO Needs https://github.com/vaadin/web-components/issues/9797
             masterDetailLayout.setMaster(new NoProjects());
             masterDetailLayout.setMasterSize(null);
         }
