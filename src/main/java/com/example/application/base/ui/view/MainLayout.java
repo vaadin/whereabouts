@@ -1,6 +1,7 @@
 package com.example.application.base.ui.view;
 
 import com.example.application.base.ui.component.UserMenu;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
@@ -24,7 +25,7 @@ public final class MainLayout extends AppLayout {
     MainLayout(AuthenticationContext authenticationContext) {
         addClassName("main-layout");
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createHeader(), new Scroller(createSideNav()), new UserMenu(authenticationContext));
+        addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu(authenticationContext));
     }
 
     private Div createHeader() {
@@ -57,4 +58,9 @@ public final class MainLayout extends AppLayout {
         return item;
     }
 
+    private Component createUserMenu(AuthenticationContext authenticationContext) {
+        var userMenu = new UserMenu(authenticationContext);
+        userMenu.addClassName(Margin.Bottom.MEDIUM);
+        return userMenu;
+    }
 }
