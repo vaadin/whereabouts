@@ -55,10 +55,12 @@ public class TaskForm extends Composite<FormLayout> {
         binder.forField(descriptionField).asRequired()
                 .withValidator(new StringLengthValidator("Description is too long", 0, Task.DESCRIPTION_MAX_LENGTH))
                 .bind(Task::getDescription, Task::setDescription);
-        binder.forField(dueDateField) // TODO Validator
+        var dueDateFieldBinding = binder.forField(dueDateField)
+                .withValidator(date -> date != null || dueTimeField.isEmpty(), "Specify a due date")
                 .bind(Task::getDueDate, Task::setDueDate);
-        binder.forField(dueTimeField) // TODO Validator
+        binder.forField(dueTimeField)
                 .bind(Task::getDueTime, Task::setDueTime);
+        dueTimeField.addValueChangeListener(event -> dueDateFieldBinding.validate());
         binder.forField(statusField).asRequired().bind(Task::getStatus, Task::setStatus);
         binder.forField(priorityField).asRequired().bind(Task::getPriority, Task::setPriority);
         binder.forField(assigneesField).bind(Task::getAssignees, Task::setAssignees);
