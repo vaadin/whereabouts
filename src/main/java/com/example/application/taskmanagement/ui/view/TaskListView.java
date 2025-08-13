@@ -1,9 +1,6 @@
 package com.example.application.taskmanagement.ui.view;
 
-import com.example.application.base.ui.component.Badges;
-import com.example.application.base.ui.component.EmptyStateWrapper;
-import com.example.application.base.ui.component.Notifications;
-import com.example.application.base.ui.component.SectionToolbar;
+import com.example.application.base.ui.component.*;
 import com.example.application.security.AppRoles;
 import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
@@ -32,9 +29,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
@@ -59,7 +54,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     private final AppUserInfoLookup appUserInfoLookup;
     private final TaskService taskService;
     private final H2 title;
-    private final EmptyStateWrapper gridWrapper;
+    private final ConditionalComponent<Boolean> gridWrapper;
     private final TaskList taskList;
     private final ZoneId timeZone;
     private final boolean isAdmin;
@@ -82,8 +77,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
         taskList = new TaskList();
 
-        gridWrapper = new EmptyStateWrapper(new NoTasks(), taskList);
-        gridWrapper.setSizeFull();
+        gridWrapper = ConditionalComponent.createBinary(taskList, new NoTasks(), false);
 
         setSizeFull();
         addClassNames("task-list-view", LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
@@ -135,9 +129,10 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
                 .withLocale(getLocale());
         private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
                 .withLocale(getLocale());
-        private final Grid<Task> grid;
+        private final Grid<Task> wideGrid;
+        private final Grid<Task> narrowGrid;
+        private final ConditionalComponent<Component> grid;
         private final TaskFilter filter;
-        private final Grid.Column<Task> cardColumn;
 
         TaskList() {
             filter = new TaskFilter();
@@ -154,57 +149,39 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
             var filterMenu = createFilterMenu();
 
-            grid = new Grid<>();
-            grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItemsPageable(pageable -> taskService.findTasks(project, filter, pageable)); // TODO project can be null. What to do about it?
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-            grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
+            wideGrid = new Grid<>();
+            wideGrid.setSelectionMode(Grid.SelectionMode.NONE);
+            wideGrid.setItemsPageable(pageable -> taskService.findTasks(project, filter, pageable)); // TODO project can be null. What to do about it?
+            wideGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            wideGrid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
                     .setFlexGrow(0).setSortProperty(Task.STATUS_SORT_PROPERTY);
-            grid.addColumn(Task::getDescription).setHeader("Description").setFlexGrow(1)
+            wideGrid.addColumn(Task::getDescription).setHeader("Description").setFlexGrow(1)
                     .setSortProperty(Task.DESCRIPTION_SORT_PROPERTY);
-            grid.addColumn(new ComponentRenderer<>(this::createDueDate))
+            wideGrid.addColumn(new ComponentRenderer<>(this::createDueDate))
                     .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
                     .setWidth("200px").setFlexGrow(0).setSortProperty(Task.DUE_DATE_SORT_PROPERTY);
-            grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge)).setHeader("Priority").setWidth("150px")
+            wideGrid.addColumn(new ComponentRenderer<>(this::createPriorityBadge)).setHeader("Priority").setWidth("150px")
                     .setFlexGrow(0).setSortProperty(Task.PRIORITY_SORT_PROPERTY);
-            grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
-            grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
+            wideGrid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
+            wideGrid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
                     .setWidth("60px").setFlexGrow(0);
-            cardColumn = grid.addColumn(new ComponentRenderer<>(this::createTaskCard));
-            createContextMenu(grid.addContextMenu());
+            createContextMenu(wideGrid.addContextMenu());
 
-            // TODO What component should I use to create a card view? VirtualList (it lacks setItemsPageable)?
-            //  How do I sync the state between grid and the card view so that I can switch between them seamlessly
-            //  and keep the selection and scroll position?
+            narrowGrid = new Grid<>();
+            narrowGrid.setSelectionMode(Grid.SelectionMode.NONE);
+            narrowGrid.setDataProvider(wideGrid.getDataProvider());
+            narrowGrid.getLazyDataView().setItemCountUnknown();
+            narrowGrid.addColumn(new ComponentRenderer<>(this::createTaskCard));
+            createContextMenu(narrowGrid.addContextMenu());
+
+            grid = ConditionalComponent.createBistate(wideGrid, narrowGrid, wideGrid);
 
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
             add(new SectionToolbar(searchField, filterMenu), grid);
-        }
 
-        @Override
-        protected void onAttach(AttachEvent attachEvent) {
-            var page = attachEvent.getUI().getPage();
-            var registration = page.addBrowserWindowResizeListener(event -> adjustVisibleGridColumns(event.getWidth()));
-            page.retrieveExtendedClientDetails(receiver -> {
-                var browserWidth = receiver.getBodyClientWidth();
-                adjustVisibleGridColumns(browserWidth);
-            });
-            addDetachListener(event -> {
-                registration.remove();
-                event.unregisterListener();
-            });
-        }
-
-        private void adjustVisibleGridColumns(int browserWidth) {
-            // TODO The problem here is that the width of the grid depends on what happens with the navbar and whether
-            //  the detail area is displayed as an overlay or not.
-            setCardColumnVisible(browserWidth < 1000);
-        }
-
-        private void setCardColumnVisible(boolean visible) {
-            cardColumn.setVisible(visible);
-            grid.getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!visible));
+            var resizeObserver = new ResizeObserver(this);
+            ProgressiveConditionalComponentSwitcher.switchStateOnResize(grid, resizeObserver, ((width, height) -> width < 800 ? narrowGrid : wideGrid));
         }
 
         private Component createStatusBadge(Task task) {
@@ -382,12 +359,12 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             throw new IllegalStateException("Cannot refresh: project is null");
         }
         title.setText(project.getName());
-        gridWrapper.setEmpty(!taskService.hasTasks(project));
-        taskList.grid.getDataProvider().refreshAll();
+        gridWrapper.setState(taskService.hasTasks(project));
+        taskList.wideGrid.getDataProvider().refreshAll();
     }
 
     private void refreshTask(Task task) {
-        taskList.grid.getDataProvider().refreshItem(task);
+        taskList.wideGrid.getDataProvider().refreshItem(task);
     }
 
     private void notifyProjectTasksChanged() {
