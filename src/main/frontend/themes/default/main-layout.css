@@ -35,10 +35,10 @@ vaadin-app-layout.main-layout .app-name {
     background-color: var(--lumo-base-color);
 }
 
-.main-layout vaadin-menu-bar-button::part(label) {
+.main-layout .user-menu vaadin-menu-bar-button::part(label) {
     color: var(--dark-body-text-color);
 }
 
-.main-layout vaadin-menu-bar-button::part(label):hover {
+.main-layout .user-menu vaadin-menu-bar-button::part(label):hover {
     color: var(--dark-primary-contrast-color);
 }

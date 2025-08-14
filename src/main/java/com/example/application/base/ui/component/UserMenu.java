@@ -13,6 +13,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 public class UserMenu extends Composite<MenuBar> {
 
     public UserMenu(AuthenticationContext authenticationContext) {
+        addClassName("user-menu");
         var user = authenticationContext.getAuthenticatedUser(AppUserPrincipal.class).orElseThrow().getAppUser();
 
         var avatar = new Avatar(user.getFullName(), user.getPictureUrl());
