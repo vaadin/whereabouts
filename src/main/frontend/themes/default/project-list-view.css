@@ -1,3 +1,8 @@
 .project-list-view .project-list .section-toolbar {
     border-bottom: 1px solid var(--lumo-contrast-20pct);
 }
+
+.project-list-view .project-list {
+    --vaadin-card-background: none;
+    --vaadin-card-padding: var(--lumo-space-m) 0;
+}

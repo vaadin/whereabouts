@@ -14,6 +14,15 @@ vaadin-app-layout.main-layout .app-name {
     color: var(--dark-header-text-color);
 }
 
+vaadin-app-layout.main-layout:not([overlay]) vaadin-drawer-toggle {
+    display: none;
+}
+
+vaadin-drawer-toggle {
+    margin: 0;
+    width: auto;
+}
+
 .main-layout vaadin-side-nav {
     margin-top: var(--lumo-space-xs);
     --lumo-header-text-color: var(--dark-header-text-color);

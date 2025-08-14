@@ -1,23 +1,26 @@
 package com.example.application.taskmanagement.ui.view;
 
 import com.example.application.base.ui.component.SectionToolbar;
-import com.example.application.base.ui.component.ViewHeader;
 import com.example.application.base.ui.view.MainLayout;
 import com.example.application.security.AppRoles;
 import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
-import com.vaadin.flow.component.HasElement;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -31,12 +34,11 @@ import org.springframework.data.domain.Sort;
 
 @ParentLayout(MainLayout.class)
 @Route(value = "projects", layout = MainLayout.class)
-@PageTitle("Tasks")
-@Menu(order = 0, icon = "icons/list_alt_check.svg", title = "Tasks")
+@PageTitle("Projects")
+@Menu(order = 0, icon = "icons/folder_check_2.svg", title = "Projects")
 @PermitAll
-class ProjectListView extends Div implements RouterLayout, AfterNavigationObserver {
+class ProjectListView extends MasterDetailLayout implements AfterNavigationObserver {
 
-    private final MasterDetailLayout masterDetailLayout;
     private final ProjectService projectService;
     private final ProjectList projectList;
     private final boolean isAdmin; // Only admins can add projects
@@ -46,50 +48,25 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
 
         isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
 
-        masterDetailLayout = new MasterDetailLayout();
-        masterDetailLayout.setDetailMinSize(300, Unit.PIXELS);
         projectList = new ProjectList();
 
-        setSizeFull();
-        addClassNames("project-list-view", Display.FLEX, FlexDirection.COLUMN);
-        add(new ViewHeader("Tasks"));
-        add(masterDetailLayout);
+        // TODO Can the master take the full size when there is no detail, and a fixed size when there is a detail?
+        setMaster(projectList);
+        setDetailMinSize(300, Unit.PIXELS);
+        addBackdropClickListener(event -> projectList.grid.deselectAll());
+
+        addClassNames("project-list-view");
 
         addListener(ProjectTasksChangedEvent.class, event -> refreshProject(event.getProjectId()));
     }
 
     @Override
-    public void showRouterLayoutContent(HasElement content) {
-        masterDetailLayout.showRouterLayoutContent(content);
-    }
-
-    @Override
-    public void removeRouterLayoutContent(HasElement oldContent) {
-        masterDetailLayout.removeRouterLayoutContent(oldContent);
-    }
-
-    @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        if (projectService.hasProjects()) {
-            masterDetailLayout.setMaster(projectList);
-            masterDetailLayout.setMasterSize(300, Unit.PIXELS);
-            refresh();
-            event.getRouteParameters().getLong(TaskListView.PARAM_PROJECT_ID)
-                    .flatMap(projectService::findProjectListItemById).ifPresentOrElse(this::select, this::deselectAll);
-        } else {
-            // TODO Needs https://github.com/vaadin/web-components/issues/9797
-            masterDetailLayout.setMaster(new NoProjects());
-            masterDetailLayout.setMasterSize(null);
-        }
-    }
-
-    private void select(ProjectListItem project) {
-        projectList.grid.select(project);
-    }
-
-    private void deselectAll() {
-        projectList.grid.deselectAll();
-        masterDetailLayout.setDetail(new NoProjectSelection());
+        refresh();
+        event.getRouteParameters()
+                .getLong(TaskListView.PARAM_PROJECT_ID)
+                .flatMap(projectService::findProjectListItemById)
+                .ifPresentOrElse(projectList.grid::select, projectList.grid::deselectAll);
     }
 
     private void refresh() {
@@ -101,6 +78,10 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
                 projectList.grid.getDataProvider()::refreshItem, projectList.grid.getDataProvider()::refreshAll);
     }
 
+    private void clearSearchCriteria() {
+        projectList.searchField.clear();
+    }
+
     private void addProject() {
         var dialog = new AddProjectDialog(fdo -> {
             var projectId = projectService.saveProject(fdo).requireId();
@@ -109,24 +90,11 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         dialog.open();
     }
 
-    private class NoProjects extends Div {
-        NoProjects() {
-            var icon = new SvgIcon("icons/list_alt_check.svg");
-            icon.setSize("60px");
-            var title = new H4("No projects yet");
-            var instruction = new Span("Add a project to get started");
-            var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
-            addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-            addProject.setVisible(isAdmin);
-
-            setSizeFull();
-            addClassNames(Display.FLEX, FlexDirection.COLUMN, AlignItems.CENTER, JustifyContent.CENTER);
-            var centerDiv = new Div(icon, title, instruction, addProject);
-            centerDiv.addClassNames(Display.FLEX, FlexDirection.COLUMN, AlignItems.CENTER, Gap.SMALL);
-            add(centerDiv);
-        }
+    public static void showProjects() {
+        UI.getCurrent().navigate(ProjectListView.class);
     }
 
+    // TODO Requires https://github.com/vaadin/web-components/issues/9797
     private static class NoProjectSelection extends Div {
         NoProjectSelection() {
             var icon = new SvgIcon("icons/list_alt_check.svg");
@@ -145,6 +113,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
     private class ProjectList extends Section {
 
         private final Grid<ProjectListItem> grid;
+        private final TextField searchField;
 
         ProjectList() {
             var title = new H3("Projects");
@@ -153,7 +122,7 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             addProjectButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             addProjectButton.setVisible(isAdmin);
 
-            var searchField = new TextField();
+            searchField = new TextField();
             searchField.setPlaceholder("Search");
             searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
             searchField.addClassNames(Flex.GROW);
@@ -171,16 +140,56 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
             grid.setItemsPageable(pageable -> projectService.findProjectListItems(searchField.getValue(),
                     PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())));
-            grid.addColumn(new ComponentRenderer<>(ProjectListItemPanel::new));
+            grid.addColumn(new ComponentRenderer<>(this::createProjectCard));
             grid.setSizeFull();
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
             grid.addSelectionListener(event -> event.getFirstSelectedItem().map(ProjectListItem::projectId)
                     .ifPresentOrElse(TaskListView::showTasksForProjectId, ProjectListView::showProjects));
+            grid.setEmptyStateComponent(new ProjectListEmptyComponent());
 
             setSizeFull();
             addClassNames("project-list", Display.FLEX, FlexDirection.COLUMN);
-            var toolbar = new SectionToolbar(title, addProjectButton).withRow(searchField).withRow(sortField);
+            var toolbar = new SectionToolbar(SectionToolbar.group(new DrawerToggle(), title), addProjectButton).withRow(searchField).withRow(sortField);
             add(toolbar, grid);
+        }
+
+        private Component createProjectCard(ProjectListItem projectListItem) {
+            var card = new Card();
+            card.setTitle(projectListItem.projectName());
+
+            var tasks = new Span(
+                    projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
+            tasks.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
+
+            var assignees = new Span(projectListItem.assignees() == 1
+                    ? "1 assignee"
+                    : "%d assignees".formatted(projectListItem.assignees()));
+            assignees.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
+
+            card.addToFooter(tasks, assignees);
+            return card;
+        }
+    }
+
+    private class ProjectListEmptyComponent extends VerticalLayout {
+        ProjectListEmptyComponent() {
+            var icon = new SvgIcon("icons/folder_check_2.svg");
+            icon.setSize("60px");
+            var title = new H4("No projects found");
+            var instruction = new Span("Change the search criteria or add a project");
+
+            var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
+            addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            addProject.setVisible(isAdmin);
+
+            var clearSearchCriteria = new Button("Clear Search Criteria", VaadinIcon.ERASER.create(), event -> clearSearchCriteria());
+            clearSearchCriteria.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+            add(icon, title, instruction, new HorizontalLayout(addProject, clearSearchCriteria));
+
+            setSizeFull();
+            setAlignItems(Alignment.CENTER);
+            setJustifyContentMode(JustifyContentMode.CENTER);
         }
     }
 
@@ -205,28 +214,5 @@ class ProjectListView extends Div implements RouterLayout, AfterNavigationObserv
         Sort getSort() {
             return sort;
         }
-    }
-
-    private static class ProjectListItemPanel extends Div {
-
-        public ProjectListItemPanel(ProjectListItem projectListItem) {
-            var name = new H4(projectListItem.projectName());
-            var tasks = new Span(
-                    projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
-            tasks.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
-            var assignees = new Span(projectListItem.assignees() == 1
-                    ? "1 assignee"
-                    : "%d assignees".formatted(projectListItem.assignees()));
-            assignees.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
-            var footer = new Div(tasks, assignees);
-            footer.addClassNames(Display.FLEX, FlexDirection.ROW, JustifyContent.BETWEEN);
-
-            addClassNames(Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM, Padding.Vertical.MEDIUM);
-            add(name, footer);
-        }
-    }
-
-    public static void showProjects() {
-        UI.getCurrent().navigate(ProjectListView.class);
     }
 }
