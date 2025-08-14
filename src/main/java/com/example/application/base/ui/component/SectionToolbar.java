@@ -22,4 +22,10 @@ public final class SectionToolbar extends Composite<Header> {
         addRow(components);
         return this;
     }
+
+    public static Component group(Component... components) {
+        var group = new Div(components);
+        group.addClassNames("section-toolbar-group");
+        return group;
+    }
 }

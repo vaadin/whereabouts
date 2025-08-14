@@ -14,3 +14,9 @@
     padding-left: var(--lumo-space-m);
     padding-right: var(--lumo-space-m);
 }
+
+.section-toolbar .section-toolbar-group {
+    display: flex;
+    align-items: center;
+    column-gap: var(--lumo-space-xs);
+}
