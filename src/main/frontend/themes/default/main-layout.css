@@ -40,8 +40,10 @@ vaadin-drawer-toggle {
 .main-layout vaadin-master-detail-layout::part(detail) {
     z-index: 1;
     box-shadow: var(--lumo-box-shadow-xs);
-    border-top-left-radius: var(--lumo-border-radius-m);
-    background-color: var(--lumo-base-color);
+    border: none;
+    border-top-left-radius: var(--lumo-border-radius-l);
+    overflow: hidden;
+    margin-top: var(--lumo-space-s);
 }
 
 .main-layout .user-menu vaadin-menu-bar-button::part(label) {
