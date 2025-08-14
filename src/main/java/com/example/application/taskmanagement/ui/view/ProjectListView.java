@@ -50,8 +50,8 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
         projectList = new ProjectList();
 
-        // TODO Can the master take the full size when there is no detail, and a fixed size when there is a detail?
         setMaster(projectList);
+        setMasterSize(400, Unit.PIXELS);
         setDetailMinSize(300, Unit.PIXELS);
         addBackdropClickListener(event -> projectList.grid.deselectAll());
 

@@ -6,3 +6,7 @@
     --vaadin-card-background: none;
     --vaadin-card-padding: var(--lumo-space-m) 0;
 }
+
+vaadin-master-detail-layout.project-list-view:not([has-detail])::part(master) {
+    flex-grow: 1;
+}
