@@ -78,7 +78,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
                 projectList.grid.getDataProvider()::refreshItem, projectList.grid.getDataProvider()::refreshAll);
     }
 
-    private void clearSearchCriteria() {
+    private void showAll() {
         projectList.searchField.clear();
     }
 
@@ -182,10 +182,10 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
             addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             addProject.setVisible(isAdmin);
 
-            var clearSearchCriteria = new Button("Clear Search Criteria", VaadinIcon.ERASER.create(), event -> clearSearchCriteria());
-            clearSearchCriteria.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            var showAll = new Button("Show All", new SvgIcon("icons/filter_none.svg"), event -> showAll());
+            showAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-            add(icon, title, instruction, new HorizontalLayout(addProject, clearSearchCriteria));
+            add(icon, title, instruction, new HorizontalLayout(addProject, showAll));
 
             setSizeFull();
             setAlignItems(Alignment.CENTER);
