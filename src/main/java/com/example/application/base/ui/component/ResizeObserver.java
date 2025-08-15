@@ -13,13 +13,15 @@ public class ResizeObserver implements Serializable {
     private final List<SerializableConsumer<ResizeEvent>> listeners = new ArrayList<>();
 
     private final HasElement component;
+    private final String elementPropertyName;
     private int width = -1;
     private int height = -1;
 
     public ResizeObserver(HasElement component) {
         this.component = component;
+        this.elementPropertyName = "vaadinFlowResizeObserver" +  (int)(Math.random() * 10000);
         component.getElement().addAttachListener(event -> {
-            // TODO Need a unique name instead of vaadinFlowResizeObserver
+            // ResizeObserver will automatically disconnect when the element is removed from the DOM
             event.getSource().executeJs("""
                     const resizeObserver = new ResizeObserver((entries) => {
                         const rect = entries.at(0).contentRect;
@@ -29,17 +31,8 @@ public class ResizeObserver implements Serializable {
                         $0.dispatchEvent(event);
                     });
                     resizeObserver.observe($0);
-                    $0.vaadinFlowResizeObserver = resizeObserver;
-                    """, event.getSource());
-        });
-        component.getElement().addDetachListener(event -> {
-            event.getSource().executeJs("""
-                    const resizeObserver = $0.vaadinFlowResizeObserver;
-                    if (resizeObserver) {
-                        resizeObserver.disconnect();
-                        delete $0.vaadinFlowResizeObserver;
-                    }
-                    """, event.getSource());
+                    $0[$1] = resizeObserver;
+                    """, event.getSource(), elementPropertyName);
         });
         var listenerRegistration = component.getElement().addEventListener("content-resize", event -> {
             this.width = (int) event.getEventData().getNumber("event.detail.w");
