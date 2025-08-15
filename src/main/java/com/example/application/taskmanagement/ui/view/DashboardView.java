@@ -8,7 +8,7 @@ import jakarta.annotation.security.PermitAll;
 
 @Route("")
 @PageTitle("Dashboard")
-@Menu(icon = "icons/speed.svg", title = "Dashboard")
+@Menu(order = 0, icon = "icons/speed.svg", title = "Dashboard")
 @PermitAll
 public class DashboardView extends Main {
     // TODO Implement DashboardView

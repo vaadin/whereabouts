@@ -35,7 +35,7 @@ import org.springframework.data.domain.Sort;
 @ParentLayout(MainLayout.class)
 @Route(value = "projects", layout = MainLayout.class)
 @PageTitle("Projects")
-@Menu(order = 0, icon = "icons/folder_check_2.svg", title = "Projects")
+@Menu(order = 10, icon = "icons/folder_check_2.svg", title = "Projects")
 @PermitAll
 class ProjectListView extends MasterDetailLayout implements AfterNavigationObserver {
 
@@ -52,7 +52,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
         setMaster(projectList);
         setMasterSize(400, Unit.PIXELS);
-        setDetailMinSize(300, Unit.PIXELS);
+        setDetailMinSize(400, Unit.PIXELS);
         addBackdropClickListener(event -> projectList.grid.deselectAll());
 
         addClassNames("project-list-view");
