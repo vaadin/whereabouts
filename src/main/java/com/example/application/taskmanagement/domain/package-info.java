@@ -11,7 +11,6 @@
  * directly to the application package.
  * </p>
  */
-@NamedInterface
 package com.example.application.taskmanagement.domain;
 // TODO Remove this package once you have added real features
 
