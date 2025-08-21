@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
  * </p>
  * <p>
  * Usage examples (assumes {@code currentUser} has been injected):
- *
+ * <p>
  * <!-- spotless:off -->
  * <pre>
  * {@code
@@ -55,8 +55,7 @@ public class CurrentUser {
      * {@link org.springframework.security.core.context.SecurityContextHolder}.
      * </p>
      *
-     * @param securityContextHolderStrategy
-     *            the strategy used to fetch the security context (never {@code null}).
+     * @param securityContextHolderStrategy the strategy used to fetch the security context (never {@code null}).
      */
     CurrentUser(SecurityContextHolderStrategy securityContextHolderStrategy) {
         this.securityContextHolderStrategy = requireNonNull(securityContextHolderStrategy);
@@ -74,8 +73,8 @@ public class CurrentUser {
      * </p>
      *
      * @return an {@code Optional} containing the current user if authenticated and accessible, or an empty
-     *         {@code Optional} if there is no authenticated user or the principal doesn't implement
-     *         {@link AppUserPrincipal}
+     * {@code Optional} if there is no authenticated user or the principal doesn't implement
+     * {@link AppUserPrincipal}
      * @see #require() For cases where authentication is required
      */
     public Optional<AppUserInfo> get() {
@@ -94,8 +93,8 @@ public class CurrentUser {
      * </p>
      *
      * @return an {@code Optional} containing the current principal if authenticated and accessible, or an empty
-     *         {@code Optional} if there is no authenticated user or the principal doesn't implement
-     *         {@link AppUserPrincipal}
+     * {@code Optional} if there is no authenticated user or the principal doesn't implement
+     * {@link AppUserPrincipal}
      * @see #requirePrincipal() For cases where authentication is required
      */
     public Optional<AppUserPrincipal> getPrincipal() {
@@ -106,8 +105,7 @@ public class CurrentUser {
     /**
      * Extracts the principal from the provided authentication object.
      *
-     * @param authentication
-     *            the authentication object from which to extract the principal, may be {@code null}
+     * @param authentication the authentication object from which to extract the principal, may be {@code null}
      * @return the principal if available, or {@code null} if it cannot be extracted
      */
     private @Nullable AppUserPrincipal getPrincipalFromAuthentication(@Nullable Authentication authentication) {
@@ -135,9 +133,8 @@ public class CurrentUser {
      * </p>
      *
      * @return the currently authenticated user (never {@code null})
-     * @throws AuthenticationCredentialsNotFoundException
-     *             if there is no authenticated user, or the authenticated principal doesn't implement
-     *             {@link AppUserPrincipal}
+     * @throws AuthenticationCredentialsNotFoundException if there is no authenticated user, or the authenticated principal doesn't implement
+     *                                                    {@link AppUserPrincipal}
      */
     public AppUserInfo require() {
         return get().orElseThrow(() -> new AuthenticationCredentialsNotFoundException("No current user"));
@@ -151,9 +148,8 @@ public class CurrentUser {
      * </p>
      *
      * @return the currently authenticated principal (never {@code null})
-     * @throws AuthenticationCredentialsNotFoundException
-     *             if there is no authenticated user, or the authenticated principal doesn't implement
-     *             {@link AppUserPrincipal}
+     * @throws AuthenticationCredentialsNotFoundException if there is no authenticated user, or the authenticated principal doesn't implement
+     *                                                    {@link AppUserPrincipal}
      */
     public AppUserPrincipal requirePrincipal() {
         return getPrincipal().orElseThrow(() -> new AuthenticationCredentialsNotFoundException("No current user"));

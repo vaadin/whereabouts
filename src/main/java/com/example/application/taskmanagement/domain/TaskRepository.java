@@ -12,5 +12,5 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     Slice<Task> findAllByProject(Project project, Pageable pageable);
 
     Slice<Task> findAllByProjectAndDescriptionContainingIgnoreCase(Project project, String description,
-            Pageable pageable);
+                                                                   Pageable pageable);
 }

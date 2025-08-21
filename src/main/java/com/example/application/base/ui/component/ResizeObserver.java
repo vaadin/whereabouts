@@ -19,7 +19,7 @@ public class ResizeObserver implements Serializable {
 
     public ResizeObserver(HasElement component) {
         this.component = component;
-        this.elementPropertyName = "vaadinFlowResizeObserver" +  (int)(Math.random() * 10000);
+        this.elementPropertyName = "vaadinFlowResizeObserver" + (int) (Math.random() * 10000);
         component.getElement().addAttachListener(event -> {
             // ResizeObserver will automatically disconnect when the element is removed from the DOM
             event.getSource().executeJs("""

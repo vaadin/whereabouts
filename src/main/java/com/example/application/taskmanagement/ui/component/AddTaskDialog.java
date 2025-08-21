@@ -14,7 +14,7 @@ public class AddTaskDialog extends Dialog {
     private final TaskForm form;
 
     public AddTaskDialog(AppUserInfoLookup appUserInfoLookup, SerializableSupplier<Task> formDataObjectFactory,
-            SerializableConsumer<Task> onSaveCallback) {
+                         SerializableConsumer<Task> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
         form = new TaskForm(appUserInfoLookup, formDataObjectFactory.get());

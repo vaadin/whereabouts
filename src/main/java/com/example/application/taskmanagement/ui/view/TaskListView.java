@@ -1,6 +1,9 @@
 package com.example.application.taskmanagement.ui.view;
 
-import com.example.application.base.ui.component.*;
+import com.example.application.base.ui.component.Badges;
+import com.example.application.base.ui.component.Notifications;
+import com.example.application.base.ui.component.ResizeObserver;
+import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.security.AppRoles;
 import com.example.application.security.AppUserInfoLookup;
 import com.example.application.security.CurrentUser;
@@ -12,7 +15,10 @@ import com.example.application.taskmanagement.service.TaskFilter;
 import com.example.application.taskmanagement.service.TaskService;
 import com.example.application.taskmanagement.ui.component.AddTaskDialog;
 import com.example.application.taskmanagement.ui.component.EditTaskDialog;
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

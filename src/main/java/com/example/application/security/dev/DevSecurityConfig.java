@@ -45,7 +45,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @EnableWebSecurity
 @Configuration
-@Import({ VaadinAwareSecurityContextHolderStrategyConfiguration.class })
+@Import({VaadinAwareSecurityContextHolderStrategyConfiguration.class})
 @ConditionalOnMissingBean(ControlCenterSecurityConfig.class)
 class DevSecurityConfig {
 

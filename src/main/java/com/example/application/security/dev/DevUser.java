@@ -130,7 +130,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
      * </p>
      * <p>
      * Example usage:
-     * 
+     *
      * <pre>
      * {@code
      * DevUser user = DevUser.builder().preferredUsername("john.doe").fullName("John Doe").password("password123")
@@ -158,8 +158,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's ID. If left unset, a random UUID is generated when the user is built.
          *
-         * @param userId
-         *            the user ID (never {@code null})
+         * @param userId the user ID (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder userId(UserId userId) {
@@ -170,8 +169,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's preferred username.
          *
-         * @param preferredUsername
-         *            the preferred username (never {@code null})
+         * @param preferredUsername the preferred username (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder preferredUsername(String preferredUsername) {
@@ -182,8 +180,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's full name. If left unset, the preferred username will be used.
          *
-         * @param fullName
-         *            the full name
+         * @param fullName the full name
          * @return this builder for method chaining
          */
         public DevUserBuilder fullName(@Nullable String fullName) {
@@ -194,8 +191,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's email address.
          *
-         * @param email
-         *            the email address.
+         * @param email the email address.
          * @return this builder for method chaining.
          */
         public DevUserBuilder email(@Nullable String email) {
@@ -206,8 +202,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's profile URL.
          *
-         * @param profileUrl
-         *            the profile URL
+         * @param profileUrl the profile URL
          * @return this builder for method chaining
          */
         public DevUserBuilder profileUrl(@Nullable String profileUrl) {
@@ -218,8 +213,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's profile picture URL.
          *
-         * @param pictureUrl
-         *            the picture URL
+         * @param pictureUrl the picture URL
          * @return this builder for method chaining
          */
         public DevUserBuilder pictureUrl(@Nullable String pictureUrl) {
@@ -230,8 +224,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's time zone.
          *
-         * @param zoneInfo
-         *            the time zone (never {@code null})
+         * @param zoneInfo the time zone (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder zoneInfo(ZoneId zoneInfo) {
@@ -242,8 +235,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's locale.
          *
-         * @param locale
-         *            the locale (never {@code null})
+         * @param locale the locale (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder locale(Locale locale) {
@@ -257,8 +249,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
          * For example, the role "ADMIN" will become the authority "ROLE_ADMIN".
          * </p>
          *
-         * @param roles
-         *            the roles to assign to the user
+         * @param roles the roles to assign to the user
          * @return this builder for method chaining
          */
         public DevUserBuilder roles(String... roles) {
@@ -272,8 +263,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's authorities directly.
          *
-         * @param authorities
-         *            the authority strings
+         * @param authorities the authority strings
          * @return this builder for method chaining
          */
         public DevUserBuilder authorities(String... authorities) {
@@ -283,8 +273,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
         /**
          * Sets the user's authorities directly.
          *
-         * @param authorities
-         *            the authority objects (never {@code null})
+         * @param authorities the authority objects (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder authorities(Collection<? extends GrantedAuthority> authorities) {
@@ -298,8 +287,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
          * The password will be encoded when the user is built.
          * </p>
          *
-         * @param password
-         *            the raw password (never {@code null})
+         * @param password the raw password (never {@code null})
          * @return this builder for method chaining
          */
         public DevUserBuilder password(String password) {
@@ -311,8 +299,7 @@ final class DevUser implements AppUserPrincipal, UserDetails {
          * Builds the development user with the properties set on this builder.
          *
          * @return a new development user
-         * @throws IllegalStateException
-         *             if the preferred username or password has not been set
+         * @throws IllegalStateException if the preferred username or password has not been set
          */
         public DevUser build() {
             if (preferredUsername == null) {

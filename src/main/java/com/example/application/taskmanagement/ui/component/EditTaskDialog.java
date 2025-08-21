@@ -17,7 +17,7 @@ public class EditTaskDialog extends Dialog {
     private final TaskForm form;
 
     public EditTaskDialog(AppUserInfoLookup appUserInfoLookup, Task formDataObject,
-            SerializableConsumer<Task> onSaveCallback) {
+                          SerializableConsumer<Task> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
         form = new TaskForm(appUserInfoLookup, formDataObject);

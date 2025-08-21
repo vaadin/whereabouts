@@ -49,11 +49,9 @@ public final class UserId implements Serializable {
      * encapsulation of the user ID value.
      * </p>
      *
-     * @param userId
-     *            the user ID string (never {@code null})
+     * @param userId the user ID string (never {@code null})
      * @return a new {@code UserId} instance
-     * @throws IllegalArgumentException
-     *             if the user ID is invalid
+     * @throws IllegalArgumentException if the user ID is invalid
      */
     public static UserId of(String userId) {
         return new UserId(userId);

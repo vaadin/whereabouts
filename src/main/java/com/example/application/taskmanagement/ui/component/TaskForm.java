@@ -73,7 +73,7 @@ public class TaskForm extends Composite<FormLayout> {
         assigneesField.setItemLabelGenerator(
                 userId -> appUserInfoLookup.findUserInfo(userId).map(AppUserInfo::getFullName).orElse("N/A"));
         assigneesField.setItems(query -> query.getFilter().map(searchTerm -> appUserInfoLookup
-                .findUsers(searchTerm, query.getLimit(), query.getOffset()).stream().map(AppUserInfo::getUserId))
+                        .findUsers(searchTerm, query.getLimit(), query.getOffset()).stream().map(AppUserInfo::getUserId))
                 .orElse(Stream.empty()));
         return assigneesField;
     }

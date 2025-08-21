@@ -15,4 +15,3 @@
 package com.example.application.taskmanagement.domain;
 // TODO Remove this package once you have added real features
 
-import org.springframework.modulith.NamedInterface;

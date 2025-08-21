@@ -4,7 +4,6 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.repository.Repository;
-import org.springframework.modulith.ApplicationModule;
 import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.transaction.annotation.Transactional;
 

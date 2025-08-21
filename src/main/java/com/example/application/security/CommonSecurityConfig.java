@@ -70,8 +70,7 @@ class CommonSecurityConfig {
      * mandate authentication. It expects all authenticated principals to implement {@link AppUserPrincipal}.
      * </p>
      *
-     * @param securityContextHolderStrategy
-     *            the strategy for accessing the security context
+     * @param securityContextHolderStrategy the strategy for accessing the security context
      * @return a {@link CurrentUser} service for accessing current user information
      * @see AppUserPrincipal The principal interface that all authenticated users must implement
      * @see CurrentUser The service class for accessing current user information

@@ -33,8 +33,7 @@ final class OidcUserAdapter implements OidcUser, AppUserPrincipal {
     /**
      * Creates a new adapter for the specified OIDC user.
      *
-     * @param oidcUser
-     *            the OIDC user to adapt (never {@code null})
+     * @param oidcUser the OIDC user to adapt (never {@code null})
      */
     public OidcUserAdapter(OidcUser oidcUser) {
         this.delegate = requireNonNull(oidcUser);
@@ -108,8 +107,7 @@ final class OidcUserAdapter implements OidcUser, AppUserPrincipal {
      * </ul>
      * </p>
      *
-     * @param zoneInfo
-     *            the timezone identifier string, may be {@code null}
+     * @param zoneInfo the timezone identifier string, may be {@code null}
      * @return a {@link ZoneId} parsed from the input, or the system default if the input is null or invalid
      * @see ZoneId#of(String) The underlying parsing method
      * @see ZoneId#systemDefault() The fallback used for invalid input
@@ -146,8 +144,7 @@ final class OidcUserAdapter implements OidcUser, AppUserPrincipal {
      * root locale.
      * </p>
      *
-     * @param locale
-     *            the locale identifier string (BCP 47 language tag), may be {@code null}
+     * @param locale the locale identifier string (BCP 47 language tag), may be {@code null}
      * @return a {@link Locale} parsed from the input, or the system default if the input is null
      * @see Locale#forLanguageTag(String) The underlying parsing method
      * @see Locale#getDefault() The fallback used for null input

@@ -59,8 +59,7 @@ final class DevUserDetailsService implements UserDetailsService, AppUserInfoLook
      * This constructor stores the provided users in memory, indexing them by preferred username for efficient lookups.
      * </p>
      *
-     * @param users
-     *            the development users to include in this service
+     * @param users the development users to include in this service
      */
     DevUserDetailsService(Collection<DevUser> users) {
         userByUsername = new HashMap<>();

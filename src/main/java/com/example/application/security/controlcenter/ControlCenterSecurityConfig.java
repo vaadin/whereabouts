@@ -93,13 +93,10 @@ public class ControlCenterSecurityConfig extends IdentityManagementConfiguration
      * authentication with the application's security model</li>
      * </ol>
      *
-     * @param userRequest
-     *            the OIDC user request containing client registration and tokens
-     * @param userInfo
-     *            the OIDC user information containing user claims and attributes
+     * @param userRequest the OIDC user request containing client registration and tokens
+     * @param userInfo    the OIDC user information containing user claims and attributes
      * @return an {@link OidcUserAdapter} instance that adapts the OIDC user to the application's security model
-     * @throws IllegalArgumentException
-     *             if userRequest or userInfo is null
+     * @throws IllegalArgumentException if userRequest or userInfo is null
      * @see DefaultOidcUser
      * @see OidcUserAdapter
      * @see #mapAuthorities(OidcUserRequest, OidcUserInfo)

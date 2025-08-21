@@ -18,18 +18,18 @@ public final class Notifications {
     }
 
     public static Notification createNonCriticalNotification(Component prefixComponent, String text,
-            NotificationVariant variant) {
+                                                             NotificationVariant variant) {
         return createNotification(prefixComponent, text, variant, Notification.Position.BOTTOM_END,
                 Duration.ofSeconds(5));
     }
 
     public static Notification createCriticalNotification(Component prefixComponent, String text,
-            NotificationVariant variant) {
+                                                          NotificationVariant variant) {
         return createNotification(prefixComponent, text, variant, Notification.Position.MIDDLE, null);
     }
 
     public static Notification createNotification(Component prefixComponent, String text, NotificationVariant variant,
-            Notification.Position position, @Nullable Duration duration) {
+                                                  Notification.Position position, @Nullable Duration duration) {
         var notification = new Notification();
         notification.setPosition(position);
         notification.setDuration(duration == null ? 0 : (int) duration.toMillis());
