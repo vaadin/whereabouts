@@ -287,7 +287,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
             var assignees = new AvatarGroup();
             task.getAssignees().stream()
-                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getDisplayName(), userInfo.getPictureUrl()))
+                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getDisplayName()))
                     .forEach(assignees::add);
             return assignees;
         }
