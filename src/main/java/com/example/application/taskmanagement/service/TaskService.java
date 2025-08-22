@@ -29,6 +29,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    @Deprecated
     public boolean hasTasks(Project project) {
         return taskRepository.countAllByProject(project) > 0;
     }

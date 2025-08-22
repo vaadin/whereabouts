@@ -24,6 +24,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    @Deprecated
     public boolean hasProjects() {
         return projectRepository.count() > 0;
     }
