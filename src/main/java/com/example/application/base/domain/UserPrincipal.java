@@ -1,5 +1,6 @@
 package com.example.application.base.domain;
 
+import com.example.application.AppRoles;
 import jakarta.persistence.*;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -8,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 @Entity
@@ -20,7 +22,7 @@ public class UserPrincipal extends AbstractEntity<Long> implements UserDetails {
     @Nullable
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
@@ -31,20 +33,22 @@ public class UserPrincipal extends AbstractEntity<Long> implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "app_user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role_name")
-    private Set<String> roles;
+    @Column(name = "admin")
+    private boolean admin;
+
+    @Transient
+    @Nullable
+    private Set<GrantedAuthority> authorities;
 
     protected UserPrincipal() { // To keep Hibernate happy
     }
 
-    public UserPrincipal(User user, @Nullable String encodedPassword, boolean enabled, Set<String> roles) {
+    public UserPrincipal(User user, @Nullable String encodedPassword, boolean enabled, boolean admin) {
         this.id = user.getId();
         this.user = user;
         this.encodedPassword = encodedPassword;
         this.enabled = enabled;
-        this.roles = Set.copyOf(roles);
+        this.admin = admin;
     }
 
     @Override
@@ -70,8 +74,26 @@ public class UserPrincipal extends AbstractEntity<Long> implements UserDetails {
         return enabled;
     }
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(roleName -> new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase())).toList();
+        if (!enabled) {
+            return Collections.emptySet();
+        }
+        if (authorities == null) {
+            if (admin) {
+                authorities = Set.of(createRole(AppRoles.USER), createRole(AppRoles.ADMIN));
+            } else {
+                authorities = Set.of(createRole(AppRoles.USER));
+            }
+        }
+        return authorities;
+    }
+
+    private static GrantedAuthority createRole(String role) {
+        return new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
     }
 }

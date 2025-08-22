@@ -14,7 +14,6 @@ public class User extends AbstractEntity<Long> {
 
     public static final int USERNAME_MAX_LENGTH = 50;
     public static final int DISPLAY_NAME_MAX_LENGTH = 90;
-    public static final int PICTURE_URL_MAX_LENGTH = 300;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
@@ -34,11 +33,6 @@ public class User extends AbstractEntity<Long> {
     @Column(name = "display_name")
     @Size(max = DISPLAY_NAME_MAX_LENGTH)
     private String displayName = "";
-
-    @Column(name = "picture_url")
-    @Size(max = PICTURE_URL_MAX_LENGTH)
-    @Nullable
-    private String pictureUrl;
 
     protected User() { // To keep Hibernate happy
     }
@@ -67,13 +61,5 @@ public class User extends AbstractEntity<Long> {
 
     public void setDisplayName(String displayName) {
         this.displayName = requireNonNull(displayName);
-    }
-
-    public @Nullable String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    public void setPictureUrl(@Nullable String pictureUrl) {
-        this.pictureUrl = pictureUrl;
     }
 }

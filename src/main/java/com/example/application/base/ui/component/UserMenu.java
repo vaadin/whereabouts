@@ -17,7 +17,7 @@ public class UserMenu extends Composite<MenuBar> {
         addClassName("user-menu");
         var user = authenticationContext.getAuthenticatedUser(UserPrincipal.class).orElseThrow().getUser();
 
-        var avatar = new Avatar(user.getDisplayName(), user.getPictureUrl());
+        var avatar = new Avatar(user.getDisplayName());
         avatar.addThemeVariants(AvatarVariant.LUMO_XSMALL);
         avatar.addClassNames(LumoUtility.Margin.Right.SMALL);
         // Make the avatar a little nicer looking if there is no picture URL

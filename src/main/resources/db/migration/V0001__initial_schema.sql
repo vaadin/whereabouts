@@ -5,24 +5,16 @@ create table app_user
     user_id      bigint not null primary key,
     version      bigint not null,
     username     text   not null unique,
-    display_name text   not null,
-    picture_url  text
+    display_name text   not null
 );
 
 create table app_user_principal
 (
     user_id          bigint  not null,
     encoded_password text,
-    enabled          boolean not null,
+    enabled          boolean not null default false,
+    admin            boolean not null default false,
     primary key (user_id),
-    foreign key (user_id) references app_user (user_id)
-);
-
-create table app_user_role
-(
-    user_id   bigint not null,
-    role_name text   not null,
-    primary key (user_id, role_name),
     foreign key (user_id) references app_user (user_id)
 );
 
