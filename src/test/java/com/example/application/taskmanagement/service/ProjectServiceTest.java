@@ -3,7 +3,7 @@ package com.example.application.taskmanagement.service;
 import com.example.application.TestcontainersConfiguration;
 import com.example.application.base.domain.User;
 import com.example.application.base.domain.UserRepository;
-import com.example.application.security.AppRoles;
+import com.example.application.base.AppRoles;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
 import com.example.application.taskmanagement.domain.Task;

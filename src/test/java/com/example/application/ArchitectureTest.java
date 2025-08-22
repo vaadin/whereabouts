@@ -52,12 +52,4 @@ class ArchitectureTest {
     void there_should_not_be_circular_dependencies_between_feature_packages() {
         slices().matching(BASE_PACKAGE + ".(*)..").should().beFreeOfCycles().check(importedClasses);
     }
-
-    @Test
-    void security_package_should_not_depend_on_other_application_classes() {
-        classes().that().resideInAPackage(BASE_PACKAGE + ".security..").should().onlyAccessClassesThat()
-                .resideOutsideOfPackage(BASE_PACKAGE + "..").orShould().accessClassesThat()
-                .resideInAPackage(BASE_PACKAGE + ".security..")
-                .because("Security classes should only depend on external libraries and other security classes");
-    }
 }

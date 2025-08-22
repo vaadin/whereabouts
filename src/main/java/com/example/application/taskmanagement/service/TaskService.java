@@ -1,6 +1,6 @@
 package com.example.application.taskmanagement.service;
 
-import com.example.application.security.AppRoles;
+import com.example.application.base.AppRoles;
 import com.example.application.taskmanagement.domain.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package com.example.application.security;
+package com.example.application.base.ui.view;
 
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.login.LoginForm;
@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 @Route(value = "login", autoLayout = false)
 @AnonymousAllowed
 @NullMarked
-class LoginView extends Main implements BeforeEnterObserver {
+public class LoginView extends Main implements BeforeEnterObserver {
 
     private final AuthenticationContext authenticationContext;
     private final LoginForm login;

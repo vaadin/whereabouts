@@ -1,6 +1,6 @@
 package com.example.application.taskmanagement.service;
 
-import com.example.application.security.AppRoles;
+import com.example.application.base.AppRoles;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
 import com.example.application.taskmanagement.dto.ProjectListItem;

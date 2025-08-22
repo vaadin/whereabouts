@@ -1,4 +1,4 @@
-package com.example.application.security;
+package com.example.application.base.service;
 
 import com.example.application.base.domain.UserPrincipalRepository;
 import org.jspecify.annotations.NullMarked;

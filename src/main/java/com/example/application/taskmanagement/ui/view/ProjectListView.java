@@ -2,7 +2,7 @@ package com.example.application.taskmanagement.ui.view;
 
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.ui.view.MainLayout;
-import com.example.application.security.AppRoles;
+import com.example.application.base.AppRoles;
 import com.example.application.taskmanagement.dto.ProjectListItem;
 import com.example.application.taskmanagement.service.ProjectService;
 import com.example.application.taskmanagement.ui.component.AddProjectDialog;
