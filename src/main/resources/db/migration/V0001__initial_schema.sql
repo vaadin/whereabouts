@@ -1,4 +1,32 @@
-create sequence project_id_seq increment 50;
+create sequence app_user_id_seq start 100 increment 50;
+
+create table app_user
+(
+    user_id      bigint not null primary key,
+    version      bigint not null,
+    username     text   not null unique,
+    display_name text   not null,
+    picture_url  text
+);
+
+create table app_user_principal
+(
+    user_id          bigint  not null,
+    encoded_password text,
+    enabled          boolean not null,
+    primary key (user_id),
+    foreign key (user_id) references app_user (user_id)
+);
+
+create table app_user_role
+(
+    user_id   bigint not null,
+    role_name text   not null,
+    primary key (user_id, role_name),
+    foreign key (user_id) references app_user (user_id)
+);
+
+create sequence project_id_seq start 100 increment 50;
 
 create table project
 (
@@ -6,7 +34,7 @@ create table project
     name       text   not null
 );
 
-create sequence task_id_seq increment 50;
+create sequence task_id_seq start 100 increment 50;
 
 create table task
 (
@@ -25,8 +53,9 @@ create table task
 
 create table task_assignee
 (
-    task_id  bigint      not null,
-    assignee varchar(36) not null,
-    primary key (task_id, assignee),
-    foreign key (task_id) references task (task_id)
+    task_id bigint not null,
+    user_id bigint not null,
+    primary key (task_id, user_id),
+    foreign key (task_id) references task (task_id),
+    foreign key (user_id) references app_user (user_id)
 );

@@ -1,0 +1,16 @@
+/* This CSS is used by the development mode login view */
+
+.login-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--lumo-shade-5pct);
+}
+
+.login-view vaadin-login-form {
+    box-shadow: var(--lumo-box-shadow-s);
+    border: 1px solid var(--lumo-shade-30pct);
+    border-radius: var(--lumo-border-radius-s);
+    background-color: var(--lumo-base-color);
+    overflow: clip;
+}

@@ -1,8 +1,9 @@
 package com.example.application.taskmanagement.service;
 
 import com.example.application.TestcontainersConfiguration;
-import com.example.application.security.dev.SampleUsers;
-import com.example.application.security.domain.UserId;
+import com.example.application.base.domain.User;
+import com.example.application.base.domain.UserRepository;
+import com.example.application.security.AppRoles;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.ProjectRepository;
 import com.example.application.taskmanagement.domain.Task;
@@ -13,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
@@ -36,7 +37,10 @@ class ProjectServiceTest {
     @Autowired
     TaskRepository taskRepository;
 
-    @WithUserDetails(SampleUsers.ADMIN_USERNAME)
+    @Autowired
+    UserRepository userRepository;
+
+    @WithMockUser(roles = AppRoles.ADMIN)
     @Test
     void administrators_can_save_projects() {
         var project = projectService.saveProject(new Project("Test Project"));
@@ -44,7 +48,7 @@ class ProjectServiceTest {
         assertThat(projectRepository.existsById(project.requireId())).isTrue();
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void users_cannot_save_projects() {
         assertThatThrownBy(() -> projectService.saveProject(new Project())).isInstanceOf(AccessDeniedException.class);
@@ -57,7 +61,7 @@ class ProjectServiceTest {
         projectRepository.save(new Project("A third project"));
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void returns_all_projects_for_empty_search_term() {
         saveTestProjects();
@@ -65,7 +69,7 @@ class ProjectServiceTest {
         assertThat(projectService.findProjectListItems("", PageRequest.ofSize(10))).hasSize(3);
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void returns_matching_projects_for_non_empty_search_term() {
         saveTestProjects();
@@ -74,7 +78,7 @@ class ProjectServiceTest {
         assertThat(projectService.findProjectListItems("nonexistent", PageRequest.ofSize(10))).hasSize(0);
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void includes_task_and_assignee_counts() {
         var project = projectRepository.save(new Project("Test project"));
@@ -83,8 +87,11 @@ class ProjectServiceTest {
         assertThat(itemWithNoTask.tasks()).isZero();
         assertThat(itemWithNoTask.assignees()).isZero();
 
+        var user1 = userRepository.save(new User("user1", "First User"));
+        var user2 = userRepository.save(new User("user2", "Second User"));
+
         var task1 = new Task(project, ZoneId.systemDefault());
-        task1.setAssignees(Set.of(UserId.of("user1")));
+        task1.setAssignees(Set.of(user1));
         taskRepository.save(task1);
 
         var itemWithOneTask = projectService.findProjectListItemById(project.requireId()).orElseThrow();
@@ -92,7 +99,7 @@ class ProjectServiceTest {
         assertThat(itemWithOneTask.assignees()).isOne();
 
         var task2 = new Task(project, ZoneId.systemDefault());
-        task2.setAssignees(Set.of(UserId.of("user1"), UserId.of("user2")));
+        task2.setAssignees(Set.of(user1, user2));
         taskRepository.save(task2);
 
         var itemWithTwoTasks = projectService.findProjectListItemById(project.requireId()).orElseThrow();

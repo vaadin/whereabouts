@@ -1,6 +1,6 @@
 package com.example.application.taskmanagement.ui.component;
 
-import com.example.application.security.AppUserInfoLookup;
+import com.example.application.base.service.AppUserLookupService;
 import com.example.application.taskmanagement.domain.Task;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -13,11 +13,11 @@ public class AddTaskDialog extends Dialog {
     private final SerializableConsumer<Task> onSaveCallback;
     private final TaskForm form;
 
-    public AddTaskDialog(AppUserInfoLookup appUserInfoLookup, SerializableSupplier<Task> formDataObjectFactory,
+    public AddTaskDialog(AppUserLookupService appUserLookupService, SerializableSupplier<Task> formDataObjectFactory,
                          SerializableConsumer<Task> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
-        form = new TaskForm(appUserInfoLookup, formDataObjectFactory.get());
+        form = new TaskForm(appUserLookupService, formDataObjectFactory.get());
 
         var saveBtn = new Button("Save", event -> save());
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

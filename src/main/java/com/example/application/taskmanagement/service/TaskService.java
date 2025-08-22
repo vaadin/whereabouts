@@ -1,7 +1,6 @@
 package com.example.application.taskmanagement.service;
 
 import com.example.application.security.AppRoles;
-import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
@@ -18,21 +17,15 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
-    private final CurrentUser currentUser;
 
-    TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, CurrentUser currentUser) {
+    TaskService(TaskRepository taskRepository, ProjectRepository projectRepository) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
-        this.currentUser = currentUser;
     }
 
     @Transactional(readOnly = true)
     public Optional<Project> findProjectById(Long projectId) {
         return projectRepository.findById(projectId);
-    }
-
-    public Task createTask(Project project) {
-        return new Task(project, currentUser.require().getZoneId());
     }
 
     @Transactional(readOnly = true)

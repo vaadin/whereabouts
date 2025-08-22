@@ -5,7 +5,7 @@
 /* Views */
 @import url("project-list-view.css");
 @import url("task-list-view.css");
-@import url("dev-login.css");
+@import url("login.css");
 
 /* Layouts */
 @import url("main-layout.css");

@@ -1,8 +1,7 @@
 package com.example.application.taskmanagement.service;
 
 import com.example.application.TestcontainersConfiguration;
-import com.example.application.security.CurrentUser;
-import com.example.application.security.dev.SampleUsers;
+import com.example.application.security.AppRoles;
 import com.example.application.taskmanagement.domain.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
@@ -30,12 +29,9 @@ class TaskServiceTest {
     ProjectRepository projectRepository;
 
     @Autowired
-    CurrentUser currentUser;
-
-    @Autowired
     TaskRepository taskRepository;
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void users_can_save_tasks() {
         var project = projectRepository.save(new Project("Test Project"));
@@ -44,7 +40,7 @@ class TaskServiceTest {
         assertThat(taskService.hasTasks(project)).isTrue();
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void users_cannot_delete_tasks() {
         var project = projectRepository.save(new Project("Test Project"));
@@ -53,21 +49,13 @@ class TaskServiceTest {
         assertThat(taskService.hasTasks(project)).isTrue();
     }
 
-    @WithUserDetails(SampleUsers.ADMIN_USERNAME)
+    @WithMockUser(roles = AppRoles.ADMIN)
     @Test
     void administrators_can_delete_tasks() {
         var project = projectRepository.save(new Project("Test Project"));
         var task = taskService.saveTask(new Task(project, ZoneId.systemDefault()));
         taskService.deleteTask(task);
         assertThat(taskService.hasTasks(project)).isFalse();
-    }
-
-    @WithUserDetails(SampleUsers.USER_USERNAME)
-    @Test
-    void create_task_uses_current_users_time_zone() {
-        var project = projectRepository.save(new Project("Test Project"));
-        var task = taskService.createTask(project);
-        assertThat(task.getTimeZone()).isEqualTo(currentUser.require().getZoneId());
     }
 
     private void saveTestTasks(Project project) {
@@ -81,7 +69,7 @@ class TaskServiceTest {
                 .save(new Task(project, ZoneId.systemDefault(), "Fourth todo", TaskStatus.DONE, TaskPriority.URGENT));
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void returns_all_tasks_for_empty_filter() {
         var project = projectRepository.save(new Project("Test Project"));
@@ -90,7 +78,7 @@ class TaskServiceTest {
         assertThat(taskService.findTasks(project, new TaskFilter(), PageRequest.ofSize(10))).hasSize(4);
     }
 
-    @WithUserDetails(SampleUsers.USER_USERNAME)
+    @WithMockUser(roles = AppRoles.USER)
     @Test
     void returns_matching_tasks_for_non_empty_filter() {
         var project = projectRepository.save(new Project("Test Project"));

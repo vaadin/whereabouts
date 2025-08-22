@@ -1,8 +1,7 @@
 package com.example.application.taskmanagement.ui.component;
 
-import com.example.application.security.AppUserInfo;
-import com.example.application.security.AppUserInfoLookup;
-import com.example.application.security.domain.UserId;
+import com.example.application.base.domain.User;
+import com.example.application.base.service.AppUserLookupService;
 import com.example.application.taskmanagement.domain.Task;
 import com.example.application.taskmanagement.domain.TaskPriority;
 import com.example.application.taskmanagement.domain.TaskStatus;
@@ -18,7 +17,6 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 
 import java.time.format.TextStyle;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class TaskForm extends Composite<FormLayout> {
 
@@ -26,7 +24,7 @@ public class TaskForm extends Composite<FormLayout> {
     private final TimePicker dueTimeField;
     private Task formDataObject;
 
-    public TaskForm(AppUserInfoLookup appUserInfoLookup, Task initialFormDataObject) {
+    public TaskForm(AppUserLookupService appUserLookupService, Task initialFormDataObject) {
         var descriptionField = new TextField("Description");
         descriptionField.setPlaceholder("Enter a description");
 
@@ -42,7 +40,7 @@ public class TaskForm extends Composite<FormLayout> {
         priorityField.setItems(TaskPriority.values());
         priorityField.setItemLabelGenerator(TaskPriority::getDisplayName);
 
-        var assigneesField = createAssigneesField(appUserInfoLookup);
+        var assigneesField = createAssigneesField(appUserLookupService);
 
         var formLayout = getContent();
         formLayout.setMaxWidth("640px");
@@ -68,13 +66,10 @@ public class TaskForm extends Composite<FormLayout> {
         setFormDataObject(initialFormDataObject);
     }
 
-    private static MultiSelectComboBox<UserId> createAssigneesField(AppUserInfoLookup appUserInfoLookup) {
-        var assigneesField = new MultiSelectComboBox<UserId>("Assignees");
-        assigneesField.setItemLabelGenerator(
-                userId -> appUserInfoLookup.findUserInfo(userId).map(AppUserInfo::getFullName).orElse("N/A"));
-        assigneesField.setItems(query -> query.getFilter().map(searchTerm -> appUserInfoLookup
-                        .findUsers(searchTerm, query.getLimit(), query.getOffset()).stream().map(AppUserInfo::getUserId))
-                .orElse(Stream.empty()));
+    private static MultiSelectComboBox<User> createAssigneesField(AppUserLookupService appUserLookupService) {
+        var assigneesField = new MultiSelectComboBox<User>("Assignees");
+        assigneesField.setItemLabelGenerator(User::getDisplayName);
+        assigneesField.setItemsPageable(appUserLookupService::findUsers);
         return assigneesField;
     }
 

@@ -1,7 +1,7 @@
 package com.example.application.taskmanagement.ui.component;
 
 import com.example.application.base.ui.component.Notifications;
-import com.example.application.security.AppUserInfoLookup;
+import com.example.application.base.service.AppUserLookupService;
 import com.example.application.taskmanagement.domain.Task;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,11 +16,11 @@ public class EditTaskDialog extends Dialog {
     private final SerializableConsumer<Task> onSaveCallback;
     private final TaskForm form;
 
-    public EditTaskDialog(AppUserInfoLookup appUserInfoLookup, Task formDataObject,
+    public EditTaskDialog(AppUserLookupService appUserLookupService, Task formDataObject,
                           SerializableConsumer<Task> onSaveCallback) {
         this.onSaveCallback = onSaveCallback;
 
-        form = new TaskForm(appUserInfoLookup, formDataObject);
+        form = new TaskForm(appUserLookupService, formDataObject);
 
         var saveBtn = new Button("Save", event -> save());
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

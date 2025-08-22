@@ -2,16 +2,18 @@ package com.example.application.base.domain;
 
 import jakarta.persistence.MappedSuperclass;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.util.ProxyUtils;
 
 @MappedSuperclass
+@NullMarked
 public abstract class AbstractEntity<ID> {
 
     public abstract @Nullable ID getId();
 
     public @NonNull ID requireId() {
-        var id = getId();
+        var  id = getId();
         if (id == null) {
             throw new IllegalStateException("Entity has no ID");
         }

@@ -1,8 +1,7 @@
 package com.example.application.taskmanagement.domain;
 
 import com.example.application.base.domain.AbstractEntity;
-import com.example.application.security.domain.UserId;
-import com.example.application.security.domain.jpa.UserIdAttributeConverter;
+import com.example.application.base.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 @Table(name = "task")
 public class Task extends AbstractEntity<Long> {
 
-    public static final int DESCRIPTION_MAX_LENGTH = 255;
+    public static final int DESCRIPTION_MAX_LENGTH = 500;
 
     public static final String STATUS_SORT_PROPERTY = "status";
     public static final String DESCRIPTION_SORT_PROPERTY = "description";
@@ -34,14 +33,14 @@ public class Task extends AbstractEntity<Long> {
     private Long id;
 
     @Version
-    @Column(name = "version", nullable = false)
+    @Column(name = "version")
     private Long version;
 
     @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id")
     private Project project;
 
-    @Column(name = "description", nullable = false, length = DESCRIPTION_MAX_LENGTH)
+    @Column(name = "description")
     @Size(max = DESCRIPTION_MAX_LENGTH)
     private String description = "";
 
@@ -53,7 +52,7 @@ public class Task extends AbstractEntity<Long> {
     @Nullable
     private LocalTime dueTime;
 
-    @Column(name = "time_zone", nullable = false)
+    @Column(name = "time_zone")
     private ZoneId timeZone;
 
     @Column(name = "due_date_time")
@@ -61,18 +60,16 @@ public class Task extends AbstractEntity<Long> {
     private ZonedDateTime dueDateTime;
 
     @Enumerated
-    @Column(name = "task_status", nullable = false)
+    @Column(name = "task_status")
     private TaskStatus status = TaskStatus.PENDING;
 
     @Enumerated
-    @Column(name = "task_priority", nullable = false)
+    @Column(name = "task_priority")
     private TaskPriority priority = TaskPriority.NORMAL;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "task_assignee", joinColumns = @JoinColumn(name = "task_id"))
-    @Convert(converter = UserIdAttributeConverter.class)
-    @Column(name = "assignee", nullable = false)
-    private Set<UserId> assignees = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "task_assignee", joinColumns = @JoinColumn(name = "task_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> assignees = new HashSet<>();
 
     protected Task() { // To keep Hibernate happy
     }
@@ -159,11 +156,11 @@ public class Task extends AbstractEntity<Long> {
         this.priority = requireNonNull(priority);
     }
 
-    public Set<UserId> getAssignees() {
+    public Set<User> getAssignees() {
         return assignees;
     }
 
-    public void setAssignees(Set<UserId> assignees) {
+    public void setAssignees(Set<User> assignees) {
         this.assignees = requireNonNull(assignees);
     }
 }

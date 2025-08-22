@@ -4,9 +4,8 @@ import com.example.application.base.ui.component.Badges;
 import com.example.application.base.ui.component.Notifications;
 import com.example.application.base.ui.component.ResizeObserver;
 import com.example.application.base.ui.component.SectionToolbar;
+import com.example.application.base.service.AppUserLookupService;
 import com.example.application.security.AppRoles;
-import com.example.application.security.AppUserInfoLookup;
-import com.example.application.security.CurrentUser;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.Task;
 import com.example.application.taskmanagement.domain.TaskPriority;
@@ -59,23 +58,22 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
 
     public static final String PARAM_PROJECT_ID = "projectId";
 
-    private final AppUserInfoLookup appUserInfoLookup;
+    private final AppUserLookupService appUserLookupService;
     private final TaskService taskService;
     private final H2 title;
     private final TaskList taskList;
-    private final ZoneId timeZone;
     private final boolean isAdmin;
+    private ZoneId timeZone = ZoneId.systemDefault(); // TODO Replace with timezone from browser
 
     @Nullable
     private Project project;
 
-    TaskListView(AuthenticationContext authenticationContext, CurrentUser currentUser,
-                 AppUserInfoLookup appUserInfoLookup, TaskService taskService) {
+    TaskListView(AuthenticationContext authenticationContext, AppUserLookupService appUserLookupService,
+                 TaskService taskService) {
         isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
 
-        this.appUserInfoLookup = appUserInfoLookup;
+        this.appUserLookupService = appUserLookupService;
         this.taskService = taskService;
-        this.timeZone = currentUser.require().getZoneId();
 
         title = new H2("");
 
@@ -110,7 +108,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             throw new IllegalStateException("Cannot add task: project is null");
         }
 
-        var dialog = new AddTaskDialog(appUserInfoLookup, () -> taskService.createTask(project), newTask -> {
+        var dialog = new AddTaskDialog(appUserLookupService, () -> new Task(project, timeZone), newTask -> {
             taskService.saveTask(newTask);
             refresh();
             notifyProjectTasksChanged();
@@ -121,7 +119,7 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
     }
 
     private void editTask(Task task) {
-        var dialog = new EditTaskDialog(appUserInfoLookup, task, editedTask -> {
+        var dialog = new EditTaskDialog(appUserLookupService, task, editedTask -> {
             refreshTask(taskService.saveTask(editedTask));
             notifyProjectTasksChanged();
             Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully",
@@ -288,8 +286,8 @@ class TaskListView extends Main implements AfterNavigationObserver, HasDynamicTi
             }
 
             var assignees = new AvatarGroup();
-            task.getAssignees().stream().flatMap(userId -> appUserInfoLookup.findUserInfo(userId).stream())
-                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getFullName(), userInfo.getPictureUrl()))
+            task.getAssignees().stream()
+                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getDisplayName(), userInfo.getPictureUrl()))
                     .forEach(assignees::add);
             return assignees;
         }
