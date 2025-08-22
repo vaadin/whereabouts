@@ -23,7 +23,7 @@ public class AppUserLookupService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<User> findUsers(Pageable pageable, @Nullable String searchTerm) {
         if (searchTerm == null || searchTerm.isEmpty()) {
             return Collections.emptyList();
