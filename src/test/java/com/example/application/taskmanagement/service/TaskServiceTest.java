@@ -1,7 +1,7 @@
 package com.example.application.taskmanagement.service;
 
 import com.example.application.TestcontainersConfiguration;
-import com.example.application.base.AppRoles;
+import com.example.application.AppRoles;
 import com.example.application.taskmanagement.domain.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

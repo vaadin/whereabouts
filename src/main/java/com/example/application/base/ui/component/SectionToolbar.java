@@ -4,7 +4,9 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Header;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class SectionToolbar extends Composite<Header> {
 
     public SectionToolbar(Component... components) {

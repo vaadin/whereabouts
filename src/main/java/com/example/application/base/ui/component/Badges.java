@@ -1,8 +1,11 @@
 package com.example.application.base.ui.component;
 
 import com.vaadin.flow.component.html.Span;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class Badges {
+
     private Badges() {
     }
 

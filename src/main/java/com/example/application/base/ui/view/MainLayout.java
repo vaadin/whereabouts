@@ -15,11 +15,13 @@ import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
+import org.jspecify.annotations.NullMarked;
 
 import static com.vaadin.flow.theme.lumo.LumoUtility.*;
 
 @Layout
 @PermitAll // When security is enabled, allow all authenticated users
+@NullMarked
 public final class MainLayout extends AppLayout {
 
     MainLayout(AuthenticationContext authenticationContext) {

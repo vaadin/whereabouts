@@ -5,7 +5,7 @@ import com.example.application.base.ui.component.Notifications;
 import com.example.application.base.ui.component.ResizeObserver;
 import com.example.application.base.ui.component.SectionToolbar;
 import com.example.application.base.service.AppUserLookupService;
-import com.example.application.base.AppRoles;
+import com.example.application.AppRoles;
 import com.example.application.taskmanagement.domain.Project;
 import com.example.application.taskmanagement.domain.Task;
 import com.example.application.taskmanagement.domain.TaskPriority;

@@ -1,4 +1,4 @@
-package com.example.application.base;
+package com.example.application;
 
 public final class AppRoles {
 

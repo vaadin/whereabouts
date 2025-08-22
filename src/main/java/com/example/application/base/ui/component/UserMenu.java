@@ -8,7 +8,9 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class UserMenu extends Composite<MenuBar> {
 
     public UserMenu(AuthenticationContext authenticationContext) {

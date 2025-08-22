@@ -4,12 +4,14 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.server.VaadinServiceInitListener;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@NullMarked
 class MainErrorHandler {
 
     private static final Logger log = LoggerFactory.getLogger(MainErrorHandler.class);

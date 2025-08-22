@@ -3,11 +3,13 @@ package com.example.application.base.ui.component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.shared.Registration;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@NullMarked
 public class ResizeObserver implements Serializable {
 
     private final List<SerializableConsumer<ResizeEvent>> listeners = new ArrayList<>();
