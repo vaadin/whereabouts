@@ -1,6 +1,7 @@
 package com.example.application.common;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,13 +11,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * Domain primitive representing a domain name.
  */
+@NullMarked
 public final class DomainName implements Serializable {
 
     public static final int MAX_LENGTH = 253;
 
     private final String value;
 
-    private DomainName(@NonNull String value) {
+    private DomainName(String value) {
         this.value = requireNonNull(value);
     }
 
@@ -26,7 +28,7 @@ public final class DomainName implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var that = (DomainName) o;
@@ -44,7 +46,7 @@ public final class DomainName implements Serializable {
      * @param value the string to check.
      * @return {@code true} if the string is a valid domain name, {@code false} otherwise.
      */
-    public static boolean isValid(@NonNull String value) {
+    public static boolean isValid(String value) {
         // Check length
         if (value.isEmpty() || value.length() > MAX_LENGTH) {
             return false;
@@ -76,7 +78,7 @@ public final class DomainName implements Serializable {
      * @return the new {@code DomainName}.
      * @throws IllegalArgumentException if the string is not a valid domain name.
      */
-    public static @NonNull DomainName of(@NonNull String value) {
+    public static DomainName of(String value) {
         if (!isValid(value)) {
             throw new IllegalArgumentException("Invalid domain name");
         }

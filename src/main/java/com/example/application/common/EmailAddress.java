@@ -1,6 +1,7 @@
 package com.example.application.common;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,13 +11,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * Domain primitive representing a valid e-mail address.
  */
+@NullMarked
 public final class EmailAddress implements Serializable {
 
     public static final int MAX_LENGTH = 320; // local name 64 bytes, @ 1 byte, domain name 255 bytes
 
     private final String value;
 
-    private EmailAddress(@NonNull String value) {
+    private EmailAddress(String value) {
         this.value = requireNonNull(value);
     }
 
@@ -26,7 +28,7 @@ public final class EmailAddress implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var that = (EmailAddress) o;
@@ -44,7 +46,7 @@ public final class EmailAddress implements Serializable {
      * @param value the e-mail address to validate.
      * @return {@code true} if the e-mail address is valid, {@code false} otherwise.
      */
-    public static boolean isValid(@NonNull String value) {
+    public static boolean isValid(String value) {
         // Check length
         if (value.isEmpty() || value.length() > MAX_LENGTH) {
             return false;
@@ -61,7 +63,7 @@ public final class EmailAddress implements Serializable {
     /**
      * Note! Comments and quoted local parts are not supported (yet).
      */
-    private static boolean isValidLocalPart(@NonNull String localPart) {
+    private static boolean isValidLocalPart(String localPart) {
         // Check length
         if (localPart.isEmpty() || localPart.length() > 64) {
             return false;
@@ -78,7 +80,7 @@ public final class EmailAddress implements Serializable {
         return !localPart.startsWith(".") && !localPart.endsWith(".");
     }
 
-    private static boolean isValidDomainName(@NonNull String domainName) {
+    private static boolean isValidDomainName(String domainName) {
         // Check length
         if (domainName.isEmpty() || domainName.length() > 255) {
             return false;
@@ -105,7 +107,7 @@ public final class EmailAddress implements Serializable {
      * @return the new {@code EmailAddress}.
      * @throws IllegalArgumentException if the value is not a valid e-mail address.
      */
-    public static @NonNull EmailAddress of(@NonNull String value) {
+    public static EmailAddress of(String value) {
         if (!isValid(value)) {
             throw new IllegalArgumentException("Invalid e-mail address");
         }

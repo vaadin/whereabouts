@@ -1,6 +1,6 @@
 package com.example.application.common;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Domain primitive representing a country.
  */
+@NullMarked
 public final class Country implements Serializable {
 
     private static final List<Country> ISO_COUNTRIES;
@@ -23,7 +24,7 @@ public final class Country implements Serializable {
 
     private final Locale locale;
 
-    private Country(@NonNull Locale locale) {
+    private Country(Locale locale) {
         this.locale = requireNonNull(locale);
     }
 
@@ -32,7 +33,7 @@ public final class Country implements Serializable {
      *
      * @return the locale.
      */
-    public @NonNull Locale locale() {
+    public Locale locale() {
         return locale;
     }
 
@@ -41,7 +42,7 @@ public final class Country implements Serializable {
      *
      * @return the ISO code.
      */
-    public @NonNull String isoCode() {
+    public String isoCode() {
         return locale.getCountry();
     }
 
@@ -50,7 +51,7 @@ public final class Country implements Serializable {
      *
      * @return the display name of the country.
      */
-    public @NonNull String displayName() {
+    public String displayName() {
         return displayName(null);
     }
 
@@ -60,7 +61,7 @@ public final class Country implements Serializable {
      * @param displayIn the locale to display the country's name in, if relevant.
      * @return the display name of the country.
      */
-    public @NonNull String displayName(@Nullable Locale displayIn) {
+    public String displayName(@Nullable Locale displayIn) {
         return locale.getDisplayCountry(displayIn == null ? Locale.getDefault() : displayIn);
     }
 
@@ -70,7 +71,7 @@ public final class Country implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var that = (Country) o;
@@ -88,7 +89,7 @@ public final class Country implements Serializable {
      * @param locale the locale to check.
      * @return {@code true} if the locale is a valid country, {@code false} otherwise.
      */
-    public static boolean isValid(@NonNull Locale locale) {
+    public static boolean isValid(Locale locale) {
         var countryName = locale.getDisplayCountry();
         return !countryName.isBlank() && !countryName.equals(locale.getCountry());
     }
@@ -100,7 +101,7 @@ public final class Country implements Serializable {
      * @return the new {@code Country}.
      * @throws IllegalArgumentException if the given locale does not represent a valid country.
      */
-    public static @NonNull Country ofLocale(@NonNull Locale locale) {
+    public static Country ofLocale(Locale locale) {
         if (!isValid(locale)) {
             throw new IllegalArgumentException("Locale does not represent a country");
         }
@@ -114,14 +115,14 @@ public final class Country implements Serializable {
      * @return the new {@code Country}.
      * @throws IllegalArgumentException if the given ISO code is not valid.
      */
-    public static @NonNull Country ofIsoCode(@NonNull String isoCode) {
+    public static Country ofIsoCode(String isoCode) {
         return ofLocale(Locale.of("", isoCode));
     }
 
     /**
      * A list of all ISO countries provided by the current Java VM.
      */
-    public static @NonNull List<Country> isoCountries() {
+    public static List<Country> isoCountries() {
         return ISO_COUNTRIES;
     }
 }

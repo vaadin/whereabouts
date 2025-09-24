@@ -1,6 +1,7 @@
 package com.example.application.common;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,13 +11,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * Domain primitive representing a phone number.
  */
+@NullMarked
 public final class PhoneNumber implements Serializable {
 
     public static final int MAX_LENGTH = 16;
 
     private final String value;
 
-    private PhoneNumber(@NonNull String value) {
+    private PhoneNumber(String value) {
         this.value = requireNonNull(value);
     }
 
@@ -26,7 +28,7 @@ public final class PhoneNumber implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var that = (PhoneNumber) o;
@@ -44,7 +46,7 @@ public final class PhoneNumber implements Serializable {
      * @param value the phone number to validate.
      * @return {@code true} if the phone number is valid, {@code false} otherwise.
      */
-    public static boolean isValid(@NonNull String value) {
+    public static boolean isValid(String value) {
         // Check length
         if (value.isEmpty() || value.length() > MAX_LENGTH) {
             return false;
@@ -74,7 +76,7 @@ public final class PhoneNumber implements Serializable {
      * @param value the phone number to sanitize.
      * @return the sanitized phone number.
      */
-    public static @NonNull String sanitize(@NonNull String value) {
+    public static String sanitize(String value) {
         var sb = new StringBuilder();
         for (var c : value.toCharArray()) {
             if (!Character.isWhitespace(c) && c != '-' && c != '(' && c != ')' && c != '.') {
@@ -91,7 +93,7 @@ public final class PhoneNumber implements Serializable {
      * @return the new {@code PhoneNumber}.
      * @throws IllegalArgumentException if the value is not a valid phone number, even after sanitization.
      */
-    public static @NonNull PhoneNumber of(@NonNull String value) {
+    public static PhoneNumber of(String value) {
         var sanitized = sanitize(value);
         if (!isValid(sanitized)) {
             throw new IllegalArgumentException("Invalid phone number");

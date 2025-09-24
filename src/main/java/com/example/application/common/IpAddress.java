@@ -1,7 +1,8 @@
 package com.example.application.common;
 
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -11,11 +12,12 @@ import static java.util.Objects.requireNonNull;
 /**
  * Domain primitive representing an IP address (either IPv4 or IPv6).
  */
+@NullMarked
 public sealed abstract class IpAddress implements Serializable {
 
     private final String value;
 
-    protected IpAddress(@NonNull String value) {
+    protected IpAddress(String value) {
         this.value = requireNonNull(value);
     }
 
@@ -25,7 +27,7 @@ public sealed abstract class IpAddress implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var that = (IpAddress) o;
@@ -45,7 +47,7 @@ public sealed abstract class IpAddress implements Serializable {
         public static final int MIN_LENGTH = 7; // 0.0.0.0
         public static final int MAX_LENGTH = 15; // 255.255.255.255
 
-        private Ipv4(@NonNull String value) {
+        private Ipv4(String value) {
             super(value);
         }
 
@@ -55,7 +57,7 @@ public sealed abstract class IpAddress implements Serializable {
          * @param value the string to check.
          * @return {@code true} if the string is a valid IPv4 address, {@code false} otherwise.
          */
-        public static boolean isValidIpv4(@NonNull String value) {
+        public static boolean isValidIpv4(String value) {
             // Check length
             if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
                 return false;
@@ -88,7 +90,7 @@ public sealed abstract class IpAddress implements Serializable {
         public static final int MIN_LENGTH = 2; // ::
         public static final int MAX_LENGTH = 39; // 2001:0db8:85a3:0000:0000:8a2e:0370:7334
 
-        private Ipv6(@NonNull String value) {
+        private Ipv6(String value) {
             super(value);
         }
 
@@ -98,7 +100,7 @@ public sealed abstract class IpAddress implements Serializable {
          * @param value the string to check.
          * @return {@code true} if the string is a valid IPv6 address, {@code false} otherwise.
          */
-        public static boolean isValidIpv6(@NonNull String value) {
+        public static boolean isValidIpv6(String value) {
             // Check length
             if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
                 return false;
@@ -151,7 +153,7 @@ public sealed abstract class IpAddress implements Serializable {
      * @return the new {@code IpAddress}.
      * @throws IllegalArgumentException if the string is not a valid IP address.
      */
-    public static @NonNull IpAddress of(@NonNull String value) {
+    public static IpAddress of(String value) {
         if (Ipv4.isValidIpv4(value)) {
             return new Ipv4(value);
         } else if (Ipv6.isValidIpv6(value)) {
