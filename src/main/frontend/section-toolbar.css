@@ -1,22 +1,22 @@
 .section-toolbar {
     display: flex;
     flex-direction: column;
-    row-gap: var(--lumo-space-xs);
-    padding-top: var(--lumo-space-xs);
-    padding-bottom: var(--lumo-space-xs);
+    row-gap: var(--vaadin-gap-xs);
+    padding-top: var(--vaadin-padding-xs);
+    padding-bottom: var(--vaadin-padding-xs);
 }
 
 .section-toolbar .section-toolbar-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--lumo-space-s);
-    padding-left: var(--lumo-space-m);
-    padding-right: var(--lumo-space-m);
+    gap: var(--vaadin-gap-s);
+    padding-left: var(--vaadin-padding-m);
+    padding-right: var(--vaadin-padding-m);
 }
 
 .section-toolbar .section-toolbar-group {
     display: flex;
     align-items: center;
-    column-gap: var(--lumo-space-xs);
+    column-gap: var(--vaadin-gap-xs);
 }
