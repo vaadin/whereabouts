@@ -1,4 +1,4 @@
-package com.example.application.common.address.canada;
+package com.example.application.common.address;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -10,14 +10,15 @@ import java.util.regex.Pattern;
 import static java.util.Objects.requireNonNull;
 
 @NullMarked
-public final class CanadianPostalCode implements Serializable {
+public final class USZipCode implements Serializable {
 
-    public static final int LENGTH = 7;
-    private static final Pattern REGEX = Pattern.compile("^[A-CEG-HJ-NPR-TVXY][0-9][A-CEG-HJ-NPR-TVXY] [0-9][A-CEG-HJ-NPR-TVW-Z][0-9]$");
+    public static final int MAX_LENGTH = 10;
+    public static final int MIN_LENGTH = 5;
+    private static final Pattern REGEX = Pattern.compile("^[0-9]{5}(-[0-9]{4})?$");
 
     private final String value;
 
-    CanadianPostalCode(String value) {
+    private USZipCode(String value) {
         this.value = requireNonNull(value);
     }
 
@@ -30,7 +31,7 @@ public final class CanadianPostalCode implements Serializable {
     public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        var that = (CanadianPostalCode) o;
+        var that = (USZipCode) o;
         return Objects.equals(value, that.value);
     }
 
@@ -41,21 +42,20 @@ public final class CanadianPostalCode implements Serializable {
 
     public static boolean isValid(String value) {
         // Check length
-        if (value.length() != LENGTH) {
+        if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
             return false;
         }
-        // All characters should be ASCII letters, ASCII digits or a space
-        if (!value.chars().allMatch(ch -> (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || (ch == ' '))) {
+        // All characters should be ASCII digits or a '-'
+        if (!value.chars().allMatch(ch -> (ch >= '0' && ch <= '9') || (ch == '-'))) {
             return false;
         }
         return REGEX.matcher(value).matches();
     }
 
-    public static CanadianPostalCode of(String value) {
-        var sanitized = value.toUpperCase().strip();
-        if (!isValid(sanitized)) {
-            throw new IllegalArgumentException("Invalid postal code");
+    public static USZipCode of(String value) {
+        if (!isValid(value)) {
+            throw new IllegalArgumentException("Invalid zip code");
         }
-        return new CanadianPostalCode(sanitized);
+        return new USZipCode(value);
     }
 }

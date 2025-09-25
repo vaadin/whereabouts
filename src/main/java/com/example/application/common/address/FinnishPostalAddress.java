@@ -1,7 +1,6 @@
-package com.example.application.common.address.finland;
+package com.example.application.common.address;
 
 import com.example.application.common.Country;
-import com.example.application.common.address.PostalAddress;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

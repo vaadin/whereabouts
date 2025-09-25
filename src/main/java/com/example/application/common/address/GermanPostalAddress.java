@@ -1,18 +1,16 @@
-package com.example.application.common.address.canada;
+package com.example.application.common.address;
 
 import com.example.application.common.Country;
-import com.example.application.common.address.PostalAddress;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public record CanadianPostalAddress(@Nullable String streetAddress, @Nullable String city,
-                                    @Nullable CanadianProvince province,
-                                    @Nullable CanadianPostalCode postalCode, Country country) implements PostalAddress {
+public record GermanPostalAddress(@Nullable String streetAddress, @Nullable GermanPostalCode postalCode,
+                                  @Nullable String city, Country country) implements PostalAddress {
 
     public static final int MAX_STRING_LENGTH = 150;
 
-    public CanadianPostalAddress {
+    public GermanPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {
             throw new IllegalArgumentException("streetAddress is too long");
         }

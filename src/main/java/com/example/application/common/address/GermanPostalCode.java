@@ -1,4 +1,4 @@
-package com.example.application.common.address.germany;
+package com.example.application.common.address;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
