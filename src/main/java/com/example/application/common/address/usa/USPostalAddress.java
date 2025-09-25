@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 public record USPostalAddress(@Nullable String streetAddress, @Nullable String city, @Nullable USState state,
                               @Nullable USZipCode zipCode, Country country) implements PostalAddress {
 
-    static final int MAX_STRING_LENGTH = 150;
+    public static final int MAX_STRING_LENGTH = 150;
 
     public USPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {

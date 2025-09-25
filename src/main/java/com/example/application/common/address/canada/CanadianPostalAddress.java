@@ -10,7 +10,7 @@ public record CanadianPostalAddress(@Nullable String streetAddress, @Nullable St
                                     @Nullable CanadianProvince province,
                                     @Nullable CanadianPostalCode postalCode, Country country) implements PostalAddress {
 
-    static final int MAX_STRING_LENGTH = 150;
+    public static final int MAX_STRING_LENGTH = 150;
 
     public CanadianPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {
