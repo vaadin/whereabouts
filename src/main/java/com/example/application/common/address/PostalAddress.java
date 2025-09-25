@@ -6,6 +6,9 @@ import org.jspecify.annotations.NonNull;
 public sealed interface PostalAddress permits CanadianPostalAddress, FinnishPostalAddress, GermanPostalAddress,
         InternationalPostalAddress, USPostalAddress {
 
+    String PROP_COUNTRY = "country";
+
+
     @NonNull
     Country country();
 }

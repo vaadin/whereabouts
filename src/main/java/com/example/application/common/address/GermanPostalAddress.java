@@ -9,6 +9,9 @@ public record GermanPostalAddress(@Nullable String streetAddress, @Nullable Germ
                                   @Nullable String city, Country country) implements PostalAddress {
 
     public static final int MAX_STRING_LENGTH = 150;
+    public static final String PROP_STREET_ADDRESS = "streetAddress";
+    public static final String PROP_POSTAL_CODE = "postalCode";
+    public static final String PROP_CITY = "city";
 
     public GermanPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {

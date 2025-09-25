@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -19,7 +20,11 @@ public final class Country implements Serializable {
     private static final List<Country> ISO_COUNTRIES;
 
     static {
-        ISO_COUNTRIES = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2).stream().map(Country::ofIsoCode).toList();
+        ISO_COUNTRIES = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)
+                .stream()
+                .map(Country::ofIsoCode)
+                .sorted(Comparator.comparing(Country::displayName))
+                .toList();
     }
 
     private final Locale locale;

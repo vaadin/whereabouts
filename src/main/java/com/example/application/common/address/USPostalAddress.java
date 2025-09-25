@@ -9,6 +9,10 @@ public record USPostalAddress(@Nullable String streetAddress, @Nullable String c
                               @Nullable USZipCode zipCode, Country country) implements PostalAddress {
 
     public static final int MAX_STRING_LENGTH = 150;
+    public static final String PROP_STREET_ADDRESS = "streetAddress";
+    public static final String PROP_CITY = "city";
+    public static final String PROP_STATE = "state";
+    public static final String PROP_ZIP_CODE = "zipCode";
 
     public USPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {

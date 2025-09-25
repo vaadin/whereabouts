@@ -9,6 +9,9 @@ public record FinnishPostalAddress(@Nullable String streetAddress, @Nullable Fin
                                    @Nullable String postOffice, Country country) implements PostalAddress {
 
     public static final int MAX_STRING_LENGTH = 150;
+    public static final String PROP_STREET_ADDRESS = "streetAddress";
+    public static final String PROP_POSTAL_CODE = "postalCode";
+    public static final String PROP_POST_OFFICE = "postOffice";
 
     public FinnishPostalAddress {
         if (streetAddress != null && streetAddress.length() > MAX_STRING_LENGTH) {

@@ -9,6 +9,11 @@ public record CanadianPostalAddress(@Nullable String streetAddress, @Nullable St
                                     @Nullable CanadianProvince province,
                                     @Nullable CanadianPostalCode postalCode, Country country) implements PostalAddress {
 
+    public static final String PROP_STREET_ADDRESS = "streetAddress";
+    public static final String PROP_CITY = "city";
+    public static final String PROP_PROVINCE = "province";
+    public static final String PROP_POSTAL_CODE = "postalCode";
+
     public static final int MAX_STRING_LENGTH = 150;
 
     public CanadianPostalAddress {

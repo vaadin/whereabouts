@@ -10,12 +10,16 @@ public record InternationalPostalAddress(@Nullable String streetAddress, @Nullab
                                          Country country) implements PostalAddress {
 
     public static final int MAX_STRING_LENGTH = 150;
+    public static final String PROP_STREET_ADDRESS = "streetAddress";
+    public static final String PROP_CITY = "city";
+    public static final String PROP_STATE_PROVINCE_OR_REGION = "stateProvinceOrRegion";
+    public static final String PROP_POSTAL_CODE = "postalCode";
 
     public InternationalPostalAddress {
-        requireMaxLength(streetAddress, "streetAddress");
-        requireMaxLength(city, "city");
-        requireMaxLength(stateProvinceOrRegion, "stateProvinceOrRegion");
-        requireMaxLength(postalCode, "postalCode");
+        requireMaxLength(streetAddress, PROP_STREET_ADDRESS);
+        requireMaxLength(city, PROP_CITY);
+        requireMaxLength(stateProvinceOrRegion, PROP_STATE_PROVINCE_OR_REGION);
+        requireMaxLength(postalCode, PROP_POSTAL_CODE);
     }
 
     private static void requireMaxLength(@Nullable String value, String fieldName) {
