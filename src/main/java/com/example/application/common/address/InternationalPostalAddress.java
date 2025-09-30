@@ -27,4 +27,23 @@ public record InternationalPostalAddress(@Nullable String streetAddress, @Nullab
             throw new IllegalArgumentException(fieldName + " is too long");
         }
     }
+
+    @Override
+    public String toFormattedString() {
+        var sb = new StringBuilder();
+        if (streetAddress != null) {
+            sb.append(streetAddress).append(", ");
+        }
+        if (city != null) {
+            sb.append(city).append(", ");
+        }
+        if (stateProvinceOrRegion != null) {
+            sb.append(stateProvinceOrRegion).append(" ");
+        }
+        if (postalCode != null) {
+            sb.append(postalCode).append(", ");
+        }
+        sb.append(country.displayName());
+        return sb.toString();
+    }
 }

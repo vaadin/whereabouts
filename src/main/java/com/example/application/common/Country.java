@@ -1,5 +1,7 @@
 package com.example.application.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -47,6 +49,7 @@ public final class Country implements Serializable {
      *
      * @return the ISO code.
      */
+    @JsonValue
     public String isoCode() {
         return locale.getCountry();
     }
@@ -120,6 +123,7 @@ public final class Country implements Serializable {
      * @return the new {@code Country}.
      * @throws IllegalArgumentException if the given ISO code is not valid.
      */
+    @JsonCreator
     public static Country ofIsoCode(String isoCode) {
         return ofLocale(Locale.of("", isoCode));
     }
