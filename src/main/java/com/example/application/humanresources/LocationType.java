@@ -1,5 +1,8 @@
 package com.example.application.humanresources;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum LocationType {
     REGIONAL_HQ("Regional headquarters"),
     BRANCH_OFFICE("Branch office"),
