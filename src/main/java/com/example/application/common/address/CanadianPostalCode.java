@@ -1,5 +1,7 @@
 package com.example.application.common.address;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -22,6 +24,7 @@ public final class CanadianPostalCode implements Serializable {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return value;
     }
@@ -51,6 +54,7 @@ public final class CanadianPostalCode implements Serializable {
         return REGEX.matcher(value).matches();
     }
 
+    @JsonCreator
     public static CanadianPostalCode of(String value) {
         var sanitized = value.toUpperCase().strip();
         if (!isValid(sanitized)) {

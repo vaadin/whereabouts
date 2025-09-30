@@ -1,5 +1,7 @@
 package com.example.application.common.address;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -23,6 +25,7 @@ public final class USZipCode implements Serializable {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return value;
     }
@@ -52,6 +55,7 @@ public final class USZipCode implements Serializable {
         return REGEX.matcher(value).matches();
     }
 
+    @JsonCreator
     public static USZipCode of(String value) {
         if (!isValid(value)) {
             throw new IllegalArgumentException("Invalid zip code");

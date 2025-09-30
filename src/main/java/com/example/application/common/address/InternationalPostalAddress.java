@@ -1,10 +1,12 @@
 package com.example.application.common.address;
 
 import com.example.application.common.Country;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
+@JsonDeserialize
 public record InternationalPostalAddress(@Nullable String streetAddress, @Nullable String city,
                                          @Nullable String stateProvinceOrRegion, @Nullable String postalCode,
                                          Country country) implements PostalAddress {

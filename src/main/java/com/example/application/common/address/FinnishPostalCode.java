@@ -1,5 +1,7 @@
 package com.example.application.common.address;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -20,6 +22,7 @@ public final class FinnishPostalCode implements Serializable {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return value;
     }
@@ -45,6 +48,7 @@ public final class FinnishPostalCode implements Serializable {
         return value.chars().allMatch(ch -> (ch >= '0' && ch <= '9'));
     }
 
+    @JsonCreator
     public static FinnishPostalCode of(String value) {
         if (!isValid(value)) {
             throw new IllegalArgumentException("Invalid postal code");

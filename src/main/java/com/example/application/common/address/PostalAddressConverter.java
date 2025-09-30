@@ -20,16 +20,7 @@ public final class PostalAddressConverter implements Converter<JSON, PostalAddre
     @Override
     public PostalAddress from(JSON databaseObject) {
         try {
-            var node = objectMapper.readTree(databaseObject.data());
-            return switch (node.get("country").asText()) {
-                case CanadianPostalAddress.ISO_CODE ->
-                        objectMapper.readerFor(CanadianPostalAddress.class).readValue(node);
-                case FinnishPostalAddress.ISO_CODE ->
-                        objectMapper.readerFor(FinnishPostalAddress.class).readValue(node);
-                case GermanPostalAddress.ISO_CODE -> objectMapper.readerFor(GermanPostalAddress.class).readValue(node);
-                case USPostalAddress.ISO_CODE -> objectMapper.readerFor(USPostalAddress.class).readValue(node);
-                default -> objectMapper.readerFor(InternationalPostalAddress.class).readValue(node);
-            };
+            return objectMapper.readerFor(PostalAddress.class).readValue(databaseObject.data());
         } catch (IOException ex) {
             throw new DataAccessException("Error reading address JSON", ex);
         }
