@@ -1,7 +1,7 @@
 package com.example.application.humanresources.location;
 
+import com.example.application.common.address.JooqPostalAddressConverter;
 import com.example.application.common.address.PostalAddress;
-import com.example.application.common.address.PostalAddressConverter;
 import org.jooq.Converter;
 
 import java.time.ZoneId;
@@ -56,7 +56,7 @@ final class JooqLocationConverters {
      * of addresses across different countries. This converter handles serialization and
      * deserialization using Jackson.
      */
-    public static final PostalAddressConverter postalAddressConverter = new PostalAddressConverter();
+    public static final JooqPostalAddressConverter postalAddressConverter = new JooqPostalAddressConverter();
 
     /**
      * Converts between database timezone strings and Java {@link ZoneId} objects.

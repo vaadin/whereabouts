@@ -1,9 +1,10 @@
 package com.example.application.common.address;
 
+import com.example.application.common.ValueObject;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public enum CanadianProvince {
+public enum CanadianProvince implements ValueObject {
     AB("Alberta", true),
     BC("British Columbia", true),
     MB("Manitoba", true),

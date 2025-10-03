@@ -1,17 +1,17 @@
 package com.example.application.common.address;
 
+import com.example.application.common.ValueObject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 @NullMarked
-public final class FinnishPostalCode implements Serializable {
+public final class FinnishPostalCode implements ValueObject {
 
     public static final int LENGTH = 5;
 

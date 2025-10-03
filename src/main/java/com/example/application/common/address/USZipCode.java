@@ -1,18 +1,18 @@
 package com.example.application.common.address;
 
+import com.example.application.common.ValueObject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
 @NullMarked
-public final class USZipCode implements Serializable {
+public final class USZipCode implements ValueObject {
 
     public static final int MAX_LENGTH = 10;
     public static final int MIN_LENGTH = 5;

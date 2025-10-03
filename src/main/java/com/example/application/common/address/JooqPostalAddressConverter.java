@@ -5,7 +5,7 @@ import org.jooq.Converter;
 import org.jooq.JSON;
 import tools.jackson.databind.ObjectMapper;
 
-public final class PostalAddressConverter implements Converter<JSON, PostalAddress> {
+public final class JooqPostalAddressConverter implements Converter<JSON, PostalAddress> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

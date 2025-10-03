@@ -1,9 +1,10 @@
 package com.example.application.common.address;
 
+import com.example.application.common.ValueObject;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public enum USState {
+public enum USState implements ValueObject {
     AL("Alabama", true),
     AK("Alaska", true),
     AZ("Arizona", true),
