@@ -3,16 +3,15 @@ package com.example.application.common;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Domain primitive representing a domain name.
+ * Value object representing a domain name.
  */
 @NullMarked
-public final class DomainName implements Serializable {
+public final class DomainName implements ValueObject {
 
     public static final int MAX_LENGTH = 253;
 
@@ -43,8 +42,8 @@ public final class DomainName implements Serializable {
     /**
      * Checks if the given string is a valid domain name (without actually checking that the domain name exists).
      *
-     * @param value the string to check.
-     * @return {@code true} if the string is a valid domain name, {@code false} otherwise.
+     * @param value the string to check
+     * @return {@code true} if the string is a valid domain name, {@code false} otherwise
      */
     public static boolean isValid(String value) {
         // Check length
@@ -74,9 +73,9 @@ public final class DomainName implements Serializable {
     /**
      * Creates a new {@code DomainName} from the given string.
      *
-     * @param value the domain name to create.
-     * @return the new {@code DomainName}.
-     * @throws IllegalArgumentException if the string is not a valid domain name.
+     * @param value the domain name to create
+     * @return the new {@code DomainName}
+     * @throws IllegalArgumentException if the string is not a valid domain name
      */
     public static DomainName of(String value) {
         if (!isValid(value)) {

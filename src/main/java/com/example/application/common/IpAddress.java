@@ -4,16 +4,15 @@ package com.example.application.common;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Domain primitive representing an IP address (either IPv4 or IPv6).
+ * Value object representing an IP address (either IPv4 or IPv6).
  */
 @NullMarked
-public sealed abstract class IpAddress implements Serializable {
+public sealed abstract class IpAddress implements ValueObject {
 
     private final String value;
 
@@ -40,7 +39,7 @@ public sealed abstract class IpAddress implements Serializable {
     }
 
     /**
-     * Domain primitive representing an IPv4 address.
+     * Value object representing an IPv4 address.
      */
     public static final class Ipv4 extends IpAddress {
 
@@ -54,8 +53,8 @@ public sealed abstract class IpAddress implements Serializable {
         /**
          * Checks if the given string is a valid IPv4 address.
          *
-         * @param value the string to check.
-         * @return {@code true} if the string is a valid IPv4 address, {@code false} otherwise.
+         * @param value the string to check
+         * @return {@code true} if the string is a valid IPv4 address, {@code false} otherwise
          */
         public static boolean isValidIpv4(String value) {
             // Check length
@@ -83,7 +82,7 @@ public sealed abstract class IpAddress implements Serializable {
     }
 
     /**
-     * Domain primitive representing an IPv6 address.
+     * Value object representing an IPv6 address.
      */
     public static final class Ipv6 extends IpAddress {
 
@@ -97,8 +96,8 @@ public sealed abstract class IpAddress implements Serializable {
         /**
          * Checks if the given string is a valid IPv6 address.
          *
-         * @param value the string to check.
-         * @return {@code true} if the string is a valid IPv6 address, {@code false} otherwise.
+         * @param value the string to check
+         * @return {@code true} if the string is a valid IPv6 address, {@code false} otherwise
          */
         public static boolean isValidIpv6(String value) {
             // Check length
@@ -149,9 +148,9 @@ public sealed abstract class IpAddress implements Serializable {
     /**
      * Creates a new {@code IpAddress} from the given string.
      *
-     * @param value the IP address to create.
-     * @return the new {@code IpAddress}.
-     * @throws IllegalArgumentException if the string is not a valid IP address.
+     * @param value the IP address to create
+     * @return the new {@code IpAddress}
+     * @throws IllegalArgumentException if the string is not a valid IP address
      */
     public static IpAddress of(String value) {
         if (Ipv4.isValidIpv4(value)) {

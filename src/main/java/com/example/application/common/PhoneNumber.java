@@ -3,16 +3,15 @@ package com.example.application.common;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Domain primitive representing a phone number.
+ * Value object representing a phone number.
  */
 @NullMarked
-public final class PhoneNumber implements Serializable {
+public final class PhoneNumber implements ValueObject {
 
     public static final int MAX_LENGTH = 16;
 
@@ -43,8 +42,8 @@ public final class PhoneNumber implements Serializable {
     /**
      * Checks if the given string is a valid phone number.
      *
-     * @param value the phone number to validate.
-     * @return {@code true} if the phone number is valid, {@code false} otherwise.
+     * @param value the phone number to validate
+     * @return {@code true} if the phone number is valid, {@code false} otherwise
      */
     public static boolean isValid(String value) {
         // Check length
@@ -73,8 +72,8 @@ public final class PhoneNumber implements Serializable {
      * characters, such as letters, will be kept. To make sure the sanitized phone number is valid, you should
      * pass it through {@link #isValid(String)}.
      *
-     * @param value the phone number to sanitize.
-     * @return the sanitized phone number.
+     * @param value the phone number to sanitize
+     * @return the sanitized phone number
      */
     public static String sanitize(String value) {
         var sb = new StringBuilder();
@@ -89,9 +88,9 @@ public final class PhoneNumber implements Serializable {
     /**
      * {@linkplain #sanitize(String) Sanitizes} the given string and creates a new {@code PhoneNumber} from it.
      *
-     * @param value the phone number to create.
-     * @return the new {@code PhoneNumber}.
-     * @throws IllegalArgumentException if the value is not a valid phone number, even after sanitization.
+     * @param value the phone number to create
+     * @return the new {@code PhoneNumber}
+     * @throws IllegalArgumentException if the value is not a valid phone number, even after sanitization
      */
     public static PhoneNumber of(String value) {
         var sanitized = sanitize(value);

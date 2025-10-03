@@ -3,16 +3,15 @@ package com.example.application.common;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Domain primitive representing a valid e-mail address.
+ * Value object representing a valid e-mail address.
  */
 @NullMarked
-public final class EmailAddress implements Serializable {
+public final class EmailAddress implements ValueObject {
 
     public static final int MAX_LENGTH = 320; // local name 64 bytes, @ 1 byte, domain name 255 bytes
 
@@ -43,8 +42,8 @@ public final class EmailAddress implements Serializable {
     /**
      * Checks if the given string is a valid e-mail address.
      *
-     * @param value the e-mail address to validate.
-     * @return {@code true} if the e-mail address is valid, {@code false} otherwise.
+     * @param value the e-mail address to validate
+     * @return {@code true} if the e-mail address is valid, {@code false} otherwise
      */
     public static boolean isValid(String value) {
         // Check length
@@ -103,9 +102,9 @@ public final class EmailAddress implements Serializable {
     /**
      * Creates a new {@code EmailAddress} from the given string.
      *
-     * @param value the e-mail address to create.
-     * @return the new {@code EmailAddress}.
-     * @throws IllegalArgumentException if the value is not a valid e-mail address.
+     * @param value the e-mail address to create
+     * @return the new {@code EmailAddress}
+     * @throws IllegalArgumentException if the value is not a valid e-mail address
      */
     public static EmailAddress of(String value) {
         if (!isValid(value)) {

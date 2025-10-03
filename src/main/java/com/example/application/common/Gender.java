@@ -1,5 +1,8 @@
 package com.example.application.common;
 
-public enum Gender {
+/**
+ * Enumeration representing the gender of a person.
+ */
+public enum Gender implements ValueObject {
     MALE, FEMALE, OTHER
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -14,10 +13,10 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Domain primitive representing a country.
+ * Value object representing a country.
  */
 @NullMarked
-public final class Country implements Serializable {
+public final class Country implements ValueObject {
 
     private static final List<Country> ISO_COUNTRIES;
 
@@ -38,7 +37,7 @@ public final class Country implements Serializable {
     /**
      * Gets the locale of the country.
      *
-     * @return the locale.
+     * @return the locale
      */
     public Locale locale() {
         return locale;
@@ -47,7 +46,7 @@ public final class Country implements Serializable {
     /**
      * Gets the ISO 3166 code of the country,
      *
-     * @return the ISO code.
+     * @return the ISO code
      */
     @JsonValue
     public String isoCode() {
@@ -57,7 +56,7 @@ public final class Country implements Serializable {
     /**
      * Gets the display name of the country.
      *
-     * @return the display name of the country.
+     * @return the display name of the country
      */
     public String displayName() {
         return displayName(null);
@@ -66,8 +65,8 @@ public final class Country implements Serializable {
     /**
      * The display name of the country, in the given locale if applicable.
      *
-     * @param displayIn the locale to display the country's name in, if relevant.
-     * @return the display name of the country.
+     * @param displayIn the locale to display the country's name in, if relevant
+     * @return the display name of the country
      */
     public String displayName(@Nullable Locale displayIn) {
         return locale.getDisplayCountry(displayIn == null ? Locale.getDefault() : displayIn);
@@ -92,10 +91,10 @@ public final class Country implements Serializable {
     }
 
     /**
-     * Checks if the given locale is a valid country,
+     * Checks if the given locale is a valid country.
      *
-     * @param locale the locale to check.
-     * @return {@code true} if the locale is a valid country, {@code false} otherwise.
+     * @param locale the locale to check
+     * @return {@code true} if the locale is a valid country, {@code false} otherwise
      */
     public static boolean isValid(Locale locale) {
         var countryName = locale.getDisplayCountry();
@@ -105,9 +104,9 @@ public final class Country implements Serializable {
     /**
      * Creates a new {@code Country} from the given locale.
      *
-     * @param locale the locale of the country to create.
-     * @return the new {@code Country}.
-     * @throws IllegalArgumentException if the given locale does not represent a valid country.
+     * @param locale the locale of the country to create
+     * @return the new {@code Country}
+     * @throws IllegalArgumentException if the given locale does not represent a valid country
      */
     public static Country ofLocale(Locale locale) {
         if (!isValid(locale)) {
@@ -119,9 +118,9 @@ public final class Country implements Serializable {
     /**
      * Creates a new {@code Country} from the given ISO 3166 code.
      *
-     * @param isoCode the ISO code of the country to create.
-     * @return the new {@code Country}.
-     * @throws IllegalArgumentException if the given ISO code is not valid.
+     * @param isoCode the ISO code of the country to create
+     * @return the new {@code Country}
+     * @throws IllegalArgumentException if the given ISO code is not valid
      */
     @JsonCreator
     public static Country ofIsoCode(String isoCode) {
@@ -130,6 +129,8 @@ public final class Country implements Serializable {
 
     /**
      * A list of all ISO countries provided by the current Java VM.
+     *
+     * @return an unmodifiable list of countries sorted by display name
      */
     public static List<Country> isoCountries() {
         return ISO_COUNTRIES;
