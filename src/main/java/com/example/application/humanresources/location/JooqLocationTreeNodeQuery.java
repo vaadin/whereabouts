@@ -26,10 +26,10 @@ import static org.jooq.impl.DSL.countDistinct;
 
 @Component
 @NullMarked
-class JooqLocationQuery implements LocationQuery {
+class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
     private final DSLContext dsl;
 
-    JooqLocationQuery(DSLContext dsl) {
+    JooqLocationTreeNodeQuery(DSLContext dsl) {
         this.dsl = dsl;
     }
 
