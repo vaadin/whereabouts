@@ -2,6 +2,7 @@ package com.example.application.humanresources.location.ui;
 
 import com.example.application.AppRoles;
 import com.example.application.base.ui.view.MainLayout;
+import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.SectionToolbar;
 import com.example.application.humanresources.location.Location;
 import com.example.application.humanresources.location.LocationId;
@@ -78,9 +79,12 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
         LocationList(boolean isAdmin) {
             var title = new H2("Locations");
 
-            var addLocationButton = new Button("Add Location", e -> addLocation());
+            var addLocationButton = new Button("Add Location");
             addLocationButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             addLocationButton.setVisible(isAdmin);
+
+            var refreshButton = new Button(AppIcon.REFRESH.create());
+            refreshButton.addThemeVariants(ButtonVariant.LUMO_ICON);
 
             grid = new TreeGrid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -128,9 +132,14 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                             },
                             LocationNavigation::navigateToLocationList
                     ));
+            addLocationButton.addClickListener(e -> addLocation());
+            refreshButton.addClickListener(e -> grid.getDataProvider().refreshAll());
 
             // Layout components
-            var toolbar = new SectionToolbar(SectionToolbar.group(new DrawerToggle(), title), addLocationButton);
+            var toolbar = new SectionToolbar(
+                    SectionToolbar.group(new DrawerToggle(), title),
+                    SectionToolbar.group(addLocationButton, refreshButton)
+            );
             setSizeFull();
             grid.setSizeFull();
             add(toolbar, grid);

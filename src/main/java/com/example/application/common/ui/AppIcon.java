@@ -11,7 +11,9 @@ public enum AppIcon {
     FLATWARE("icons/flatware.svg"),
     GLOBE_LOCATION_PIN("icons/globe_location_pin.svg"),
     MEETING_ROOM("icons/meeting_room.svg"),
-    PARKING_SIGN("icons/parking_sign.svg");
+    PARKING_SIGN("icons/parking_sign.svg"),
+    PERSON_PLAY("icons/person_play.svg"),
+    REFRESH("icons/refresh.svg");
 
     private final String source;
 
