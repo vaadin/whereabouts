@@ -1,32 +1,27 @@
 package com.example.application.common.address;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.jooq.exception.DataAccessException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
-
-class PostalAddressDeserializer extends JsonDeserializer<PostalAddress> {
+class PostalAddressDeserializer extends ValueDeserializer<PostalAddress> {
 
     @Override
-    public PostalAddress deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public PostalAddress deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws JacksonException {
         JsonNode node = jsonParser.readValueAsTree();
-        String countryCode = node.required("country").asText();
-        var codec = jsonParser.getCodec();
-
-        try {
-            return switch (countryCode) {
-                case CanadianPostalAddress.ISO_CODE -> codec.treeToValue(node, CanadianPostalAddress.class);
-                case FinnishPostalAddress.ISO_CODE -> codec.treeToValue(node, FinnishPostalAddress.class);
-                case GermanPostalAddress.ISO_CODE -> codec.treeToValue(node, GermanPostalAddress.class);
-                case USPostalAddress.ISO_CODE -> codec.treeToValue(node, USPostalAddress.class);
-                default -> codec.treeToValue(node, InternationalPostalAddress.class);
-            };
-        } catch (IOException ex) {
-            throw new DataAccessException("Error reading address JSON", ex);
-        }
+        String countryCode = node.required("country").asString();
+        return switch (countryCode) {
+            case CanadianPostalAddress.ISO_CODE ->
+                    deserializationContext.readTreeAsValue(node, CanadianPostalAddress.class);
+            case FinnishPostalAddress.ISO_CODE ->
+                    deserializationContext.readTreeAsValue(node, FinnishPostalAddress.class);
+            case GermanPostalAddress.ISO_CODE ->
+                    deserializationContext.readTreeAsValue(node, GermanPostalAddress.class);
+            case USPostalAddress.ISO_CODE -> deserializationContext.readTreeAsValue(node, USPostalAddress.class);
+            default -> deserializationContext.readTreeAsValue(node, InternationalPostalAddress.class);
+        };
     }
+
 }

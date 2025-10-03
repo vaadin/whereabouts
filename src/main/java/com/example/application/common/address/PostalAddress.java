@@ -1,8 +1,8 @@
 package com.example.application.common.address;
 
 import com.example.application.common.Country;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.jspecify.annotations.NullMarked;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 @NullMarked
 @JsonDeserialize(using = PostalAddressDeserializer.class)

@@ -1,5 +1,7 @@
 package com.example.application.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -19,6 +21,7 @@ public abstract class AbstractLongId implements Serializable {
         return Long.toString(value, 10);
     }
 
+    @JsonValue
     public long toLong() {
         return value;
     }
