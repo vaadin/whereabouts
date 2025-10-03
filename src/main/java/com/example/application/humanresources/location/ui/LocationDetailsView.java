@@ -52,6 +52,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         var title = new H2();
         var editButton = new Button("Edit", e -> edit());
         editButton.setVisible(isAdmin);
+        // TODO Delete button?
         var closeButton = new Button(AppIcon.CLOSE.create(), e -> LocationNavigation.navigateToLocationList());
         closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);
 
@@ -62,7 +63,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         // Layout components
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
-        add(new SectionToolbar(title, SectionToolbar.group(editButton, closeButton)));
+        add(new SectionToolbar(title, closeButton));
 
         var sections = new FormLayout(about, summary, facilities);
         sections.setResponsiveSteps(
@@ -70,7 +71,11 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
                 new FormLayout.ResponsiveStep("1000px", 2),
                 new FormLayout.ResponsiveStep("1500px", 3)
         );
-        add(new Scroller(sections));
+        var scroller = new Scroller(sections);
+        add(scroller);
+        setFlexGrow(1, scroller);
+
+        add(new SectionToolbar(editButton));
 
         // Populate components
         ComponentEffect.effect(this, () -> {
