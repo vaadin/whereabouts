@@ -6,6 +6,7 @@ public enum AppIcon {
     ACCESSIBLE("icons/accessible.svg"),
     APARTMENT("icons/apartment.svg"),
     CALENDAR_MONTH("icons/calendar_month.svg"),
+    CLOSE("icons/close.svg"),
     DESK("icons/desk.svg"),
     DIVERSITY("icons/diversity.svg"),
     FLATWARE("icons/flatware.svg"),

@@ -8,12 +8,15 @@ import com.example.application.humanresources.location.*;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.AbstractIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
@@ -49,7 +52,8 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         var title = new H2();
         var editButton = new Button("Edit", e -> edit());
         editButton.setVisible(isAdmin);
-        var closeButton = new Button("Close", e -> LocationNavigation.navigateToLocationList());
+        var closeButton = new Button(AppIcon.CLOSE.create(), e -> LocationNavigation.navigateToLocationList());
+        closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);
 
         var about = new AboutSection();
         var summary = new SummarySection();
@@ -57,18 +61,22 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
 
         // Layout components
         setSizeFull();
-        setPadding(false);
         setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
         add(new SectionToolbar(title, SectionToolbar.group(editButton, closeButton)));
 
-        var sections = new HorizontalLayout(about, new VerticalLayout(summary, facilities));
-        add(sections);
+        var sections = new FormLayout(about, summary, facilities);
+        sections.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("1000px", 2),
+                new FormLayout.ResponsiveStep("1500px", 3)
+        );
+        add(new Scroller(sections));
 
         // Populate components
         ComponentEffect.effect(this, () -> {
             var location = locationSignal.value();
             if (location != null) {
-                title.setText("%s %s".formatted(location.data().name(), location.data().locationType().displayName()));
+                title.setText("%s (%s)".formatted(location.data().name(), location.data().locationType().displayName()));
                 about.setAbout(location.data().about());
                 summary.setEmployees(locationService.getLocationNodeById(location.id())
                         .map(LocationTreeNode.LocationNode::employees)
@@ -205,14 +213,14 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         private final Span valueSpan;
 
         public IconItem(AbstractIcon<?> icon, String label) {
-            var labelSpan = new Span(label);
-            labelSpan.setWidth(130, Unit.PIXELS);
+            var labelDiv = new Div(label);
+            labelDiv.setWidth(130, Unit.PIXELS);
 
             valueSpan = new Span();
 
-
             add(icon);
-            add(labelSpan, valueSpan);
+            add(labelDiv, valueSpan);
+            setFlexShrink(0, labelDiv);
         }
 
         public void setValue(String value) {

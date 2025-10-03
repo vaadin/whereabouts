@@ -8,6 +8,7 @@ import com.example.application.humanresources.location.Location;
 import com.example.application.humanresources.location.LocationId;
 import com.example.application.humanresources.location.LocationService;
 import com.example.application.humanresources.location.LocationTreeNode;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -46,6 +47,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
         // Layout components
         setMaster(locationList);
         setOrientation(Orientation.VERTICAL);
+        setDetailSize(300, Unit.PIXELS);
     }
 
     @Override
@@ -141,8 +143,8 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                     SectionToolbar.group(addLocationButton, refreshButton)
             );
             setSizeFull();
-            grid.setSizeFull();
             add(toolbar, grid);
+            getFlexGrow(grid);
         }
 
         private void addLocation() {

@@ -1,4 +1,4 @@
-package com.example.application.base.ui.component;
+package com.example.application.common.ui;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
