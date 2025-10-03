@@ -2,7 +2,6 @@ package com.example.application.common.ui;
 
 import com.example.application.common.Country;
 import com.example.application.common.address.*;
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.select.Select;
@@ -16,28 +15,29 @@ import org.jspecify.annotations.Nullable;
 import java.io.Serializable;
 
 @NullMarked
-public class PostalAddressField extends CustomField<PostalAddress> {
+public final class PostalAddressField extends CustomField<PostalAddress> {
 
     private final Select<Country> country;
     private final FormLayout layout;
     private @Nullable AddressForm<?> addressForm;
 
     public PostalAddressField() {
+        // TODO Add row spacing
         country = new Select<>();
-        country.setLabel("Country");
+        country.setPlaceholder("Country");
         country.setItems(Country.isoCountries());
         country.setItemLabelGenerator(Country::displayName);
         country.addValueChangeListener(this::onCountryValueChange);
 
         layout = new FormLayout();
-        layout.add(country, 3);
         layout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("500px", 2),
-                new FormLayout.ResponsiveStep("800px", 3)
+                new FormLayout.ResponsiveStep("300px", 2),
+                new FormLayout.ResponsiveStep("600px", 3)
         );
-        layout.setColumnSpacing(8, Unit.PIXELS);
-        layout.setRowSpacing(8, Unit.PIXELS);
+
+        layout.add(country, 3);
+
         add(layout);
     }
 
@@ -51,13 +51,13 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         if (country == null) {
             hideAddressForm();
-        } else if (country.isoCode().equals("CA")) {
+        } else if (country.isoCode().equals(CanadianPostalAddress.ISO_CODE)) {
             showAddressForm(new CanadianAddressForm());
-        } else if (country.isoCode().equals("FI")) {
+        } else if (country.isoCode().equals(FinnishPostalAddress.ISO_CODE)) {
             showAddressForm(new FinnishAddressForm());
-        } else if (country.isoCode().equals("DE")) {
+        } else if (country.isoCode().equals(GermanPostalAddress.ISO_CODE)) {
             showAddressForm(new GermanAddressForm());
-        } else if (country.isoCode().equals("US")) {
+        } else if (country.isoCode().equals(USPostalAddress.ISO_CODE)) {
             showAddressForm(new USAddressForm());
         } else {
             showAddressForm(new InternationalAddressForm());
@@ -66,7 +66,7 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
     @Override
     protected @Nullable PostalAddress generateModelValue() {
-        return addressForm == null ? null : addressForm.getFormValueObject();
+        return addressForm == null ? null : addressForm.getFormDataObject();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
     private <F extends AddressForm<T>, T extends Record & PostalAddress> void showAddressForm(F form, T dataObject) {
         showAddressForm(form);
-        form.setFormValueObject(dataObject);
+        form.setFormDataObject(dataObject);
     }
 
     private static sealed abstract class AddressForm<T extends Record & PostalAddress> implements Serializable permits CanadianAddressForm, FinnishAddressForm, GermanAddressForm, InternationalAddressForm, USAddressForm {
@@ -139,12 +139,12 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         protected abstract void removeFieldsFromLayout();
 
-        final void setFormValueObject(T formDataObject) {
+        final void setFormDataObject(T formDataObject) {
             binder.readRecord(formDataObject);
         }
 
         @Nullable
-        final T getFormValueObject() {
+        final T getFormDataObject() {
             try {
                 return binder.writeRecord();
             } catch (ValidationException ex) {
@@ -163,14 +163,14 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         CanadianAddressForm() {
             super(CanadianPostalAddress.class);
-            streetAddress.setLabel("Street Address");
+            streetAddress.setPlaceholder("Street Address");
             streetAddress.setMaxLength(CanadianPostalAddress.MAX_STRING_LENGTH);
-            city.setLabel("City");
+            city.setPlaceholder("City");
             city.setMaxLength(CanadianPostalAddress.MAX_STRING_LENGTH);
-            province.setLabel("Province");
+            province.setPlaceholder("Province");
             province.setItems(CanadianProvince.values());
             province.setItemLabelGenerator(CanadianProvince::displayName);
-            postalCode.setLabel("Postal Code");
+            postalCode.setPlaceholder("Postal Code");
 
             binder.forField(streetAddress).bind(CanadianPostalAddress.PROP_STREET_ADDRESS);
             binder.forField(city).bind(CanadianPostalAddress.PROP_CITY);
@@ -212,10 +212,10 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         FinnishAddressForm() {
             super(FinnishPostalAddress.class);
-            streetAddress.setLabel("Street Address");
+            streetAddress.setPlaceholder("Street Address");
             streetAddress.setMaxLength(FinnishPostalAddress.MAX_STRING_LENGTH);
-            postalCode.setLabel("Postal Code");
-            postOffice.setLabel("Post Office");
+            postalCode.setPlaceholder("Postal Code");
+            postOffice.setPlaceholder("Post Office");
             postOffice.setMaxLength(FinnishPostalAddress.MAX_STRING_LENGTH);
 
             binder.forField(streetAddress).bind(FinnishPostalAddress.PROP_STREET_ADDRESS);
@@ -254,10 +254,10 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         GermanAddressForm() {
             super(GermanPostalAddress.class);
-            streetAddress.setLabel("Street Address");
+            streetAddress.setPlaceholder("Street Address");
             streetAddress.setMaxLength(GermanPostalAddress.MAX_STRING_LENGTH);
-            postalCode.setLabel("Postal Code");
-            city.setLabel("City");
+            postalCode.setPlaceholder("Postal Code");
+            city.setPlaceholder("City");
             city.setMaxLength(GermanPostalAddress.MAX_STRING_LENGTH);
 
             binder.forField(streetAddress).bind(GermanPostalAddress.PROP_STREET_ADDRESS);
@@ -297,13 +297,13 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         InternationalAddressForm() {
             super(InternationalPostalAddress.class);
-            streetAddress.setLabel("Street Address");
+            streetAddress.setPlaceholder("Street Address");
             streetAddress.setMaxLength(InternationalPostalAddress.MAX_STRING_LENGTH);
-            city.setLabel("City");
+            city.setPlaceholder("City");
             city.setMaxLength(InternationalPostalAddress.MAX_STRING_LENGTH);
-            stateProvinceOrRegion.setLabel("State, Province or Region");
+            stateProvinceOrRegion.setPlaceholder("State, Province or Region");
             stateProvinceOrRegion.setMaxLength(InternationalPostalAddress.MAX_STRING_LENGTH);
-            postalCode.setLabel("Postal Code");
+            postalCode.setPlaceholder("Postal Code");
             postalCode.setMaxLength(InternationalPostalAddress.MAX_STRING_LENGTH);
 
             binder.forField(streetAddress).bind(InternationalPostalAddress.PROP_STREET_ADDRESS);
@@ -345,14 +345,14 @@ public class PostalAddressField extends CustomField<PostalAddress> {
 
         USAddressForm() {
             super(USPostalAddress.class);
-            streetAddress.setLabel("Street Address");
+            streetAddress.setPlaceholder("Street Address");
             streetAddress.setMaxLength(USPostalAddress.MAX_STRING_LENGTH);
-            city.setLabel("City");
+            city.setPlaceholder("City");
             city.setMaxLength(USPostalAddress.MAX_STRING_LENGTH);
-            state.setLabel("State");
+            state.setPlaceholder("State");
             state.setItems(USState.values());
             state.setItemLabelGenerator(USState::displayName);
-            zipCode.setLabel("Zip Code");
+            zipCode.setPlaceholder("Zip Code");
 
             binder.forField(streetAddress).bind(USPostalAddress.PROP_STREET_ADDRESS);
             binder.forField(city).bind(USPostalAddress.PROP_CITY);
