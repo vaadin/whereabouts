@@ -2,23 +2,25 @@ package com.example.application.common.ui;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-@CssImport("./section-toolbar.css")
-public final class SectionToolbar extends Composite<Header> {
+public final class SectionToolbar extends Composite<VerticalLayout> {
 
     public SectionToolbar(Component... components) {
-        addClassNames("section-toolbar");
+        var layout = getContent();
+        layout.setPadding(false);
         addRow(components);
     }
 
     public void addRow(Component... components) {
-        var row = new Div(components);
-        row.addClassNames("section-toolbar-row");
+        var row = new HorizontalLayout(components);
+        row.setWidthFull();
+        row.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         getContent().add(row);
     }
 
@@ -28,8 +30,8 @@ public final class SectionToolbar extends Composite<Header> {
     }
 
     public static Component group(Component... components) {
-        var group = new Div(components);
-        group.addClassNames("section-toolbar-group");
+        var group = new HorizontalLayout(components);
+        group.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         return group;
     }
 }
