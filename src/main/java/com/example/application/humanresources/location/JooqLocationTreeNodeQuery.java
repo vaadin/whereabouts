@@ -56,8 +56,8 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
                         count(EMPLOYMENT.EMPLOYEE_ID)
                 )
                 .from(LOCATION)
-                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.PRIMARY_LOCATION_ID.eq(LOCATION.LOCATION_ID)
-                        .and(EMPLOYMENT.STATUS.eq(EmploymentStatus.active)))
+                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.LOCATION_ID.eq(LOCATION.LOCATION_ID)
+                        .and(EMPLOYMENT.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)))
                 .groupBy(country)
                 .orderBy(country) // TODO Sort from pageable
                 .offset(pageable.getOffset())
@@ -94,7 +94,7 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
                         LOCATION.LOCATION_TYPE.convert(locationTypeConverter),
                         LOCATION.ADDRESS.convert(postalAddressConverter))
                 .from(LOCATION)
-                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.PRIMARY_LOCATION_ID.eq(LOCATION.LOCATION_ID)
-                        .and(EMPLOYMENT.STATUS.eq(EmploymentStatus.active)));
+                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.LOCATION_ID.eq(LOCATION.LOCATION_ID)
+                        .and(EMPLOYMENT.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)));
     }
 }

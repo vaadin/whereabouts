@@ -7,6 +7,7 @@ import org.jooq.impl.DSL;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -69,12 +70,13 @@ class JooqLocationRepository implements LocationRepository {
         this.dsl = dsl;
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public boolean isEmpty() {
         return dsl.selectCount().from(LOCATION).fetchSingle().value1() == 0;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Location> findById(LocationId id) {
         var LOCATION_TYPE = LOCATION.LOCATION_TYPE.convert(locationTypeConverter);
@@ -112,7 +114,7 @@ class JooqLocationRepository implements LocationRepository {
                 ));
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public LocationId insert(LocationData locationData) {
         var id = LocationId.of(dsl.nextval(LOCATION_ID_SEQ));

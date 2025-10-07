@@ -3,8 +3,10 @@ package com.example.application.humanresources.location;
 import com.example.application.common.Country;
 import com.example.application.common.address.*;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,13 +18,16 @@ import java.util.Random;
  * Generates {@link Location} test data at application startup if the database is empty.
  */
 @Component
+@Profile("!integration-test")
 class LocationTestDataGenerator {
 
     private final Random rnd = new Random();
+    private final TransactionTemplate txTemplate;
     private final LocationRepository locationRepository;
 
-    LocationTestDataGenerator(LocationRepository locationRepository) {
+    LocationTestDataGenerator(LocationRepository locationRepository, PlatformTransactionManager transactionManager) {
         this.locationRepository = locationRepository;
+        this.txTemplate = new TransactionTemplate(transactionManager);
     }
 
     private List<LocationFacility> generateRandomFacilities() {
@@ -41,13 +46,16 @@ class LocationTestDataGenerator {
         return facilities;
     }
 
-    @Transactional
     @PostConstruct
     public void generate() {
-        if (!locationRepository.isEmpty()) {
-            return;
-        }
+        txTemplate.executeWithoutResult(tx -> {
+            if (locationRepository.isEmpty()) {
+                insertData();
+            }
+        });
+    }
 
+    private void insertData() {
         // Argentina locations
         locationRepository.insert(new LocationData(
                 "Buenos Aires",
