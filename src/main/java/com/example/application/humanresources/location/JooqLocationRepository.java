@@ -134,7 +134,7 @@ class JooqLocationRepository implements LocationRepository {
         return id;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public Location update(Location location) {
         var newVersion = location.version() + 1;
@@ -181,7 +181,7 @@ class JooqLocationRepository implements LocationRepository {
         dsl.batchInsert(batch).execute();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public void deleteById(LocationId locationId) {
         dsl.deleteFrom(LOCATION_FACILITY)

@@ -1,5 +1,6 @@
 package com.example.application.humanresources.location;
 
+import com.example.application.common.CrudRepository;
 import com.example.application.common.Repository;
 import org.jspecify.annotations.NullMarked;
 
@@ -7,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
  * Repository interface for {@link Location} aggregate roots.
  * <p>
  * This repository provides persistence operations for office locations, including their
- * associated facilities. It follows the standard {@link Repository} contract for aggregate
+ * associated facilities. It follows the standard {@link CrudRepository} contract for aggregate
  * roots, supporting creation, retrieval, updates, and deletion of complete location aggregates.
  * <p>
  * <strong>Package-Private by Design</strong><br>
@@ -35,5 +36,5 @@ import org.jspecify.annotations.NullMarked;
  * @see Repository
  */
 @NullMarked
-interface LocationRepository extends Repository<LocationId, Location, LocationData> {
+interface LocationRepository extends CrudRepository<LocationId, Location, LocationData> {
 }
