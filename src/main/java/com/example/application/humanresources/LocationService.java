@@ -1,6 +1,8 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources;
 
 import com.example.application.AppRoles;
+import com.example.application.humanresources.internal.LocationRepository;
+import com.example.application.humanresources.internal.LocationTreeNodeQuery;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
