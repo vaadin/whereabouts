@@ -1,6 +1,8 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources.internal;
 
 import com.example.application.common.Country;
+import com.example.application.humanresources.LocationId;
+import com.example.application.humanresources.LocationTreeNode;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.Pageable;
 
@@ -8,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @NullMarked
-interface LocationTreeNodeQuery {
+public interface LocationTreeNodeQuery {
     int countCountriesWithLocations();
 
     int countLocationsInCountry(Country country);

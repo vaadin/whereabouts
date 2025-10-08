@@ -1,16 +1,22 @@
-package com.example.application.humanresources.employee;
+package com.example.application.humanresources.internal;
 
 import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
 import com.example.application.common.address.JooqPostalAddressConverter;
+import com.example.application.humanresources.EmploymentStatus;
+import com.example.application.humanresources.EmploymentType;
+import com.example.application.humanresources.LocationType;
+import com.example.application.humanresources.WorkArrangement;
 import org.jooq.Converter;
+import org.jspecify.annotations.NullMarked;
 
 import java.time.ZoneId;
 
-final class JooqEmployeeConverters {
+@NullMarked
+final class JooqConverters {
 
-    private JooqEmployeeConverters() {
+    private JooqConverters() {
     }
 
     public static final Converter<com.example.application.jooq.enums.EmploymentStatus, EmploymentStatus> employmentStatusConverter = Converter.ofNullable(
@@ -39,6 +45,13 @@ final class JooqEmployeeConverters {
             Gender.class,
             dbType -> Gender.valueOf(dbType.name()),
             domainType -> com.example.application.jooq.enums.Gender.valueOf(domainType.name())
+    );
+
+    public static final Converter<com.example.application.jooq.enums.LocationType, LocationType> locationTypeConverter = Converter.ofNullable(
+            com.example.application.jooq.enums.LocationType.class,
+            LocationType.class,
+            dbType -> LocationType.valueOf(dbType.name()),
+            domainType -> com.example.application.jooq.enums.LocationType.valueOf(domainType.name())
     );
 
     public static final JooqPostalAddressConverter postalAddressConverter = new JooqPostalAddressConverter();

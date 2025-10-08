@@ -1,7 +1,11 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources.internal;
 
 import com.example.application.common.Country;
 import com.example.application.common.address.*;
+import com.example.application.humanresources.Location;
+import com.example.application.humanresources.LocationData;
+import com.example.application.humanresources.LocationFacility;
+import com.example.application.humanresources.LocationType;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

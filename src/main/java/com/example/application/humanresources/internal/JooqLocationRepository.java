@@ -1,5 +1,9 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources.internal;
 
+import com.example.application.humanresources.Location;
+import com.example.application.humanresources.LocationData;
+import com.example.application.humanresources.LocationFacility;
+import com.example.application.humanresources.LocationId;
 import com.example.application.jooq.enums.FacilityType;
 import com.example.application.jooq.tables.records.LocationFacilityRecord;
 import org.jooq.DSLContext;
@@ -13,53 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.example.application.humanresources.location.JooqLocationConverters.*;
+import static com.example.application.humanresources.internal.JooqConverters.*;
 import static com.example.application.jooq.Sequences.LOCATION_ID_SEQ;
 import static com.example.application.jooq.tables.Location.LOCATION;
 import static com.example.application.jooq.tables.LocationFacility.LOCATION_FACILITY;
 
-/**
- * JOOQ-based implementation of {@link LocationRepository}.
- * <p>
- * This implementation provides type-safe SQL-based persistence for {@link Location} aggregate
- * roots using JOOQ's DSL. It handles bidirectional mapping between the domain model (immutable
- * records and sealed interfaces) and the relational database schema (tables and rows).
- * <p>
- * <strong>Database Schema</strong><br>
- * Locations are persisted across two tables:
- * <ul>
- *   <li>{@code location} - stores the location entity with all its attributes</li>
- *   <li>{@code location_facility} - stores facilities as child records with a composite
- *       primary key of (location_id, facility_type)</li>
- * </ul>
- * <p>
- * <strong>Optimistic Locking</strong><br>
- * Updates verify the version number hasn't changed before applying modifications, preventing
- * lost updates in concurrent scenarios. The version is incremented atomically during updates,
- * and mismatches throw {@link org.springframework.dao.OptimisticLockingFailureException}.
- * <p>
- * <strong>Facility Management</strong><br>
- * When updating locations, existing facilities are deleted and replaced with the new set
- * in a single transaction. This simple approach is appropriate given the small number of
- * facilities per location (typically under 10) and avoids the complexity of diffing and
- * selectively updating individual facility records.
- * <p>
- * <strong>Type Conversions</strong><br>
- * The implementation uses {@link JooqLocationConverters} for bidirectional conversion between
- * domain types and database types (location types, time zones, postal addresses). These
- * converters ensure consistent transformation logic across queries and persistence operations.
- * <p>
- * <strong>JOOQ Multiset</strong><br>
- * Queries use JOOQ's {@code multiset} feature to efficiently load locations with their
- * facilities in a single database round-trip, avoiding N+1 query problems while maintaining
- * type safety.
- *
- * @see LocationRepository
- * @see Location
- * @see LocationData
- * @see LocationFacility
- * @see JooqLocationConverters
- */
 @Component
 @NullMarked
 class JooqLocationRepository implements LocationRepository {

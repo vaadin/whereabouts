@@ -1,7 +1,10 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources.internal;
 
 import com.example.application.common.Country;
 import com.example.application.common.address.PostalAddress;
+import com.example.application.humanresources.LocationId;
+import com.example.application.humanresources.LocationTreeNode;
+import com.example.application.humanresources.LocationType;
 import com.example.application.jooq.enums.EmploymentStatus;
 import org.jooq.DSLContext;
 import org.jooq.Record5;
@@ -16,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.application.humanresources.location.JooqLocationConverters.locationTypeConverter;
-import static com.example.application.humanresources.location.JooqLocationConverters.postalAddressConverter;
-import static com.example.application.jooq.Tables.EMPLOYMENT;
+import static com.example.application.humanresources.internal.JooqConverters.locationTypeConverter;
+import static com.example.application.humanresources.internal.JooqConverters.postalAddressConverter;
+import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 import static com.example.application.jooq.Tables.LOCATION;
 import static java.util.Objects.requireNonNull;
 import static org.jooq.impl.DSL.count;
@@ -27,6 +30,7 @@ import static org.jooq.impl.DSL.countDistinct;
 @Component
 @NullMarked
 class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
+
     private final DSLContext dsl;
 
     JooqLocationTreeNodeQuery(DSLContext dsl) {
@@ -53,11 +57,11 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
         var country = LOCATION.COUNTRY.convertFrom(Country::ofIsoCode);
         return dsl.select(
                         country,
-                        count(EMPLOYMENT.EMPLOYEE_ID)
+                        count(EMPLOYMENT_DETAILS.EMPLOYEE_ID)
                 )
                 .from(LOCATION)
-                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.LOCATION_ID.eq(LOCATION.LOCATION_ID)
-                        .and(EMPLOYMENT.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)))
+                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.LOCATION_ID.eq(LOCATION.LOCATION_ID)
+                        .and(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)))
                 .groupBy(country)
                 .orderBy(country) // TODO Sort from pageable
                 .offset(pageable.getOffset())
@@ -90,11 +94,11 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
         return dsl.select(
                         LOCATION.LOCATION_ID.convertFrom(LocationId::of),
                         LOCATION.NAME,
-                        count(EMPLOYMENT.EMPLOYEE_ID),
+                        count(EMPLOYMENT_DETAILS.EMPLOYEE_ID),
                         LOCATION.LOCATION_TYPE.convert(locationTypeConverter),
                         LOCATION.ADDRESS.convert(postalAddressConverter))
                 .from(LOCATION)
-                .leftJoin(EMPLOYMENT).on(EMPLOYMENT.LOCATION_ID.eq(LOCATION.LOCATION_ID)
-                        .and(EMPLOYMENT.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)));
+                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.LOCATION_ID.eq(LOCATION.LOCATION_ID)
+                        .and(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)));
     }
 }

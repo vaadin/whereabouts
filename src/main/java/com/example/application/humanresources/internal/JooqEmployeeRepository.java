@@ -1,5 +1,8 @@
-package com.example.application.humanresources.employee;
+package com.example.application.humanresources.internal;
 
+import com.example.application.humanresources.Employee;
+import com.example.application.humanresources.EmployeeData;
+import com.example.application.humanresources.EmployeeId;
 import org.jooq.DSLContext;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -9,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.application.humanresources.employee.JooqEmployeeConverters.*;
+import static com.example.application.humanresources.internal.JooqConverters.*;
 import static com.example.application.jooq.Sequences.EMPLOYEE_ID_SEQ;
 import static com.example.application.jooq.Tables.EMPLOYEE;
 
@@ -126,7 +129,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .execute();
 
         if (rowsUpdated == 0) {
-            throw new OptimisticLockingFailureException("Location was modified by another user");
+            throw new OptimisticLockingFailureException("Employee was modified by another user");
         }
 
         return new Employee(employee.id(), newVersion, employee.data());
