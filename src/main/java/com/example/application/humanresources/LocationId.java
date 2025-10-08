@@ -1,4 +1,4 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources;
 
 import com.example.application.common.AbstractLongId;
 import com.fasterxml.jackson.annotation.JsonCreator;

@@ -1,4 +1,4 @@
-package com.example.application.humanresources.location;
+package com.example.application.humanresources;
 
 import com.example.application.common.ValueObject;
 import com.example.application.common.address.PostalAddress;
