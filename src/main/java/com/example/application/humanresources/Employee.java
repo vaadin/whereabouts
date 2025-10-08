@@ -1,4 +1,4 @@
-package com.example.application.humanresources.employee;
+package com.example.application.humanresources;
 
 import com.example.application.common.AggregateRoot;
 import org.jspecify.annotations.NullMarked;
