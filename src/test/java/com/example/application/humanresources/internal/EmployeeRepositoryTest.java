@@ -1,4 +1,4 @@
-package com.example.application.humanresources.employee;
+package com.example.application.humanresources.internal;
 
 import com.example.application.TestcontainersConfiguration;
 import com.example.application.common.Country;
@@ -8,6 +8,7 @@ import com.example.application.common.PhoneNumber;
 import com.example.application.common.address.FinnishPostalAddress;
 import com.example.application.common.address.FinnishPostalCode;
 import com.example.application.common.address.InternationalPostalAddress;
+import com.example.application.humanresources.EmployeeData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
 @ActiveProfiles("integration-test")
-class JooqEmployeeRepositoryTest {
+class EmployeeRepositoryTest {
 
     @Autowired
     EmployeeRepository repository;
 
-    @Test
-    void insert_get_and_update_includes_all_properties() {
-        var originalData = new EmployeeData("First",
+    static EmployeeData createEmployeeData() {
+        return new EmployeeData("First",
                 "Middle",
                 "Last",
                 "Preferred",
@@ -50,6 +50,11 @@ class JooqEmployeeRepositoryTest {
                 PhoneNumber.of("+358441357900"),
                 EmailAddress.of("email@work.foo")
         );
+    }
+
+    @Test
+    void insert_get_and_update_include_all_properties() {
+        var originalData = createEmployeeData();
         var id = repository.insert(originalData);
         var retrieved = repository.findById(id).orElseThrow();
 
