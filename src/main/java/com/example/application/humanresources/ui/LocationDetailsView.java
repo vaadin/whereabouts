@@ -1,10 +1,10 @@
-package com.example.application.humanresources.location.ui;
+package com.example.application.humanresources.ui;
 
 import com.example.application.AppRoles;
 import com.example.application.common.address.PostalAddress;
 import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.SectionToolbar;
-import com.example.application.humanresources.location.*;
+import com.example.application.humanresources.*;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -53,7 +53,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         var editButton = new Button("Edit", e -> edit());
         editButton.setVisible(isAdmin);
         // TODO Delete button?
-        var closeButton = new Button(AppIcon.CLOSE.create(), e -> LocationNavigation.navigateToLocationList());
+        var closeButton = new Button(AppIcon.CLOSE.create(), e -> HumanResourcesNavigation.navigateToLocationList());
         closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);
 
         var about = new AboutSection();
@@ -62,8 +62,10 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
 
         // Layout components
         setSizeFull();
+        setPadding(false);
+        setSpacing(false);
         setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
-        add(new SectionToolbar(title, closeButton));
+        add(new SectionToolbar(title, SectionToolbar.group(editButton, closeButton)));
 
         var sections = new FormLayout(about, summary, facilities);
         sections.setResponsiveSteps(
@@ -71,11 +73,8 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
                 new FormLayout.ResponsiveStep("1000px", 2),
                 new FormLayout.ResponsiveStep("1500px", 3)
         );
-        var scroller = new Scroller(sections);
-        add(scroller);
-        setFlexGrow(1, scroller);
-
-        add(new SectionToolbar(editButton));
+        add(new Scroller(sections));
+        //setFlexGrow(1, sections);
 
         // Populate components
         ComponentEffect.effect(this, () -> {
@@ -114,6 +113,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         AboutSection() {
             text = new Div();
 
+            setSizeUndefined();
             add(new H4("About"));
             add(text);
         }
@@ -137,6 +137,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
             established = new IconItem(AppIcon.CALENDAR_MONTH.create(), "Established");
             address = new IconItem(AppIcon.GLOBE_LOCATION_PIN.create(), "Address");
 
+            setSizeUndefined();
             add(new H4("Summary"));
             add(employees, established, address);
         }
@@ -171,6 +172,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
             accessibleOffice = new IconItem(AppIcon.ACCESSIBLE.create(), "Accessible Office");
             parkingSlots = new IconItem(AppIcon.PARKING_SIGN.create(), "Parking Slots");
 
+            setSizeUndefined();
             add(new H4("Facilities"));
             add(accessibleOffice, floorSpace, hotDesks, kitchen, meetingBooths, parkingSlots);
         }
@@ -260,6 +262,6 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
                 .getLong(PARAM_LOCATION_ID)
                 .map(LocationId::of)
                 .flatMap(locationService::findById)
-                .ifPresentOrElse(locationSignal::value, LocationNavigation::navigateToLocationList);
+                .ifPresentOrElse(locationSignal::value, HumanResourcesNavigation::navigateToLocationList);
     }
 }

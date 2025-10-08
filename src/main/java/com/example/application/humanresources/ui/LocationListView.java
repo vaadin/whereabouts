@@ -1,24 +1,26 @@
-package com.example.application.humanresources.location.ui;
+package com.example.application.humanresources.ui;
 
 import com.example.application.AppRoles;
-import com.example.application.base.ui.view.MainLayout;
 import com.example.application.common.ui.AppIcon;
+import com.example.application.common.ui.MainLayout;
 import com.example.application.common.ui.SectionToolbar;
-import com.example.application.humanresources.location.Location;
-import com.example.application.humanresources.location.LocationId;
-import com.example.application.humanresources.location.LocationService;
-import com.example.application.humanresources.location.LocationTreeNode;
+import com.example.application.humanresources.Location;
+import com.example.application.humanresources.LocationId;
+import com.example.application.humanresources.LocationService;
+import com.example.application.humanresources.LocationTreeNode;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.spring.security.AuthenticationContext;
@@ -79,7 +81,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
         private final TreeGrid<LocationTreeNode> grid;
 
         LocationList(boolean isAdmin) {
-            var title = new H2("Locations");
+            var title = new H1("Locations");
 
             var addLocationButton = new Button("Add Location");
             addLocationButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -123,16 +125,17 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                 case LocationTreeNode.LocationNode locationNode -> locationNode.address().toFormattedString();
                 case LocationTreeNode.CountryNode ignored -> "";
             }).setHeader("Address").setFlexGrow(1);
+            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
             // Add listeners
             grid.addSelectionListener(e -> e.getFirstSelectedItem()
                     .ifPresentOrElse(
                             node -> {
                                 if (node instanceof LocationTreeNode.LocationNode locationNode) {
-                                    LocationNavigation.navigateToLocationDetails(locationNode.id());
+                                    HumanResourcesNavigation.navigateToLocationDetails(locationNode.id());
                                 }
                             },
-                            LocationNavigation::navigateToLocationList
+                            HumanResourcesNavigation::navigateToLocationList
                     ));
             addLocationButton.addClickListener(e -> addLocation());
             refreshButton.addClickListener(e -> grid.getDataProvider().refreshAll());
@@ -143,6 +146,10 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                     SectionToolbar.group(addLocationButton, refreshButton)
             );
             setSizeFull();
+            setPadding(false);
+            setSpacing(false);
+            getStyle().setOverflow(Style.Overflow.HIDDEN);
+
             add(toolbar, grid);
             getFlexGrow(grid);
         }
@@ -151,7 +158,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
             var dialog = new AddLocationDialog(locationData -> {
                 var id = locationService.insert(locationData);
                 grid.getDataProvider().refreshAll();
-                LocationNavigation.navigateToLocationDetails(id);
+                HumanResourcesNavigation.navigateToLocationDetails(id);
             });
             dialog.open();
         }

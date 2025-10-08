@@ -1,9 +1,9 @@
-package com.example.application.humanresources.location.ui;
+package com.example.application.humanresources.ui;
 
 import com.example.application.common.ui.PostalAddressField;
 import com.example.application.common.ui.TimeZoneField;
-import com.example.application.humanresources.location.LocationData;
-import com.example.application.humanresources.location.LocationType;
+import com.example.application.humanresources.LocationData;
+import com.example.application.humanresources.LocationType;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.datepicker.DatePicker;

@@ -1,9 +1,9 @@
-package com.example.application.humanresources.location.ui;
+package com.example.application.humanresources.ui;
 
 
 import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.Notifications;
-import com.example.application.humanresources.location.Location;
+import com.example.application.humanresources.Location;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;

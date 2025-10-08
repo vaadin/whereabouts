@@ -1,6 +1,6 @@
-package com.example.application.humanresources.location.ui;
+package com.example.application.humanresources.ui;
 
-import com.example.application.humanresources.location.LocationFacility;
+import com.example.application.humanresources.LocationFacility;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.customfield.CustomField;
