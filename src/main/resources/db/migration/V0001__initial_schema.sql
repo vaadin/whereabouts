@@ -84,7 +84,7 @@ create table employee
     primary key (employee_id)
 );
 
-create table employment
+create table employment_details
 (
     employee_id       bigint            not null,
     version           bigint            not null,
