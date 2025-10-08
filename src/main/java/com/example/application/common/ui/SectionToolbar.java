@@ -12,12 +12,14 @@ public final class SectionToolbar extends Composite<VerticalLayout> {
 
     public SectionToolbar(Component... components) {
         var layout = getContent();
-        layout.setPadding(false);
+        layout.setPadding(true);
+        layout.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
         addRow(components);
     }
 
     public void addRow(Component... components) {
         var row = new HorizontalLayout(components);
+        row.setWrap(true);
         row.setWidthFull();
         row.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
@@ -32,6 +34,7 @@ public final class SectionToolbar extends Composite<VerticalLayout> {
     public static Component group(Component... components) {
         var group = new HorizontalLayout(components);
         group.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        group.setWrap(true);
         return group;
     }
 }

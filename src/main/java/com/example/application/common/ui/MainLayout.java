@@ -1,15 +1,17 @@
-package com.example.application.base.ui.view;
+package com.example.application.common.ui;
 
 import com.example.application.base.ui.component.UserMenu;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
@@ -17,34 +19,30 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
 import org.jspecify.annotations.NullMarked;
 
-import static com.vaadin.flow.theme.lumo.LumoUtility.*;
-
 @Layout
-@PermitAll // When security is enabled, allow all authenticated users
+@PermitAll
 @NullMarked
 public final class MainLayout extends AppLayout {
 
     MainLayout(AuthenticationContext authenticationContext) {
-        addClassName("main-layout");
         setPrimarySection(Section.DRAWER);
         addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu(authenticationContext));
     }
 
-    private Div createHeader() {
+    private Component createHeader() {
         var appLogo = VaadinIcon.CUBES.create();
-        appLogo.addClassNames("app-logo", IconSize.LARGE);
+        appLogo.setSize("48px");
 
-        var appName = new Span("CRUD Example");
-        appName.addClassNames("app-name", FontWeight.SEMIBOLD, FontSize.LARGE);
+        var appName = new Span("Whereabouts");
+        appName.getStyle().setFontWeight(Style.FontWeight.BOLD);
 
-        var header = new Div(appLogo, appName);
-        header.addClassNames(Display.FLEX, Padding.MEDIUM, Gap.MEDIUM, AlignItems.CENTER);
+        var header = new VerticalLayout(appLogo, appName);
+        header.setAlignItems(FlexComponent.Alignment.CENTER);
         return header;
     }
 
     private SideNav createSideNav() {
         var nav = new SideNav();
-        nav.addClassNames(Margin.Horizontal.MEDIUM);
         MenuConfiguration.getMenuEntries().forEach(entry -> nav.addItem(createSideNavItem(entry)));
         return nav;
     }
@@ -61,8 +59,6 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createUserMenu(AuthenticationContext authenticationContext) {
-        var userMenu = new UserMenu(authenticationContext);
-        userMenu.addClassName(Margin.Bottom.MEDIUM);
-        return userMenu;
+        return new UserMenu(authenticationContext);
     }
 }
