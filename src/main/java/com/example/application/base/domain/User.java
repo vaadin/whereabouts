@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 @Entity
 @Table(name = "app_user")
 @NullMarked
+@Deprecated(forRemoval = true)
 public class User extends AbstractEntity<Long> {
 
     public static final int USERNAME_MAX_LENGTH = 50;

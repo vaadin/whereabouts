@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @NullMarked
+@Deprecated
 class AppUserDetailsService implements UserDetailsService {
 
     private final UserPrincipalRepository userPrincipalRepository;

@@ -1,6 +1,6 @@
 package com.example.application.humanresources;
 
-import com.example.application.common.AggregateRoot;
+import com.example.application.common.Entity;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -19,7 +19,7 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public record Location(LocationId id, long version,
-                       LocationData data) implements AggregateRoot<LocationId, LocationData> {
+                       LocationData data) implements Entity<LocationId> {
 
     /**
      * Creates a new location instance with updated data while preserving identity and version.

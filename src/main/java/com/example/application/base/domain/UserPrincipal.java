@@ -1,6 +1,6 @@
 package com.example.application.base.domain;
 
-import com.example.application.AppRoles;
+import com.example.application.security.AppRoles;
 import jakarta.persistence.*;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -15,6 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "app_user_principal")
 @NullMarked
+@Deprecated(forRemoval = true)
 public class UserPrincipal extends AbstractEntity<Long> implements UserDetails {
 
     @Id

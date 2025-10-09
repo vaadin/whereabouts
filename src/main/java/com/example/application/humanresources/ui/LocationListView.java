@@ -1,6 +1,5 @@
 package com.example.application.humanresources.ui;
 
-import com.example.application.AppRoles;
 import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.MainLayout;
 import com.example.application.common.ui.SectionToolbar;
@@ -8,6 +7,7 @@ import com.example.application.humanresources.Location;
 import com.example.application.humanresources.LocationId;
 import com.example.application.humanresources.LocationService;
 import com.example.application.humanresources.LocationTreeNode;
+import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -151,7 +151,6 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
             getStyle().setOverflow(Style.Overflow.HIDDEN);
 
             add(toolbar, grid);
-            getFlexGrow(grid);
         }
 
         private void addLocation() {

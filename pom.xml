@@ -12,14 +12,15 @@
 
     <properties>
         <java.version>21</java.version>
-        <vaadin.version>25.0.0-alpha8</vaadin.version>
+        <vaadin.version>25.0.0-alpha14</vaadin.version>
         <archunit.version>1.4.1</archunit.version>
+        <testcontainers-jooq-codegen-maven-plugin.version>0.0.4</testcontainers-jooq-codegen-maven-plugin.version>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0-M2</version>
+        <version>4.0.0-M3</version>
         <relativePath/>
     </parent>
 
@@ -74,6 +75,10 @@
             <artifactId>hibernate-jpamodelgen</artifactId>
             <version>${hibernate.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -166,6 +171,57 @@
                         <goals>
                             <goal>prepare-frontend</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-jooq-codegen-maven-plugin</artifactId>
+                <version>${testcontainers-jooq-codegen-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-codegen</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>generate-jooq-sources</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <database>
+                                <type>POSTGRES</type>
+                                <containerImage>postgres:16-alpine</containerImage>
+                            </database>
+                            <flyway/>
+                            <jooq>
+                                <generator>
+                                    <database>
+                                        <excludes>flyway_schema_history</excludes>
+                                        <inputSchema>public</inputSchema>
+                                        <recordVersionFields>version</recordVersionFields>
+                                    </database>
+                                    <target>
+                                        <packageName>com.example.application.jooq</packageName>
+                                        <directory>target/generated-sources/jooq</directory>
+                                    </target>
+                                </generator>
+                            </jooq>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

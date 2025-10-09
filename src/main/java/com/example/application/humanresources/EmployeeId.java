@@ -1,6 +1,7 @@
 package com.example.application.humanresources;
 
 import com.example.application.common.AbstractLongId;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -10,6 +11,7 @@ public final class EmployeeId extends AbstractLongId {
         super(value);
     }
 
+    @JsonCreator
     public static EmployeeId of(long value) {
         return new EmployeeId(value);
     }

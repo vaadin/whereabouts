@@ -8,6 +8,7 @@ import org.springframework.data.util.ProxyUtils;
 
 @MappedSuperclass
 @NullMarked
+@Deprecated(forRemoval = true)
 public abstract class AbstractEntity<ID> {
 
     public abstract @Nullable ID getId();

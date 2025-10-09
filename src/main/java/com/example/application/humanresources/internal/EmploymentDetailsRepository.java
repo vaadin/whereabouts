@@ -6,10 +6,18 @@ import com.example.application.humanresources.EmploymentDetails;
 import com.example.application.humanresources.EmploymentDetailsData;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Optional;
+
 @NullMarked
-public interface EmploymentDetailsRepository extends
-        Repository.WithUpdate<EmployeeId, EmploymentDetails, EmploymentDetailsData>,
-        Repository.WithDelete<EmployeeId, EmploymentDetails, EmploymentDetailsData> {
+public interface EmploymentDetailsRepository extends Repository {
+
+    boolean isEmpty();
+
+    Optional<EmploymentDetails> findById(EmployeeId id);
 
     EmploymentDetails insert(EmployeeId id, EmploymentDetailsData data);
+
+    EmploymentDetails update(EmploymentDetails employee);
+
+    void deleteById(EmployeeId id);
 }

@@ -1,5 +1,7 @@
 package com.example.application.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -22,6 +24,7 @@ public final class EmailAddress implements ValueObject {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return value;
     }
@@ -106,6 +109,7 @@ public final class EmailAddress implements ValueObject {
      * @return the new {@code EmailAddress}
      * @throws IllegalArgumentException if the value is not a valid e-mail address
      */
+    @JsonCreator
     public static EmailAddress of(String value) {
         if (!isValid(value)) {
             throw new IllegalArgumentException("Invalid e-mail address");

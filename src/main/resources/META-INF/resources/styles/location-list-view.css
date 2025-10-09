@@ -1,0 +1,13 @@
+.location-list-view {
+    height: 100%;
+}
+
+.location-list-view .location-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.location-list-view .location-list vaadin-grid {
+    flex-grow: 1;
+}

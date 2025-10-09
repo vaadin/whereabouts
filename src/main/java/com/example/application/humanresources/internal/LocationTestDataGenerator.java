@@ -29,9 +29,9 @@ class LocationTestDataGenerator {
     private final TransactionTemplate txTemplate;
     private final LocationRepository locationRepository;
 
-    LocationTestDataGenerator(LocationRepository locationRepository, PlatformTransactionManager transactionManager) {
-        this.locationRepository = locationRepository;
+    LocationTestDataGenerator(PlatformTransactionManager transactionManager, LocationRepository locationRepository) {
         this.txTemplate = new TransactionTemplate(transactionManager);
+        this.locationRepository = locationRepository;
     }
 
     private List<LocationFacility> generateRandomFacilities() {

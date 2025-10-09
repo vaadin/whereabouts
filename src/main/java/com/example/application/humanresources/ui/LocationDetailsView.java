@@ -1,10 +1,10 @@
 package com.example.application.humanresources.ui;
 
-import com.example.application.AppRoles;
 import com.example.application.common.address.PostalAddress;
 import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.SectionToolbar;
 import com.example.application.humanresources.*;
+import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -74,7 +74,6 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
                 new FormLayout.ResponsiveStep("1500px", 3)
         );
         add(new Scroller(sections));
-        //setFlexGrow(1, sections);
 
         // Populate components
         ComponentEffect.effect(this, () -> {

@@ -1,6 +1,5 @@
 package com.example.application.common.ui;
 
-import com.example.application.base.ui.component.UserMenu;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Span;

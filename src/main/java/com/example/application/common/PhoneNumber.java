@@ -1,5 +1,7 @@
 package com.example.application.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -22,6 +24,7 @@ public final class PhoneNumber implements ValueObject {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return value;
     }
@@ -92,6 +95,7 @@ public final class PhoneNumber implements ValueObject {
      * @return the new {@code PhoneNumber}
      * @throws IllegalArgumentException if the value is not a valid phone number, even after sanitization
      */
+    @JsonCreator
     public static PhoneNumber of(String value) {
         var sanitized = sanitize(value);
         if (!isValid(sanitized)) {

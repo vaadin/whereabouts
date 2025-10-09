@@ -23,7 +23,6 @@ import java.io.Serializable;
  * @param <ID> the type of identifier used by this entity
  * @see Identifier
  * @see ValueObject
- * @see AggregateRoot
  */
 @NullMarked
 public interface Entity<ID extends Identifier> extends Serializable {

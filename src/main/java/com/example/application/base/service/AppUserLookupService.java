@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 @PreAuthorize("isAuthenticated()")
 @NullMarked
+@Deprecated
 public class AppUserLookupService {
 
     private final UserRepository userRepository;

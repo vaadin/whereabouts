@@ -37,8 +37,8 @@ public class ResizeObserver implements Serializable {
                     """, event.getSource(), elementPropertyName);
         });
         var listenerRegistration = component.getElement().addEventListener("content-resize", event -> {
-            this.width = (int) event.getEventData().getNumber("event.detail.w");
-            this.height = (int) event.getEventData().getNumber("event.detail.h");
+            this.width = event.getEventData().get("event.detail.w").asInt();
+            this.height = event.getEventData().get("event.detail.h").asInt();
             fireEvent(new ResizeEvent(component, width, height));
         });
         listenerRegistration.addEventData("event.detail.w");

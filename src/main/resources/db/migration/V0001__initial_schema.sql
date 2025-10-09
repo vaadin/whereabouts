@@ -1,20 +1,22 @@
-create sequence app_user_id_seq start 100 increment 50;
+create sequence app_user_id_seq start 100 increment 1;
 
 create table app_user
 (
-    user_id      bigint not null primary key,
+    user_id          bigint  not null,
     version      bigint not null,
-    username     text   not null unique,
-    display_name text   not null
+    username     text   not null,
+    encoded_password text,
+    display_name text   not null,
+    enabled          boolean not null default false,
+    primary key (user_id),
+    unique (username)
 );
 
-create table app_user_principal
+create table app_user_role
 (
-    user_id          bigint  not null,
-    encoded_password text,
-    enabled          boolean not null default false,
-    admin            boolean not null default false,
-    primary key (user_id),
+    user_id   bigint not null,
+    role_name text   not null,
+    primary key (user_id, role_name),
     foreign key (user_id) references app_user (user_id)
 );
 
@@ -81,7 +83,10 @@ create table employee
     mobile_phone   varchar(16),
     home_phone     varchar(16),
     work_email     varchar(320) not null,
-    primary key (employee_id)
+    user_id bigint,
+    primary key (employee_id),
+    unique (user_id),
+    foreign key (user_id) references app_user (user_id)
 );
 
 create table employment_details
@@ -146,36 +151,43 @@ create table team_membership_history
 -- Projects
 ------------
 
-create sequence project_id_seq start 100 increment 50;
+create sequence project_id_seq start 100 increment 1;
 
 create table project
 (
-    project_id bigint not null primary key,
-    name       text   not null
+    project_id  bigint not null,
+    version     bigint not null,
+    name        text   not null,
+    description text,
+    primary key (project_id)
 );
 
-create sequence task_id_seq start 100 increment 50;
+create sequence task_id_seq start 100 increment 1;
+
+create type task_priority as enum ('URGENT', 'HIGH', 'NORMAL', 'LOW');
+create type task_status as enum ('PENDING', 'PLANNED', 'IN_PROGRESS', 'PAUSED', 'DONE');
 
 create table task
 (
-    task_id       bigint       not null primary key,
-    version       bigint       not null,
-    project_id    bigint       not null,
-    description   text         not null,
+    task_id       bigint        not null,
+    version       bigint        not null,
+    project_id    bigint        not null,
+    description   text          not null,
     due_date      date,
     due_time      time,
-    time_zone     varchar(100) not null,
+    time_zone     varchar(64)   not null,
     due_date_time timestamp with time zone,
-    task_status   int          not null,
-    task_priority int          not null,
+    task_status   task_status   not null,
+    task_priority task_priority not null,
+    primary key (task_id),
     foreign key (project_id) references project (project_id)
 );
 
 create table task_assignee
 (
-    task_id bigint not null,
-    user_id bigint not null,
-    primary key (task_id, user_id),
+    task_id     bigint not null,
+    employee_id bigint not null,
+    primary key (task_id, employee_id),
     foreign key (task_id) references task (task_id),
-    foreign key (user_id) references app_user (user_id)
+    foreign key (employee_id) references employee (employee_id)
 );
