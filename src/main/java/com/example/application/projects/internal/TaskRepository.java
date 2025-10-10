@@ -2,13 +2,17 @@ package com.example.application.projects.internal;
 
 import com.example.application.common.Repository;
 import com.example.application.projects.*;
+import com.vaadin.flow.data.provider.SortOrder;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @NullMarked
 public interface TaskRepository extends Repository {
+
+    Optional<Task> findById(TaskId id);
 
     TaskId insert(TaskData data);
 
@@ -16,7 +20,5 @@ public interface TaskRepository extends Repository {
 
     void deleteById(TaskId id);
 
-    List<Task> findAll(ProjectId project, Pageable pageable);
-
-    List<Task> findByFilter(ProjectId project, TaskFilter filter, Pageable pageable);
+    Stream<Task> findByFilter(ProjectId project, TaskFilter filter, int limit, int offset, List<SortOrder<TaskSortableProperty>> sortOrders);
 }

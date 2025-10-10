@@ -1,25 +1,18 @@
 package com.example.application.humanresources.internal;
 
-import com.example.application.TestcontainersConfiguration;
+import com.example.application.IntegrationTest;
 import com.example.application.humanresources.EmploymentDetailsData;
 import com.example.application.humanresources.EmploymentStatus;
 import com.example.application.humanresources.EmploymentType;
 import com.example.application.humanresources.WorkArrangement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Transactional
-@ActiveProfiles("integration-test")
+@IntegrationTest
 class EmploymentDetailsRepositoryTest {
 
     @Autowired
@@ -46,9 +39,11 @@ class EmploymentDetailsRepositoryTest {
         );
 
         var returned = repository.insert(employeeId, originalData);
-        var retrieved = repository.findById(employeeId).orElseThrow();
+        assertThat(returned.id()).isEqualTo(employeeId);
+        assertThat(returned.version()).isEqualTo(1);
+        assertThat(returned.data()).isEqualTo(originalData);
 
-        assertThat(returned).isEqualTo(retrieved);
+        var retrieved = repository.findById(employeeId).orElseThrow();
         assertThat(retrieved.id()).isEqualTo(employeeId);
         assertThat(retrieved.version()).isEqualTo(1);
         assertThat(retrieved.data()).isEqualTo(originalData);
@@ -68,6 +63,9 @@ class EmploymentDetailsRepositoryTest {
         assertThat(updated.version()).isEqualTo(2);
         assertThat(updated.data()).isEqualTo(updatedData);
 
-        assertThat(repository.findById(employeeId)).contains(updated);
+        retrieved = repository.findById(employeeId).orElseThrow();
+        assertThat(retrieved.id()).isEqualTo(employeeId);
+        assertThat(retrieved.version()).isEqualTo(2);
+        assertThat(retrieved.data()).isEqualTo(updatedData);
     }
 }

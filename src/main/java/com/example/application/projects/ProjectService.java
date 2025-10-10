@@ -3,15 +3,15 @@ package com.example.application.projects;
 import com.example.application.projects.internal.ProjectQuery;
 import com.example.application.projects.internal.ProjectRepository;
 import com.example.application.security.AppRoles;
+import com.vaadin.flow.data.provider.SortOrder;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @PreAuthorize("hasRole('" + AppRoles.PROJECT_READ + "')")
@@ -27,12 +27,8 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectListItem> findProjectListItems(@Nullable String searchTerm, Pageable pageable) {
-        if (searchTerm == null || searchTerm.isEmpty()) {
-            return projectQuery.findAllProjectListItems(pageable);
-        } else {
-            return projectQuery.findProjectListItemsBySearchTerm(searchTerm, pageable);
-        }
+    public Stream<ProjectListItem> findProjectListItems(@Nullable String searchTerm, int limit, int offset, SortOrder<ProjectSortableProperty> sortOrder) {
+        return projectQuery.findProjectListItemsBySearchTerm(searchTerm, limit, offset, sortOrder);
     }
 
     @Transactional(readOnly = true)
@@ -41,7 +37,7 @@ public class ProjectService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('" + AppRoles.PROJECT_WRITE + "')")
+    @PreAuthorize("hasRole('" + AppRoles.PROJECT_CREATE + "')")
     public ProjectId insert(ProjectData data) {
         return projectRepository.insert(data);
     }

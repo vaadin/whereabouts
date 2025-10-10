@@ -1,58 +1,60 @@
 package com.example.application.projects;
 
-import com.example.application.projects.domain.Task;
-import com.example.application.projects.domain.TaskSpecifications;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.springframework.data.jpa.domain.Specification;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @NullMarked
-public class TaskFilter {
+public record TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
 
-    private @Nullable String searchTerm;
-    private final Set<TaskStatus> statuses = new HashSet<>();
-    private final Set<TaskPriority> priorities = new HashSet<>();
-
-    public void setSearchTerm(@Nullable String searchTerm) {
+    public TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
         this.searchTerm = searchTerm;
+        this.statuses = Set.copyOf(statuses);
+        this.priorities = Set.copyOf(priorities);
     }
 
-    public void include(TaskStatus status) {
-        statuses.add(status);
+    public TaskFilter withSearchTerm(@Nullable String searchTerm) {
+        return new TaskFilter(searchTerm, statuses, priorities);
     }
 
-    public void exclude(TaskStatus status) {
-        statuses.remove(status);
+    public TaskFilter withStatus(TaskStatus status) {
+        return new TaskFilter(searchTerm, add(statuses, status), priorities);
     }
 
-    public void include(TaskPriority priority) {
-        priorities.add(priority);
+    public TaskFilter withoutStatus(TaskStatus status) {
+        return new TaskFilter(searchTerm, remove(statuses, status), priorities);
     }
 
-    public void exclude(TaskPriority priority) {
-        priorities.remove(priority);
+    public TaskFilter withPriority(TaskPriority priority) {
+        return new TaskFilter(searchTerm, statuses, add(priorities, priority));
     }
 
-    public boolean isEmpty() {
-        return (searchTerm == null || searchTerm.isEmpty()) && statuses.isEmpty() && priorities.isEmpty();
+    public TaskFilter withoutPriority(TaskPriority priority) {
+        return new TaskFilter(searchTerm, statuses, remove(priorities, priority));
     }
 
-    @Deprecated
-    Specification<Task> toSpecification() {
-        var specifications = new ArrayList<Specification<Task>>();
-        if (searchTerm != null && !searchTerm.isEmpty()) {
-            specifications.add(TaskSpecifications.bySearchTerm(searchTerm));
+    public static TaskFilter empty() {
+        return new TaskFilter(null, Collections.emptySet(), Collections.emptySet());
+    }
+
+    private static <T> Set<T> add(Set<T> items, T itemToAdd) {
+        if (items.contains(itemToAdd)) {
+            return items;
         }
-        if (!statuses.isEmpty()) {
-            specifications.add(TaskSpecifications.byStatus(statuses));
+        var newSet = new HashSet<>(items);
+        newSet.add(itemToAdd);
+        return newSet;
+    }
+
+    private static <T> Set<T> remove(Set<T> items, T itemToRemove) {
+        if (!items.contains(itemToRemove)) {
+            return items;
         }
-        if (!priorities.isEmpty()) {
-            specifications.add(TaskSpecifications.byPriority(priorities));
-        }
-        return Specification.allOf(specifications);
+        var newSet = new HashSet<>(items);
+        newSet.remove(itemToRemove);
+        return newSet;
     }
 }

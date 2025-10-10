@@ -1,6 +1,6 @@
 package com.example.application.humanresources.internal;
 
-import com.example.application.TestcontainersConfiguration;
+import com.example.application.IntegrationTest;
 import com.example.application.common.Country;
 import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
@@ -11,20 +11,13 @@ import com.example.application.common.address.InternationalPostalAddress;
 import com.example.application.humanresources.EmployeeData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Transactional
-@ActiveProfiles("integration-test")
+@IntegrationTest
 class EmployeeRepositoryTest {
 
     @Autowired
@@ -88,7 +81,10 @@ class EmployeeRepositoryTest {
         assertThat(updated.version()).isEqualTo(2);
         assertThat(updated.data()).isEqualTo(updatedData);
 
-        assertThat(repository.findById(id)).contains(updated);
+        retrieved = repository.findById(id).orElseThrow();
+        assertThat(retrieved.id()).isEqualTo(id);
+        assertThat(retrieved.version()).isEqualTo(2);
+        assertThat(retrieved.data()).isEqualTo(updatedData);
     }
 
 }

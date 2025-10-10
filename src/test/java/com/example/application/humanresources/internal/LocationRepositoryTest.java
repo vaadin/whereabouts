@@ -1,6 +1,6 @@
 package com.example.application.humanresources.internal;
 
-import com.example.application.TestcontainersConfiguration;
+import com.example.application.IntegrationTest;
 import com.example.application.common.Country;
 import com.example.application.common.address.FinnishPostalAddress;
 import com.example.application.common.address.FinnishPostalCode;
@@ -10,10 +10,6 @@ import com.example.application.humanresources.LocationFacility;
 import com.example.application.humanresources.LocationType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,10 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Transactional
-@ActiveProfiles("integration-test")
+@IntegrationTest
 class LocationRepositoryTest {
 
     @Autowired
@@ -56,8 +49,8 @@ class LocationRepositoryTest {
     void insert_get_and_update_include_all_properties() {
         var originalData = createLocationData();
         var id = repository.insert(originalData);
-        var retrieved = repository.findById(id).orElseThrow();
 
+        var retrieved = repository.findById(id).orElseThrow();
         assertThat(retrieved.id()).isEqualTo(id);
         assertThat(retrieved.version()).isEqualTo(1);
         assertThat(retrieved.data()).isEqualTo(originalData);
@@ -87,6 +80,9 @@ class LocationRepositoryTest {
         assertThat(updated.version()).isEqualTo(2);
         assertThat(updated.data()).isEqualTo(updatedData);
 
-        assertThat(repository.findById(id)).contains(updated);
+        retrieved = repository.findById(id).orElseThrow();
+        assertThat(retrieved.id()).isEqualTo(id);
+        assertThat(retrieved.version()).isEqualTo(2);
+        assertThat(retrieved.data()).isEqualTo(updatedData);
     }
 }

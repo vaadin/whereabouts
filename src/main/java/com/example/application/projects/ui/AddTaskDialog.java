@@ -15,12 +15,11 @@ class AddTaskDialog extends Dialog {
     private final TaskDataForm form;
 
     AddTaskDialog(TaskDataForm.AssigneeLookupBySearchTerm assigneeLookupBySearchTerm,
-                  TaskDataForm.AssigneeLookupById assigneeLookupById,
                   TaskData initialTaskData,
                   SaveCallback saveCallback) {
         this.saveCallback = saveCallback;
 
-        form = new TaskDataForm(assigneeLookupBySearchTerm, assigneeLookupById);
+        form = new TaskDataForm(assigneeLookupBySearchTerm);
         form.setFormDataObject(initialTaskData);
 
         var saveBtn = new Button("Save", event -> save());

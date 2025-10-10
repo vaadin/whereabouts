@@ -1,7 +1,6 @@
 package com.example.application.projects;
 
 import com.example.application.common.ValueObject;
-import com.example.application.humanresources.EmployeeId;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -10,6 +9,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Collections;
 
 @NullMarked
 public record TaskData(
@@ -20,7 +20,7 @@ public record TaskData(
         ZoneId timeZone,
         TaskStatus status,
         TaskPriority priority,
-        Collection<EmployeeId> assignees
+        Collection<TaskAssignee> assignees
 ) implements ValueObject {
 
     public static final String PROP_PROJECT = "project";
@@ -39,5 +39,15 @@ public record TaskData(
         }
         var time = (dueTime != null) ? dueTime : LocalTime.of(23, 59, 59); // end of day
         return dueDate.atTime(time).atZone(timeZone);
+    }
+
+    public @Nullable ZonedDateTime dueDateTimeInZone(ZoneId timeZone) {
+        var dueDateTime = dueDateTime();
+        return dueDateTime == null ? null : dueDateTime.withZoneSameInstant(timeZone);
+    }
+
+    public static TaskData createDefault(ProjectId project, ZoneId timeZone) {
+        return new TaskData(project, "", null, null, timeZone, TaskStatus.PENDING,
+                TaskPriority.NORMAL, Collections.emptySet());
     }
 }

@@ -1,10 +1,12 @@
 package com.example.application.projects.ui;
 
+import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.MainLayout;
 import com.example.application.common.ui.SectionToolbar;
 import com.example.application.projects.ProjectId;
 import com.example.application.projects.ProjectListItem;
 import com.example.application.projects.ProjectService;
+import com.example.application.projects.ProjectSortableProperty;
 import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
@@ -18,37 +20,37 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Section;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.provider.SortOrder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
-import jakarta.annotation.security.PermitAll;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import jakarta.annotation.security.RolesAllowed;
 
 @ParentLayout(MainLayout.class)
 @Route(value = "projects", layout = MainLayout.class)
 @PageTitle("Projects")
 @Menu(order = 10, icon = "icons/folder_check_2.svg", title = "Projects")
-@PermitAll
+@RolesAllowed(AppRoles.PROJECT_READ)
 class ProjectListView extends MasterDetailLayout implements AfterNavigationObserver {
 
     private final ProjectService projectService;
     private final ProjectList projectList;
-    private final boolean isAdmin; // Only admins can add projects
+    private final boolean canCreate;
 
     ProjectListView(AuthenticationContext authenticationContext, ProjectService projectService) {
         this.projectService = projectService;
 
-        isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
+        canCreate = authenticationContext.hasRole(AppRoles.PROJECT_CREATE);
 
         projectList = new ProjectList();
 
@@ -106,7 +108,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
             var addProjectButton = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
             addProjectButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-            addProjectButton.setVisible(isAdmin);
+            addProjectButton.setVisible(canCreate);
 
             searchField = new TextField();
             searchField.setPlaceholder("Search");
@@ -124,8 +126,9 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> projectService.findProjectListItems(searchField.getValue(),
-                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())));
+            grid.setItems((CallbackDataProvider.FetchCallback<ProjectListItem, Void>) query ->
+                    projectService.findProjectListItems(searchField.getValue(), query.getLimit(), query.getOffset(),
+                            sortField.getValue().getSortOrder()));
             grid.addColumn(new ComponentRenderer<>(this::createProjectCard));
             grid.setSizeFull();
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -159,16 +162,16 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
     private class ProjectListEmptyComponent extends VerticalLayout {
         ProjectListEmptyComponent() {
-            var icon = new SvgIcon("icons/folder_check_2.svg");
+            var icon = AppIcon.FOLDER_CHECK_2.create();
             icon.setSize("60px");
             var title = new H4("No projects found");
             var instruction = new Span("Change the search criteria or add a project");
 
             var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
             addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-            addProject.setVisible(isAdmin);
+            addProject.setVisible(canCreate);
 
-            var showAll = new Button("Show All", new SvgIcon("icons/filter_none.svg"), event -> showAll());
+            var showAll = new Button("Show All", AppIcon.FILTER_NONE.create(), event -> showAll());
             showAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
             add(icon, title, instruction, new HorizontalLayout(addProject, showAll));
@@ -180,25 +183,24 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
     }
 
     private enum ProjectSortOrder {
-        NAME_ASC("Sort by name (A-Z)", Sort.by(Sort.Direction.ASC, "name")),
-        NAME_DESC("Sort by name (Z-A)", Sort.by(Sort.Direction.DESC, "name"))
+        NAME_ASC("Sort by name (A-Z)", new SortOrder<>(ProjectSortableProperty.NAME, SortDirection.ASCENDING)),
+        NAME_DESC("Sort by name (Z-A)", new SortOrder<>(ProjectSortableProperty.NAME, SortDirection.DESCENDING));
         // TODO add more options
-        ;
 
         private final String displayName;
-        private final Sort sort;
+        private final SortOrder<ProjectSortableProperty> sortOrder;
 
-        ProjectSortOrder(String displayName, Sort sort) {
+        ProjectSortOrder(String displayName, SortOrder<ProjectSortableProperty> sortOrder) {
             this.displayName = displayName;
-            this.sort = sort;
+            this.sortOrder = sortOrder;
         }
 
         String getDisplayName() {
             return displayName;
         }
 
-        Sort getSort() {
-            return sort;
+        SortOrder<ProjectSortableProperty> getSortOrder() {
+            return sortOrder;
         }
     }
 }

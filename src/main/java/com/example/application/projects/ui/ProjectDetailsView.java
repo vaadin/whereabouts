@@ -2,13 +2,16 @@ package com.example.application.projects.ui;
 
 import com.example.application.base.ui.component.Badges;
 import com.example.application.base.ui.component.ResizeObserver;
+import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.Notifications;
 import com.example.application.common.ui.SectionToolbar;
+import com.example.application.common.ui.SortOrderUtil;
 import com.example.application.projects.*;
 import com.example.application.security.AppRoles;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.ComponentEffect;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,8 +22,10 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -29,6 +34,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.function.SerializableRunnable;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -36,91 +42,98 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vaadin.signals.ValueSignal;
-import jakarta.annotation.security.PermitAll;
-import org.jspecify.annotations.Nullable;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
 @Route(value = "projects/:projectId", layout = ProjectListView.class)
-@PermitAll // When security is enabled, allow all authenticated users
-class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDynamicTitle {
+@RolesAllowed(AppRoles.PROJECT_READ)
+class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserver, HasDynamicTitle {
 
     public static final String PARAM_PROJECT_ID = "projectId";
 
     private final TaskService taskService;
-    private final H2 title;
-    private final TaskList taskList;
-    private final boolean isAdmin;
+    private final boolean canUpdate;
+    private final boolean canDelete;
 
     private final ValueSignal<ZoneId> timeZoneSignal = new ValueSignal<>(ZoneId.class);
     private final ValueSignal<Project> projectSignal = new ValueSignal<>(Project.class);
-    private ZoneId timeZone = ZoneId.systemDefault(); // TODO Replace with timezone from browser, stored in a signal
-
-    @Nullable
-    private Project project; // TODO Replace with a signal.
 
     ProjectDetailsView(AuthenticationContext authenticationContext,
                        TaskService taskService) {
-        isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
-
         this.taskService = taskService;
+        var canCreate = authenticationContext.hasRole(AppRoles.TASK_CREATE);
+        canUpdate = authenticationContext.hasRole(AppRoles.TASK_UPDATE);
+        canDelete = authenticationContext.hasRole(AppRoles.TASK_DELETE);
 
-        title = new H2("");
+        ComponentEffect.effect(this, () -> {
+            var project = projectSignal.value();
+            var timeZone = timeZoneSignal.value();
+            removeAll();
 
-        var addTaskButton = new Button("Add Task", event -> addTask());
-        addTaskButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            if (project != null && timeZone != null) {
+                // Create components
+                var title = new H2(project.data().name());
 
-        taskList = new TaskList();
+                var addTaskButton = new Button("Add Task");
+                addTaskButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                addTaskButton.setVisible(canCreate);
 
-        setSizeFull();
-        addClassNames("task-list-view", LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
-        add(new SectionToolbar(title, addTaskButton), taskList);
+                var taskList = new TaskList(project, timeZone);
+
+                // Add listeners
+                addTaskButton.addClickListener(e -> addTask(project, timeZone, taskList.grid.getDataProvider()::refreshAll));
+
+                // Layout components
+                setSizeFull();
+                add(new SectionToolbar(title, addTaskButton), taskList);
+            }
+        });
     }
 
-
-    private void setProject(Project projectSignal) {
-        this.projectSignal = projectSignal;
-        refresh();
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails ->
+                timeZoneSignal.value(
+                        Optional.ofNullable(extendedClientDetails.getTimeZoneId())
+                                .map(ZoneId::of)
+                                .orElse(ZoneId.systemDefault())
+                ));
     }
 
-
-    private void addTask() {
-        if (projectSignal == null) {
-            throw new IllegalStateException("Cannot add task: project is null");
-        }
-
-        var dialog = new AddTaskDialog(appUserLookupService, () -> new Task(projectSignal, timeZoneSignal), newTask -> {
-            taskService.saveTask(newTask);
-            refresh();
-            notifyProjectTasksChanged();
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task created successfully",
+    private void addTask(Project project, ZoneId timeZone, SerializableRunnable refresh) {
+        var dialog = new AddTaskDialog(taskService::findAssigneesBySearchTerm, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
+            taskService.insertTask(newTaskData);
+            refresh.run();
+            getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(), "Task created successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
 
-    private void editTask(Task task) {
-        var dialog = new EditTaskDialog(appUserLookupService, task, editedTask -> {
-            refreshTask(taskService.saveTask(editedTask));
-            notifyProjectTasksChanged();
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/check.svg"), "Task updated successfully",
+    private void editTask(Task task, SerializableRunnable refresh) {
+        var dialog = new EditTaskDialog(taskService::findAssigneesBySearchTerm, task, editedTask -> {
+            var saved = taskService.updateTask(editedTask);
+            refresh.run();
+            getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(), "Task updated successfully",
                     NotificationVariant.LUMO_SUCCESS).open();
         });
         dialog.open();
     }
 
-    private void deleteTask(Task task) {
+    private void deleteTask(Task task, SerializableRunnable refresh) {
         var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
-            taskService.deleteTask(task);
-            refresh();
-            notifyProjectTasksChanged();
-            Notifications.createNonCriticalNotification(new SvgIcon("icons/delete_sweep.svg"),
+            taskService.deleteTask(task.id());
+            refresh.run();
+            getProjectListView().ifPresent(view -> view.onProjectUpdated(task.data().project()));
+            Notifications.createNonCriticalNotification(AppIcon.DELETE_SWEEP.create(),
                     "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
         }, "Cancel", event -> {
         });
@@ -128,29 +141,8 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         dialog.open();
     }
 
-    private void refresh() {
-        if (projectSignal == null) {
-            throw new IllegalStateException("Cannot refresh: project is null");
-        }
-        title.setText(projectSignal.getName());
-        taskList.grid.getDataProvider().refreshAll();
-    }
-
-    private void refreshTask(Task task) {
-        taskList.grid.getDataProvider().refreshItem(task);
-    }
-
-    private void notifyProjectTasksChanged() {
-        if (projectSignal == null) {
-            throw new IllegalStateException("Cannot notify: project is null");
-        }
-        var event = new ProjectTasksChangedEvent(this, projectSignal.requireId());
-        propagateEvent(this, event);
-    }
-
-    private static void propagateEvent(Component component, ComponentEvent<? extends Component> event) {
-        ComponentUtil.fireEvent(component, event);
-        component.getParent().ifPresent(parent -> propagateEvent(parent, event));
+    private Optional<ProjectListView> getProjectListView() {
+        return getParent().filter(ProjectListView.class::isInstance).map(ProjectListView.class::cast);
     }
 
     private class TaskList extends Div {
@@ -159,45 +151,57 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
                 .withLocale(getLocale());
         private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
                 .withLocale(getLocale());
+        private final Project project;
+        private final ZoneId timeZone;
         private final Grid<Task> grid;
-        private final TaskFilter filter;
         private final Grid.Column<Task> cardColumn;
+        private final ValueSignal<TaskFilter> filterSignal = new ValueSignal<>(TaskFilter.empty());
 
-        TaskList() {
-            filter = new TaskFilter();
+        TaskList(Project project, ZoneId timeZone) {
+            this.project = project;
+            this.timeZone = timeZone;
 
             var searchField = new TextField();
             searchField.setPlaceholder("Search");
-            searchField.setPrefixComponent(new SvgIcon("icons/search.svg"));
+            searchField.setPrefixComponent(AppIcon.SEARCH.create());
             searchField.addClassNames(LumoUtility.Flex.GROW);
             searchField.setValueChangeMode(ValueChangeMode.LAZY);
-            searchField.addValueChangeListener(event -> {
-                filter.setSearchTerm(event.getValue());
-                refresh();
-            });
 
             var filterMenu = createFilterMenu();
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItemsPageable(pageable -> projectSignal == null ? Collections.emptyList() : taskService.findTasks(projectSignal, filter, pageable));
+            grid.setItems(query -> taskService.findTasks(project.id(), filterSignal.peek(),
+                    query.getLimit(), query.getOffset(),
+                    SortOrderUtil.toSortOrderList(TaskSortableProperty::valueOf, query.getSortOrders())));
             grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
             grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
-                    .setFlexGrow(0).setSortProperty(Task.STATUS_SORT_PROPERTY);
-            grid.addColumn(Task::getDescription).setHeader("Description").setFlexGrow(1)
-                    .setSortProperty(Task.DESCRIPTION_SORT_PROPERTY);
+                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.STATUS.name());
+            grid.addColumn(task -> task.data().description()).setHeader("Description").setFlexGrow(1)
+                    .setSortProperty(TaskSortableProperty.DESCRIPTION.name());
             grid.addColumn(new ComponentRenderer<>(this::createDueDate))
-                    .setHeader("Due Date (%s)".formatted(timeZoneSignal.getDisplayName(TextStyle.SHORT, getLocale())))
-                    .setWidth("200px").setFlexGrow(0).setSortProperty(Task.DUE_DATE_SORT_PROPERTY);
+                    .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
+                    .setWidth("200px").setFlexGrow(0).setSortProperty(TaskSortableProperty.DUE_DATE.name());
             grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge)).setHeader("Priority").setWidth("150px")
-                    .setFlexGrow(0).setSortProperty(Task.PRIORITY_SORT_PROPERTY);
+                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.PRIORITY.name());
             grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
             grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
                     .setWidth("60px").setFlexGrow(0);
             cardColumn = grid.addColumn(new ComponentRenderer<>(this::createTaskCard));
-            grid.setEmptyStateComponent(new TaskListEmptyComponent());
+            grid.setEmptyStateComponent(createEmptyComponent());
             createContextMenu(grid.addContextMenu());
 
+            // Add listeners and effects
+            searchField.addValueChangeListener(event ->
+                    filterSignal.update(old -> old.withSearchTerm(event.getValue())));
+
+            ComponentEffect.effect(this, () -> {
+                // Refresh the grid whenever the filter changes
+                filterSignal.value();
+                grid.getDataProvider().refreshAll();
+            });
+
+            // Layout components
             setSizeFull();
             addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
             add(new SectionToolbar(searchField, filterMenu), grid);
@@ -220,19 +224,20 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         }
 
         private Component createStatusBadge(Task task) {
-            return switch (task.getStatus()) {
-                case PENDING -> Badges.createContrast(task.getStatus().getDisplayName());
-                case PLANNED, IN_PROGRESS -> Badges.createDefault(task.getStatus().getDisplayName());
-                case PAUSED -> Badges.createError(task.getStatus().getDisplayName());
-                case DONE -> Badges.createSuccess(task.getStatus().getDisplayName());
+            var displayName = task.data().status().getDisplayName();
+            return switch (task.data().status()) {
+                case PENDING -> Badges.createContrast(displayName);
+                case PLANNED, IN_PROGRESS -> Badges.createDefault(displayName);
+                case PAUSED -> Badges.createError(displayName);
+                case DONE -> Badges.createSuccess(displayName);
             };
         }
 
         private Component createPriorityBadge(Task task) {
-            var badge = new Span(task.getPriority().getDisplayName());
+            var badge = new Span(task.data().priority().getDisplayName());
             var themeList = badge.getElement().getThemeList();
             themeList.add("badge");
-            switch (task.getPriority()) {
+            switch (task.data().priority()) {
                 case URGENT -> {
                     themeList.add("error");
                 }
@@ -250,7 +255,7 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         }
 
         private Component createDueDate(Task task) {
-            var dueDateTime = task.getDueDateTimeInZone(timeZoneSignal);
+            var dueDateTime = task.data().dueDateTimeInZone(timeZone);
             if (dueDateTime == null) {
                 return Badges.createContrast("Never");
             }
@@ -264,13 +269,13 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         }
 
         private Component createAssignees(Task task) {
-            if (task.getAssignees().isEmpty()) {
+            if (task.data().assignees().isEmpty()) {
                 return Badges.createContrast("None");
             }
 
             var assignees = new AvatarGroup();
-            task.getAssignees().stream()
-                    .map(userInfo -> new AvatarGroup.AvatarGroupItem(userInfo.getDisplayName()))
+            task.data().assignees().stream()
+                    .map(assignee -> new AvatarGroup.AvatarGroupItem(assignee.displayName()))
                     .forEach(assignees::add);
             return assignees;
         }
@@ -279,11 +284,13 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
             var menuBar = new MenuBar();
             menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE,
                     MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_SMALL);
-            var item = menuBar.addItem(new SvgIcon("icons/more_vert.svg"));
+            var item = menuBar.addItem(AppIcon.MORE_VERT.create());
             var subMenu = item.getSubMenu();
-            subMenu.addItem("Edit", event -> editTask(task));
-            if (isAdmin) {
-                var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task));
+            if (canUpdate) {
+                subMenu.addItem("Edit", event -> editTask(task, grid.getDataProvider()::refreshAll));
+            }
+            if (canDelete) {
+                var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task, grid.getDataProvider()::refreshAll));
                 deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
             }
             return menuBar;
@@ -297,8 +304,8 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
             header.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.ROW, LumoUtility.Gap.SMALL);
             card.setHeader(header);
             card.setHeaderSuffix(createActionMenu(task));
-            card.add(task.getDescription());
-            var dueDateTime = task.getDueDateTimeInZone(timeZoneSignal);
+            card.add(task.data().description());
+            var dueDateTime = task.data().dueDateTimeInZone(timeZone);
             if (dueDateTime != null) {
                 var dueDiv = new Div();
                 dueDiv.setText("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime)));
@@ -310,11 +317,13 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         }
 
         private void createContextMenu(GridContextMenu<Task> contextMenu) {
-            contextMenu.addItem("Edit", event -> event.getItem().ifPresent(ProjectDetailsView.this::editTask));
-            if (isAdmin) {
-                var deleteItem = contextMenu.addItem("Delete",
-                        event -> event.getItem().ifPresent(ProjectDetailsView.this::deleteTask));
-                deleteItem.addClassName(LumoUtility.TextColor.ERROR);
+            if (canUpdate) {
+                contextMenu.addItem("Edit", event -> event.getItem()
+                        .ifPresent(task -> editTask(task, grid.getDataProvider()::refreshAll)));
+            }
+            if (canDelete) {
+                contextMenu.addItem("Delete", event -> event.getItem()
+                        .ifPresent(task -> deleteTask(task, grid.getDataProvider()::refreshAll)));
             }
             // Don't show the menu unless opened on a row
             contextMenu.setDynamicContentHandler(Objects::nonNull);
@@ -323,51 +332,48 @@ class ProjectDetailsView extends Main implements AfterNavigationObserver, HasDyn
         private Component createFilterMenu() {
             var menuBar = new MenuBar();
             menuBar.addThemeVariants(MenuBarVariant.LUMO_DROPDOWN_INDICATORS);
-            var item = menuBar.addItem(new SvgIcon("icons/filter_list.svg"), "Filters");
+            var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
             var subMenu = item.getSubMenu();
 
             for (var status : TaskStatus.values()) {
                 subMenu.addItem(status.getDisplayName(), event -> {
                     if (event.getSource().isChecked()) {
-                        filter.include(status);
+                        filterSignal.update(old -> old.withStatus(status));
                     } else {
-                        filter.exclude(status);
+                        filterSignal.update(old -> old.withoutStatus(status));
                     }
-                    refresh();
                 }).setCheckable(true);
             }
             subMenu.addSeparator();
             for (var priority : TaskPriority.values()) {
                 subMenu.addItem(priority.getDisplayName(), event -> {
                     if (event.getSource().isChecked()) {
-                        filter.include(priority);
+                        filterSignal.update(old -> old.withPriority(priority));
                     } else {
-                        filter.exclude(priority);
+                        filterSignal.update(old -> old.withoutPriority(priority));
                     }
-                    refresh();
                 }).setCheckable(true);
             }
             return menuBar;
         }
-    }
 
-    private class TaskListEmptyComponent extends VerticalLayout {
-        TaskListEmptyComponent() {
-            var icon = new SvgIcon("icons/list_alt_check.svg");
+        private Component createEmptyComponent() {
+            var icon = AppIcon.LIST_ALT_CHECK.create();
             icon.setSize("60px");
             var title = new H4("No tasks found");
             var instruction = new Span("Change the search criteria or add a task");
 
-            var addTask = new Button("Add Task", VaadinIcon.PLUS.create(), event -> addTask());
+            var addTask = new Button("Add Task", VaadinIcon.PLUS.create(), event -> addTask(project, timeZone, grid.getDataProvider()::refreshAll));
             addTask.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
             // TODO Add "Clear search criteria" button
 
-            add(icon, title, instruction, addTask);
-
-            setSizeFull();
-            setAlignItems(Alignment.CENTER);
-            setJustifyContentMode(JustifyContentMode.CENTER);
+            var layout = new VerticalLayout();
+            layout.add(icon, title, instruction, addTask);
+            layout.setSizeFull();
+            layout.setAlignItems(Alignment.CENTER);
+            layout.setJustifyContentMode(JustifyContentMode.CENTER);
+            return layout;
         }
     }
 

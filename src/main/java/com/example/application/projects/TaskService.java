@@ -1,29 +1,33 @@
 package com.example.application.projects;
 
 import com.example.application.projects.internal.ProjectRepository;
+import com.example.application.projects.internal.TaskQuery;
 import com.example.application.projects.internal.TaskRepository;
 import com.example.application.security.AppRoles;
+import com.vaadin.flow.data.provider.SortOrder;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
-@PreAuthorize("hasRole('" + AppRoles.TASK_READ + "')")
+@PreAuthorize("hasRole('" + AppRoles.PROJECT_READ + "')")
 @NullMarked
 public class TaskService {
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
+    private final TaskQuery taskQuery;
 
-    TaskService(TaskRepository taskRepository, ProjectRepository projectRepository) {
+    TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, TaskQuery taskQuery) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
+        this.taskQuery = taskQuery;
     }
 
     @Transactional(readOnly = true)
@@ -33,8 +37,8 @@ public class TaskService {
 
     @Transactional
     @PreAuthorize("hasRole('" + AppRoles.TASK_CREATE + "')")
-    public TaskId insertTask(TaskData data) {
-        return taskRepository.insert(data);
+    public void insertTask(TaskData data) {
+        taskRepository.insert(data);
     }
 
     @Transactional
@@ -50,11 +54,12 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<Task> findTasks(ProjectId project, @Nullable TaskFilter filter, Pageable pageable) {
-        if (filter == null || filter.isEmpty()) {
-            return taskRepository.findAll(project, pageable);
-        } else {
-            return taskRepository.findByFilter(project, filter, pageable);
-        }
+    public Stream<Task> findTasks(ProjectId project, TaskFilter filter, int limit, int offset, List<SortOrder<TaskSortableProperty>> sortOrders) {
+        return taskRepository.findByFilter(project, filter, limit, offset, sortOrders);
+    }
+
+    @Transactional(readOnly = true)
+    public Stream<TaskAssignee> findAssigneesBySearchTerm(@Nullable String searchTerm, int limit, int offset) {
+        return taskQuery.findAssigneesBySearchTerm(searchTerm, limit, offset);
     }
 }
