@@ -40,13 +40,13 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
                         EmployeePictureService employeePictureService) {
         this.employeeService = employeeService;
         this.employeePictureService = employeePictureService;
-        var isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
+        var canUpdate = authenticationContext.hasRole(AppRoles.EMPLOYEE_UPDATE);
 
         // Create components
         var title = new H2();
         var avatar = new Avatar();
         var editButton = new Button("Edit");
-        editButton.setVisible(isAdmin);
+        editButton.setVisible(canUpdate);
         // TODO Delete button?
         var closeButton = new Button(AppIcon.CLOSE.create(), e -> HumanResourcesNavigation.navigateToEmployeeList());
         closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);

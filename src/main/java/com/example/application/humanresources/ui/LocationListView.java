@@ -24,7 +24,7 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.stream.Stream;
 
@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 @Route(value = "locations", layout = MainLayout.class)
 @PageTitle("Locations")
 @Menu(order = 3, title = "Locations", icon = "icons/apartment.svg")
-@PermitAll
+@RolesAllowed(AppRoles.LOCATION_READ)
 class LocationListView extends MasterDetailLayout implements AfterNavigationObserver {
 
     private final LocationService locationService;
@@ -40,8 +40,8 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
 
     LocationListView(AuthenticationContext authenticationContext, LocationService locationService) {
         this.locationService = locationService;
-        var isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
-        this.locationList = new LocationList(isAdmin);
+        var canCreate = authenticationContext.hasRole(AppRoles.LOCATION_CREATE);
+        this.locationList = new LocationList(canCreate);
 
         // Add listeners
         addBackdropClickListener(e -> locationList.grid.deselectAll());
@@ -80,12 +80,12 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
 
         private final TreeGrid<LocationTreeNode> grid;
 
-        LocationList(boolean isAdmin) {
+        LocationList(boolean canCreate) {
             var title = new H1("Locations");
 
             var addLocationButton = new Button("Add Location");
             addLocationButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            addLocationButton.setVisible(isAdmin);
+            addLocationButton.setVisible(canCreate);
 
             var refreshButton = new Button(AppIcon.REFRESH.create());
             refreshButton.addThemeVariants(ButtonVariant.LUMO_ICON);

@@ -1,11 +1,6 @@
 package com.example.application.projects.ui;
 
-import com.example.application.base.ui.component.Badges;
-import com.example.application.base.ui.component.ResizeObserver;
-import com.example.application.common.ui.AppIcon;
-import com.example.application.common.ui.Notifications;
-import com.example.application.common.ui.SectionToolbar;
-import com.example.application.common.ui.SortOrderUtil;
+import com.example.application.common.ui.*;
 import com.example.application.projects.*;
 import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.AttachEvent;

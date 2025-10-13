@@ -24,7 +24,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.signals.ValueSignal;
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +32,7 @@ import java.time.format.FormatStyle;
 import java.util.Optional;
 
 @Route(value = "locations/:locationId", layout = LocationListView.class)
-@PermitAll
+@RolesAllowed(AppRoles.LOCATION_READ)
 class LocationDetailsView extends VerticalLayout implements AfterNavigationObserver, HasDynamicTitle {
 
     // TODO Style this view (using as little custom CSS as possible)
@@ -46,12 +46,12 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
 
     LocationDetailsView(AuthenticationContext authenticationContext, LocationService locationService) {
         this.locationService = locationService;
-        var isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
+        var canCreate = authenticationContext.hasRole(AppRoles.LOCATION_CREATE);
 
         // Create components
         var title = new H2();
         var editButton = new Button("Edit", e -> edit());
-        editButton.setVisible(isAdmin);
+        editButton.setVisible(canCreate);
         // TODO Delete button?
         var closeButton = new Button(AppIcon.CLOSE.create(), e -> HumanResourcesNavigation.navigateToLocationList());
         closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);

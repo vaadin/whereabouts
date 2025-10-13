@@ -1,4 +1,4 @@
-package com.example.application.base.ui.component;
+package com.example.application.common.ui;
 
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.function.SerializableConsumer;

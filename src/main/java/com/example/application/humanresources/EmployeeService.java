@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_READ + "')")
 @NullMarked
 public class EmployeeService {
 
@@ -42,7 +42,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
+    @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_CREATE + "')")
     public EmployeeId insert(EmployeeData data) {
         return employeeRepository.insert(data);
     }
@@ -53,7 +53,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
+    @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_UPDATE + "')")
     public Employee update(Employee employee) {
         return employeeRepository.update(employee);
     }

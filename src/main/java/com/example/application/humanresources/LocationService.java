@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('" + AppRoles.LOCATION_READ + "')")
 @NullMarked
 public class LocationService {
 
@@ -64,7 +64,7 @@ public class LocationService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
+    @PreAuthorize("hasRole('" + AppRoles.LOCATION_CREATE + "')")
     public LocationId insert(LocationData locationData) {
         return locationRepository.insert(locationData);
     }
@@ -75,7 +75,7 @@ public class LocationService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('" + AppRoles.ADMIN + "')")
+    @PreAuthorize("hasRole('" + AppRoles.LOCATION_UPDATE + "')")
     public Location update(Location location) {
         return locationRepository.update(location);
     }

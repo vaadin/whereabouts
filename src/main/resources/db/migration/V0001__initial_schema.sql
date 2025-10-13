@@ -89,6 +89,8 @@ create table employee
     foreign key (user_id) references app_user (user_id)
 );
 
+create index employee_user_id_idx on employee (user_id);
+
 create table employment_details
 (
     employee_id       bigint            not null,
@@ -106,6 +108,8 @@ create table employment_details
     constraint termination_date_matches_status check ((termination_date is null and not employment_status = 'TERMINATED') or
                                                       (termination_date is not null and employment_status = 'TERMINATED'))
 );
+
+create index employment_details_location_id_idx on employment_details (location_id);
 
 ---------
 -- Teams
@@ -134,6 +138,8 @@ create table team_membership
     foreign key (employee_id) references employee (employee_id),
     foreign key (team_id) references team (team_id)
 );
+
+create index team_membership_team_id_idx on team_membership (team_id);
 
 create table team_membership_history
 (
@@ -182,6 +188,8 @@ create table task
     primary key (task_id),
     foreign key (project_id) references project (project_id)
 );
+
+create index task_project_id_idx on task (project_id);
 
 create table task_assignee
 (

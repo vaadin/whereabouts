@@ -20,13 +20,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 @ParentLayout(MainLayout.class)
 @Route(value = "employees", layout = MainLayout.class)
 @PageTitle("Employees")
 @Menu(order = 1, title = "Employees", icon = "icons/diversity.svg")
-@PermitAll
+@RolesAllowed(AppRoles.EMPLOYEE_READ)
 class EmployeeListView extends MasterDetailLayout implements AfterNavigationObserver {
 
     private final EmployeeService employeeService;
@@ -36,8 +36,8 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
     EmployeeListView(AuthenticationContext authenticationContext, EmployeeService employeeService, EmployeePictureService employeePictureService) {
         this.employeeService = employeeService;
         this.employeePictureService = employeePictureService;
-        var isAdmin = authenticationContext.hasRole(AppRoles.ADMIN);
-        this.employeeList = new EmployeeList(isAdmin);
+        var canCreate = authenticationContext.hasRole(AppRoles.EMPLOYEE_CREATE);
+        this.employeeList = new EmployeeList(canCreate);
 
         // Add listeners
         addBackdropClickListener(e -> employeeList.grid.deselectAll());
@@ -73,12 +73,12 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
 
         private final Grid<EmployeeReference> grid;
 
-        EmployeeList(boolean isAdmin) {
+        EmployeeList(boolean canCreate) {
             var title = new H1("Employees");
 
             var addEmployeeButton = new Button("Add Employee");
             addEmployeeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            addEmployeeButton.setVisible(isAdmin);
+            addEmployeeButton.setVisible(canCreate);
 
             var searchField = new TextField();
             searchField.setPlaceholder("Search");

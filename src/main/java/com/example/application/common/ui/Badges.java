@@ -1,4 +1,4 @@
-package com.example.application.base.ui.component;
+package com.example.application.common.ui;
 
 import com.vaadin.flow.component.html.Span;
 import org.jspecify.annotations.NullMarked;
