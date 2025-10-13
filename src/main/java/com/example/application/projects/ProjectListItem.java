@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.Objects;
 
 @NullMarked
-public record ProjectListItem(ProjectId projectId, String projectName, int tasks, int assignees) {
+public record ProjectListItem(ProjectId projectId, String projectName, String description, int tasks, int assignees) {
 
     @Override
     public boolean equals(Object o) {

@@ -16,9 +16,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Section;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
@@ -31,9 +30,9 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.provider.SortOrder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import com.vaadin.flow.theme.lumo.LumoUtility.*;
 import jakarta.annotation.security.RolesAllowed;
 
 @ParentLayout(MainLayout.class)
@@ -98,13 +97,13 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
         dialog.open();
     }
 
-    private class ProjectList extends Section {
+    private class ProjectList extends VerticalLayout {
 
         private final Grid<ProjectListItem> grid;
         private final TextField searchField;
 
         ProjectList() {
-            var title = new H3("Projects");
+            var title = new H1("Projects");
 
             var addProjectButton = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
             addProjectButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -113,7 +112,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
             searchField = new TextField();
             searchField.setPlaceholder("Search");
             searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
-            searchField.addClassNames(Flex.GROW);
+            searchField.setWidthFull();
             searchField.setValueChangeMode(ValueChangeMode.LAZY);
             searchField.addValueChangeListener(event -> refresh());
 
@@ -121,7 +120,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
             sortField.setItems(ProjectSortOrder.values());
             sortField.setValue(ProjectSortOrder.NAME_ASC);
             sortField.setItemLabelGenerator(ProjectSortOrder::getDisplayName);
-            sortField.addClassNames(Flex.GROW);
+            sortField.setWidthFull();
             sortField.addValueChangeListener(event -> refresh());
 
             grid = new Grid<>();
@@ -136,9 +135,15 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
                     .ifPresentOrElse(ProjectsNavigation::navigateToProjectDetails, ProjectsNavigation::navigateToProjectList));
             grid.setEmptyStateComponent(new ProjectListEmptyComponent());
 
+            var toolbar = new SectionToolbar(
+                    SectionToolbar.group(new DrawerToggle(), title),
+                    addProjectButton
+            ).withRow(searchField).withRow(sortField);
             setSizeFull();
-            addClassNames("project-list", Display.FLEX, FlexDirection.COLUMN);
-            var toolbar = new SectionToolbar(SectionToolbar.group(new DrawerToggle(), title), addProjectButton).withRow(searchField).withRow(sortField);
+            setPadding(false);
+            setSpacing(false);
+            getStyle().setOverflow(Style.Overflow.HIDDEN);
+
             add(toolbar, grid);
         }
 
@@ -146,14 +151,16 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
             var card = new Card();
             card.setTitle(projectListItem.projectName());
 
+            card.add(projectListItem.description());
+
             var tasks = new Span(
                     projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
-            tasks.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
+            tasks.getStyle().setColor("var(--vaadin-text-color-secondary)");
 
             var assignees = new Span(projectListItem.assignees() == 1
                     ? "1 assignee"
                     : "%d assignees".formatted(projectListItem.assignees()));
-            assignees.addClassNames(TextColor.SECONDARY, FontSize.SMALL);
+            assignees.getStyle().setColor("var(--vaadin-text-color-secondary)");
 
             card.addToFooter(tasks, assignees);
             return card;

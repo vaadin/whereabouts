@@ -25,6 +25,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -35,7 +36,6 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vaadin.signals.ValueSignal;
 import jakarta.annotation.security.RolesAllowed;
 
@@ -66,6 +66,10 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         canUpdate = authenticationContext.hasRole(AppRoles.TASK_UPDATE);
         canDelete = authenticationContext.hasRole(AppRoles.TASK_DELETE);
 
+        setSizeFull();
+        setPadding(false);
+        setSpacing(false);
+
         ComponentEffect.effect(this, () -> {
             var project = projectSignal.value();
             var timeZone = timeZoneSignal.value();
@@ -85,7 +89,6 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 addTaskButton.addClickListener(e -> addTask(project, timeZone, taskList.grid.getDataProvider()::refreshAll));
 
                 // Layout components
-                setSizeFull();
                 add(new SectionToolbar(title, addTaskButton), taskList);
             }
         });
@@ -140,7 +143,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         return getParent().filter(ProjectListView.class::isInstance).map(ProjectListView.class::cast);
     }
 
-    private class TaskList extends Div {
+    private class TaskList extends VerticalLayout {
 
         private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 .withLocale(getLocale());
@@ -159,7 +162,6 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var searchField = new TextField();
             searchField.setPlaceholder("Search");
             searchField.setPrefixComponent(AppIcon.SEARCH.create());
-            searchField.addClassNames(LumoUtility.Flex.GROW);
             searchField.setValueChangeMode(ValueChangeMode.LAZY);
 
             var filterMenu = createFilterMenu();
@@ -184,6 +186,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                     .setWidth("60px").setFlexGrow(0);
             cardColumn = grid.addColumn(new ComponentRenderer<>(this::createTaskCard));
             grid.setEmptyStateComponent(createEmptyComponent());
+            grid.setSizeFull();
             createContextMenu(grid.addContextMenu());
 
             // Add listeners and effects
@@ -198,7 +201,8 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
 
             // Layout components
             setSizeFull();
-            addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN);
+            setPadding(false);
+            setSpacing(false);
             add(new SectionToolbar(searchField, filterMenu), grid);
 
             var resizeObserver = new ResizeObserver(this);
@@ -258,7 +262,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var dateDiv = new Div();
             var date = new Div(dateFormatter.format(dueDateTime));
             var time = new Div(timeFormatter.format(dueDateTime));
-            time.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL);
+            time.getStyle().setColor("var(--vaadin-text-color-secondary)");
             dateDiv.add(date, time);
             return dateDiv;
         }
@@ -286,7 +290,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             }
             if (canDelete) {
                 var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task, grid.getDataProvider()::refreshAll));
-                deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+                //deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
             }
             return menuBar;
         }
@@ -295,8 +299,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var card = new Card();
             card.addThemeVariants(CardVariant.LUMO_OUTLINED);
 
-            var header = new Div(createStatusBadge(task), createPriorityBadge(task));
-            header.addClassNames(LumoUtility.Display.FLEX, LumoUtility.FlexDirection.ROW, LumoUtility.Gap.SMALL);
+            var header = new HorizontalLayout(createStatusBadge(task), createPriorityBadge(task));
             card.setHeader(header);
             card.setHeaderSuffix(createActionMenu(task));
             card.add(task.data().description());
@@ -304,7 +307,8 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             if (dueDateTime != null) {
                 var dueDiv = new Div();
                 dueDiv.setText("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime)));
-                dueDiv.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL, LumoUtility.Padding.Top.MEDIUM);
+                dueDiv.getStyle().setColor("var(--vaadin-text-color-secondary)");
+                //dueDiv.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL, LumoUtility.Padding.Top.MEDIUM);
                 card.add(dueDiv);
             }
             card.addToFooter(createAssignees(task));

@@ -57,10 +57,11 @@ class JooqProjectQuery implements ProjectQuery {
                 .fetchOptional(Records.mapping(ProjectListItem::new));
     }
 
-    private SelectOnConditionStep<Record4<ProjectId, String, Integer, Integer>> selectProject() {
+    private SelectOnConditionStep<Record5<ProjectId, String, String, Integer, Integer>> selectProject() {
         return dsl.select(
                         PROJECT.PROJECT_ID.convertFrom(ProjectId::of),
                         PROJECT.NAME,
+                        PROJECT.DESCRIPTION,
                         DSL.countDistinct(TASK),
                         DSL.countDistinct(TASK_ASSIGNEE)
                 ).from(PROJECT)

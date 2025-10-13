@@ -76,8 +76,8 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
         EmployeeList(boolean canCreate) {
             var title = new H1("Employees");
 
-            var addEmployeeButton = new Button("Add Employee");
-            addEmployeeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            var addEmployeeButton = new Button("Add Employee", VaadinIcon.PLUS.create());
+            addEmployeeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             addEmployeeButton.setVisible(canCreate);
 
             var searchField = new TextField();
