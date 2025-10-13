@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 @NullMarked
 public record TaskData(
@@ -20,7 +20,7 @@ public record TaskData(
         ZoneId timeZone,
         TaskStatus status,
         TaskPriority priority,
-        Collection<TaskAssignee> assignees
+        Set<TaskAssignee> assignees
 ) implements ValueObject {
 
     public static final String PROP_PROJECT = "project";

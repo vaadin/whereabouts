@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,7 +39,7 @@ class TaskRepositoryTest {
                 ZoneId.of("Europe/Helsinki"),
                 TaskStatus.PENDING,
                 TaskPriority.URGENT,
-                List.of(TaskAssignee.of(employee1), TaskAssignee.of(employee2)));
+                Set.of(TaskAssignee.of(employee1), TaskAssignee.of(employee2)));
         var id = repository.insert(originalData);
 
         var retrieved = repository.findById(id).orElseThrow();
@@ -54,7 +54,7 @@ class TaskRepositoryTest {
                 ZoneId.of("Europe/Stockholm"),
                 TaskStatus.PLANNED,
                 TaskPriority.LOW,
-                List.of(TaskAssignee.of(employee3)));
+                Set.of(TaskAssignee.of(employee3)));
 
         var updated = repository.update(retrieved.withData(updatedData));
         assertThat(updated.id()).isEqualTo(id);

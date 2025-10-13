@@ -44,6 +44,8 @@ class JooqTaskQuery implements TaskQuery {
                 .from(EMPLOYEE)
                 .where(condition)
                 .orderBy(EMPLOYEE.FIRST_NAME.asc(), EMPLOYEE.LAST_NAME.asc())
+                .limit(limit)
+                .offset(offset)
                 .fetch(Records.mapping(TaskAssignee::new))
                 .stream();
     }

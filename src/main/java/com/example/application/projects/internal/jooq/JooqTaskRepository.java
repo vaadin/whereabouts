@@ -196,7 +196,7 @@ class JooqTaskRepository implements TaskRepository {
                 record.getValue(TIME_ZONE),
                 record.getValue(TASK_STATUS),
                 record.getValue(TASK_PRIORITY),
-                record.getValue(ASSIGNEES).map(Records.mapping(TaskAssignee::new))
+                record.getValue(ASSIGNEES).intoSet(Records.mapping(TaskAssignee::new))
         );
     }
 
