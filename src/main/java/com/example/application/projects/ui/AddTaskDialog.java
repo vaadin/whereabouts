@@ -2,7 +2,6 @@ package com.example.application.projects.ui;
 
 import com.example.application.projects.TaskData;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import org.jspecify.annotations.NullMarked;
 
@@ -23,7 +22,7 @@ class AddTaskDialog extends Dialog {
         form.setFormDataObject(initialTaskData);
 
         var saveBtn = new Button("Save", event -> save());
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.addThemeName("primary");
 
         var cancelBtn = new Button("Cancel", event -> close());
 

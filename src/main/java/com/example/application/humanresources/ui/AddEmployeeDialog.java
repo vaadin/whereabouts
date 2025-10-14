@@ -2,7 +2,6 @@ package com.example.application.humanresources.ui;
 
 import com.example.application.humanresources.EmployeeData;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import org.jspecify.annotations.NullMarked;
 
@@ -21,7 +20,7 @@ class AddEmployeeDialog extends Dialog {
         form = new EmployeeDataForm();
 
         var saveBtn = new Button("Create Employee", e -> save());
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.addThemeName("primary");
 
         var cancelBtn = new Button("Cancel", e -> close());
 

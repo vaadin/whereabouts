@@ -2,7 +2,6 @@ package com.example.application.common.ui;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -34,7 +33,6 @@ public final class Notifications {
         notification.setAssertive(true);
 
         var closeButton = new Button("Close", e -> notification.close());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
         var textSpan = new Span(text);
         var content = new HorizontalLayout(prefixComponent, textSpan, closeButton);

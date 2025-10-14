@@ -12,10 +12,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
@@ -106,8 +104,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
         ProjectList() {
             var title = new H1("Projects");
 
-            var addProjectButton = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
-            addProjectButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            var addProjectButton = new Button("Add Project", event -> addProject());
             addProjectButton.setVisible(canCreate);
 
             searchField = new TextField();
@@ -131,7 +128,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
                             sortField.getValue().getSortOrder()));
             grid.addColumn(new ComponentRenderer<>(this::createProjectCard));
             grid.setSizeFull();
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            grid.addThemeName("no-border");
             grid.addSelectionListener(event -> event.getFirstSelectedItem().map(ProjectListItem::projectId)
                     .ifPresentOrElse(ProjectsNavigation::navigateToProjectDetails, ProjectsNavigation::navigateToProjectList));
             grid.setEmptyStateComponent(new ProjectListEmptyComponent());
@@ -140,6 +137,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
                     SectionToolbar.group(new DrawerToggle(), title),
                     addProjectButton
             ).withRow(searchField).withRow(sortField);
+            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
             setSizeFull();
             setPadding(false);
             setSpacing(false);
@@ -175,11 +173,11 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
             var instruction = new Span("Change the search criteria or add a project");
 
             var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
-            addProject.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            addProject.addThemeName("tertiary");
             addProject.setVisible(canCreate);
 
             var showAll = new Button("Show All", AppIcon.FILTER_NONE.create(), event -> showAll());
-            showAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            showAll.addThemeName("tertiary");
 
             add(icon, title, instruction, new HorizontalLayout(addProject, showAll));
 

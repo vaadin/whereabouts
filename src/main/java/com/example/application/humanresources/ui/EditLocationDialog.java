@@ -4,7 +4,6 @@ package com.example.application.humanresources.ui;
 import com.example.application.common.ui.Notifications;
 import com.example.application.humanresources.Location;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,7 +25,7 @@ class EditLocationDialog extends Dialog {
         form.setFormDataObject(location.data());
 
         var saveBtn = new Button("Save", e -> save());
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.addThemeName("primary");
 
         var cancelBtn = new Button("Cancel", e -> close());
 

@@ -11,9 +11,7 @@ import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -84,7 +82,6 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
             var title = new H1("Locations");
 
             var addLocationButton = new Button("Add Location");
-            addLocationButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             addLocationButton.setVisible(canCreate);
 
             var refreshButton = new Button();
@@ -125,7 +122,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                 case LocationTreeNode.LocationNode locationNode -> locationNode.address().toFormattedString();
                 case LocationTreeNode.CountryNode ignored -> "";
             }).setHeader("Address").setFlexGrow(1);
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            grid.addThemeName("no-border");
 
             // Add listeners
             grid.addSelectionListener(e -> e.getFirstSelectedItem()

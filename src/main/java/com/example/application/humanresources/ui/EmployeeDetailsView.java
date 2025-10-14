@@ -9,7 +9,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -50,7 +49,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         var editButton = new Button("Edit", e -> edit());
 
         var saveButton = new Button("Save Changes", e -> saveChanges());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addThemeName("primary");
 
         var discardButton = new Button("Discard Changes", e -> discardChanges());
 

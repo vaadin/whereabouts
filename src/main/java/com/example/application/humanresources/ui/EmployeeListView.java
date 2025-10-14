@@ -7,9 +7,7 @@ import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
@@ -77,8 +75,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
         EmployeeList(boolean canCreate) {
             var title = new H1("Employees");
 
-            var addEmployeeButton = new Button("Add Employee", VaadinIcon.PLUS.create());
-            addEmployeeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            var addEmployeeButton = new Button("Add Employee");
             addEmployeeButton.setVisible(canCreate);
 
             var searchField = new TextField();
@@ -97,7 +94,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
                     employeePictureService::findEmployeePicture)
             ));
             grid.setSizeFull();
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            grid.addThemeName("no-border");
 
             // Add listeners
             searchField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());

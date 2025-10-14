@@ -9,13 +9,10 @@ import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
-import com.vaadin.flow.component.card.CardVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -23,7 +20,6 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -79,7 +75,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 var title = new H2(project.data().name());
 
                 var addTaskButton = new Button("Add Task");
-                addTaskButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                addTaskButton.addThemeName("primary");
                 addTaskButton.setVisible(canCreate);
 
                 var taskList = new TaskList(project, timeZone);
@@ -88,7 +84,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 addTaskButton.addClickListener(e -> addTask(project, timeZone, taskList.grid.getDataProvider()::refreshAll));
 
                 // Layout components
-                add(new SectionToolbar(title, addTaskButton), taskList);
+                var toolbar = new SectionToolbar(title, addTaskButton);
+                toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+                add(toolbar, taskList);
             }
         });
     }
@@ -167,7 +165,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             grid.setItems(query -> taskService.findTasks(project.id(), filterSignal.peek(),
                     query.getLimit(), query.getOffset(),
                     SortOrderUtil.toSortOrderList(TaskSortableProperty::valueOf, query.getSortOrders())));
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            grid.addThemeName("no-border");
             grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
                     .setFlexGrow(0).setSortProperty(TaskSortableProperty.STATUS.name());
             grid.addColumn(task -> task.data().description()).setHeader("Description").setFlexGrow(1)
@@ -199,7 +197,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             setSizeFull();
             setPadding(false);
             setSpacing(false);
-            add(new SectionToolbar(searchField, filterMenu), grid);
+            var toolbar = new SectionToolbar(searchField, filterMenu);
+            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+            add(toolbar, grid);
 
             var resizeObserver = new ResizeObserver(this);
             resizeObserver.addListener(this::adjustGridOnResize);
@@ -211,10 +211,10 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             grid.getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!showCardView));
             if (showCardView) {
                 grid.addClassName("card-view");
-                grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+                grid.addThemeName("no-row-borders");
             } else {
                 grid.removeClassName("card-view");
-                grid.removeThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+                grid.removeThemeName("no-row-borders");
             }
         }
 
@@ -265,8 +265,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
 
         private Component createActionMenu(Task task) {
             var menuBar = new MenuBar();
-            menuBar.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE,
-                    MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_SMALL);
+            menuBar.addThemeName("icon");
             var item = menuBar.addItem(AppIcon.MORE_VERT.create());
             var subMenu = item.getSubMenu();
             if (canUpdate) {
@@ -274,14 +273,14 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             }
             if (canDelete) {
                 var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task, grid.getDataProvider()::refreshAll));
-                //deleteItem.addClassNames(LumoUtility.TextColor.ERROR);
+                deleteItem.getStyle().setColor("var(--aura-red)");
             }
             return menuBar;
         }
 
         private Component createTaskCard(Task task) {
             var card = new Card();
-            card.addThemeVariants(CardVariant.LUMO_OUTLINED);
+            card.addThemeName("outlined");
 
             var header = new HorizontalLayout(createStatusBadge(task), createPriorityBadge(task));
             card.setHeader(header);
@@ -292,7 +291,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 var dueDiv = new Div();
                 dueDiv.setText("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime)));
                 dueDiv.getStyle().setColor("var(--vaadin-text-color-secondary)");
-                //dueDiv.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL, LumoUtility.Padding.Top.MEDIUM);
+                dueDiv.getStyle().setPaddingTop("var(--vaadin-gap-m)");
                 card.add(dueDiv);
             }
             card.addToFooter(createAssignees(task));
@@ -305,8 +304,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                         .ifPresent(task -> editTask(task, grid.getDataProvider()::refreshAll)));
             }
             if (canDelete) {
-                contextMenu.addItem("Delete", event -> event.getItem()
+                var deleteItem = contextMenu.addItem("Delete", event -> event.getItem()
                         .ifPresent(task -> deleteTask(task, grid.getDataProvider()::refreshAll)));
+                deleteItem.getStyle().setColor("var(--aura-red)");
             }
             // Don't show the menu unless opened on a row
             contextMenu.setDynamicContentHandler(Objects::nonNull);
@@ -314,7 +314,6 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
 
         private Component createFilterMenu() {
             var menuBar = new MenuBar();
-            menuBar.addThemeVariants(MenuBarVariant.LUMO_DROPDOWN_INDICATORS);
             var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
             var subMenu = item.getSubMenu();
 
@@ -346,7 +345,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var instruction = new Span("Change the search criteria or add a task");
 
             var addTask = new Button("Add Task", VaadinIcon.PLUS.create(), event -> addTask(project, timeZone, grid.getDataProvider()::refreshAll));
-            addTask.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            addTask.addThemeName("tertiary");
 
             // TODO Add "Clear search criteria" button
 

@@ -2,7 +2,6 @@ package com.example.application.humanresources.ui;
 
 import com.example.application.humanresources.LocationData;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import org.jspecify.annotations.NullMarked;
 
@@ -21,7 +20,7 @@ class AddLocationDialog extends Dialog {
         form = new LocationDataForm();
 
         var saveBtn = new Button("Create Location", e -> save());
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.addThemeName("primary");
 
         var cancelBtn = new Button("Cancel", e -> close());
 
