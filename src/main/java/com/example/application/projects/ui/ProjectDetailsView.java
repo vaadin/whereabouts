@@ -24,7 +24,6 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -109,8 +108,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             taskService.insertTask(newTaskData);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
-            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(), "Task created successfully",
-                    NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task created successfully").open();
         });
         dialog.open();
     }
@@ -120,8 +118,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var saved = taskService.updateTask(editedTask);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));
-            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(), "Task updated successfully",
-                    NotificationVariant.LUMO_SUCCESS).open();
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task updated successfully").open();
         });
         dialog.open();
     }
@@ -131,8 +128,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             taskService.deleteTask(task.id());
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(task.data().project()));
-            Notifications.createNonCriticalNotification(AppIcon.DELETE_SWEEP.create(),
-                    "Task deleted successfully", NotificationVariant.LUMO_ERROR).open();
+            Notifications.createNonCriticalNotification(AppIcon.DELETE_SWEEP.create(AppIcon.Size.M, AppIcon.Color.RED), "Task deleted successfully").open();
         }, "Cancel", event -> {
         });
         dialog.setConfirmButtonTheme("error primary");

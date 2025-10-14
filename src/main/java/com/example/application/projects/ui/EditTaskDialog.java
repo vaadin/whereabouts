@@ -1,12 +1,10 @@
 package com.example.application.projects.ui;
 
-import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.Notifications;
 import com.example.application.projects.Task;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.io.Serializable;
@@ -43,9 +41,7 @@ public class EditTaskDialog extends Dialog {
                 saveCallback.save(task.withData(data));
                 close();
             } catch (OptimisticLockingFailureException ex) {
-                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(AppIcon.Size.M),
-                        "Another user has edited the task. Please refresh and try again.",
-                        NotificationVariant.LUMO_WARNING).open();
+                Notifications.createOptimisticLockingFailureNotification().open();
             }
         });
     }

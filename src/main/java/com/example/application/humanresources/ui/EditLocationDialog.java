@@ -1,13 +1,11 @@
 package com.example.application.humanresources.ui;
 
 
-import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.Notifications;
 import com.example.application.humanresources.Location;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.dao.OptimisticLockingFailureException;
 
@@ -44,9 +42,7 @@ class EditLocationDialog extends Dialog {
                 saveCallback.save(location.withData(locationData));
                 close();
             } catch (OptimisticLockingFailureException e) {
-                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(AppIcon.Size.M),
-                        "Another user has edited the location. Please refresh and try again.",
-                        NotificationVariant.LUMO_WARNING).open();
+                Notifications.createOptimisticLockingFailureNotification().open();
             }
         });
     }

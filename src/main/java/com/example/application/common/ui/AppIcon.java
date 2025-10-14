@@ -14,6 +14,7 @@ public enum AppIcon {
     DELETE_SWEEP("icons/delete_sweep.svg"),
     DESK("icons/desk.svg"),
     DIVERSITY("icons/diversity.svg"),
+    ERROR("icons/error.svg"),
     FILTER_LIST("icons/filter_list.svg"),
     FILTER_NONE("icons/filter_none.svg"),
     FLATWARE("icons/flatware.svg"),
@@ -38,9 +39,30 @@ public enum AppIcon {
     }
 
     public SvgIcon create(Size size) {
+        return create(size, Color.UNDEFINED);
+    }
+
+    public SvgIcon create(Size size, Color color) {
         var icon = new SvgIcon(source);
         icon.setSize(size.size);
+        icon.setColor(color.color);
         return icon;
+    }
+
+    public enum Color {
+        UNDEFINED(null),
+        BLUE("var(--aura-blue)"),
+        RED("var(--aura-red)"),
+        GREEN("var(--aura-green)"),
+        YELLOW("var(--aura-yellow)"),
+        ORANGE("var(--aura-orange)"),
+        PURPLE("var(--aura-purple)");
+
+        private final @Nullable String color;
+
+        Color(@Nullable String color) {
+            this.color = color;
+        }
     }
 
     public enum Size {

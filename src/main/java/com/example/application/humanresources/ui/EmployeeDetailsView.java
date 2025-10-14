@@ -12,7 +12,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -162,9 +161,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
                     editModeSignal.value(false);
                     getEmployeeListView().ifPresent(employeeListView -> employeeListView.onEmployeeUpdated(saved));
                 } catch (OptimisticLockingFailureException e) {
-                    Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(AppIcon.Size.M),
-                            "Another user has edited the employee. Please refresh and try again.",
-                            NotificationVariant.LUMO_WARNING).open();
+                    Notifications.createOptimisticLockingFailureNotification().open();
                 }
             });
         }
