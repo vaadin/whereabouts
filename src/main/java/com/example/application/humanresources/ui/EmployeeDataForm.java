@@ -40,7 +40,7 @@ class EmployeeDataForm extends Composite<FormLayout> {
         var birthDateField = new DatePicker("Birth Date");
         var genderField = new Select<Gender>("Gender");
         genderField.setItems(Gender.values());
-        genderField.setItemLabelGenerator(gender -> StringUtils.capitalize(gender.name()));
+        genderField.setItemLabelGenerator(gender -> StringUtils.capitalize(gender.name().toLowerCase()));
         var dietaryNotesField = new TextArea("Dietary Notes");
         var homeAddressField = new PostalAddressField();
         homeAddressField.setLabel("Home Address");

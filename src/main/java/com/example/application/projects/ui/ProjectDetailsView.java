@@ -78,13 +78,17 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 addTaskButton.addThemeName("primary");
                 addTaskButton.setVisible(canCreate);
 
+                var closeButton = new Button();
+                closeButton.getElement().appendChild(AppIcon.CLOSE.create().getElement()); // Until we get an icon-only button variant for Aura
+                closeButton.addClickListener(e -> ProjectsNavigation.navigateToProjectList());
+
                 var taskList = new TaskList(project, timeZone);
 
                 // Add listeners
                 addTaskButton.addClickListener(e -> addTask(project, timeZone, taskList.grid.getDataProvider()::refreshAll));
 
                 // Layout components
-                var toolbar = new SectionToolbar(title, addTaskButton);
+                var toolbar = new SectionToolbar(title, SectionToolbar.group(addTaskButton, closeButton));
                 toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
                 add(toolbar, taskList);
             }

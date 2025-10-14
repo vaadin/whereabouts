@@ -108,6 +108,14 @@ public final class PostalAddressField extends CustomField<PostalAddress> {
         }
     }
 
+    @Override
+    public void setInvalid(boolean invalid) {
+        super.setInvalid(invalid);
+        country.setInvalid(invalid);
+    }
+
+    // TODO Error message?
+
     private <F extends AddressForm<T>, T extends Record & PostalAddress> void showAddressForm(F form, T dataObject) {
         showAddressForm(form);
         form.setFormDataObject(dataObject);

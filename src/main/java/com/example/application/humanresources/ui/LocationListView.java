@@ -142,6 +142,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                     SectionToolbar.group(new DrawerToggle(), title),
                     SectionToolbar.group(addLocationButton, refreshButton)
             );
+            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
             setSizeFull();
             setPadding(false);
             setSpacing(false);
