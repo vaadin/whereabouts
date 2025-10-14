@@ -1,2 +1,10 @@
 @import '@vaadin/aura/aura.css';
 @import 'badge.css';
+
+vaadin-master-detail-layout[orientation="horizontal"]::part(master) {
+    border-right: 1px solid var(--vaadin-border-color-secondary);
+}
+
+vaadin-master-detail-layout[orientation="horizontal"][has-detail]::part(master) {
+    border-right: none;
+}
