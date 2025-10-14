@@ -9,33 +9,33 @@ public final class Badges {
     private Badges() {
     }
 
-    public static Span createContrast(String text) {
-        var badge = new Span(text);
-        badge.getElement().getThemeList().add("badge contrast");
-        return badge;
-    }
-
-    public static Span createSuccess(String text) {
-        var badge = new Span(text);
-        badge.getElement().getThemeList().add("badge success");
-        return badge;
-    }
-
-    public static Span createError(String text) {
-        var badge = new Span(text);
-        badge.getElement().getThemeList().add("badge error");
-        return badge;
-    }
-
-    public static Span createWarning(String text) {
-        var badge = new Span(text);
-        badge.getElement().getThemeList().add("badge warning");
-        return badge;
-    }
-
-    public static Span createDefault(String text) {
+    public static Span create(String text) {
         var badge = new Span(text);
         badge.getElement().getThemeList().add("badge");
+        return badge;
+    }
+
+    public static Span createGreen(String text) {
+        var badge = new Span(text);
+        badge.getElement().getThemeList().add("badge green");
+        return badge;
+    }
+
+    public static Span createRed(String text) {
+        var badge = new Span(text);
+        badge.getElement().getThemeList().add("badge red");
+        return badge;
+    }
+
+    public static Span createYellow(String text) {
+        var badge = new Span(text);
+        badge.getElement().getThemeList().add("badge yellow");
+        return badge;
+    }
+
+    public static Span createBlue(String text) {
+        var badge = new Span(text);
+        badge.getElement().getThemeList().add("badge blue");
         return badge;
     }
 }

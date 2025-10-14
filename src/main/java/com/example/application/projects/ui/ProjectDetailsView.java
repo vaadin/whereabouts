@@ -225,38 +225,26 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         private Component createStatusBadge(Task task) {
             var displayName = task.data().status().getDisplayName();
             return switch (task.data().status()) {
-                case PENDING -> Badges.createContrast(displayName);
-                case PLANNED, IN_PROGRESS -> Badges.createDefault(displayName);
-                case PAUSED -> Badges.createError(displayName);
-                case DONE -> Badges.createSuccess(displayName);
+                case PENDING -> Badges.create(displayName);
+                case PLANNED, IN_PROGRESS -> Badges.createBlue(displayName);
+                case PAUSED -> Badges.createRed(displayName);
+                case DONE -> Badges.createGreen(displayName);
             };
         }
 
         private Component createPriorityBadge(Task task) {
-            var badge = new Span(task.data().priority().getDisplayName());
-            var themeList = badge.getElement().getThemeList();
-            themeList.add("badge");
-            switch (task.data().priority()) {
-                case URGENT -> {
-                    themeList.add("error");
-                }
-                case HIGH -> {
-                    themeList.add("warning");
-                }
-                case NORMAL -> {
-                    // Default style
-                }
-                case LOW -> {
-                    themeList.add("success");
-                }
-            }
-            return badge;
+            return switch (task.data().priority()) {
+                case URGENT -> Badges.createRed(TaskPriority.URGENT.getDisplayName());
+                case HIGH -> Badges.createYellow(TaskPriority.HIGH.getDisplayName());
+                case NORMAL -> Badges.createBlue(TaskPriority.NORMAL.getDisplayName());
+                case LOW -> Badges.createGreen(TaskPriority.LOW.getDisplayName());
+            };
         }
 
         private Component createDueDate(Task task) {
             var dueDateTime = task.data().dueDateTimeInZone(timeZone);
             if (dueDateTime == null) {
-                return Badges.createContrast("Never");
+                return Badges.create("Never");
             }
 
             var dateDiv = new Div();
@@ -269,7 +257,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
 
         private Component createAssignees(Task task) {
             if (task.data().assignees().isEmpty()) {
-                return Badges.createContrast("None");
+                return Badges.create("None");
             }
 
             var assignees = new AvatarGroup();
