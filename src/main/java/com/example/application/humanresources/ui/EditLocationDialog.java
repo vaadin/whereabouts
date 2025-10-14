@@ -44,7 +44,7 @@ class EditLocationDialog extends Dialog {
                 saveCallback.save(location.withData(locationData));
                 close();
             } catch (OptimisticLockingFailureException e) {
-                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(),
+                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(AppIcon.Size.M),
                         "Another user has edited the location. Please refresh and try again.",
                         NotificationVariant.LUMO_WARNING).open();
             }

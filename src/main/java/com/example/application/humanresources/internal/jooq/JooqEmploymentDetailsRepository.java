@@ -97,6 +97,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.LOCATION_ID, employmentDetails.data().location().toLong())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, employmentDetails.data().hireDate())
                 .set(EMPLOYMENT_DETAILS.TERMINATION_DATE, employmentDetails.data().terminationDate())
+                .where(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(employmentDetails.id().toLong())).and(EMPLOYMENT_DETAILS.VERSION.eq(employmentDetails.version()))
                 .execute();
 
         if (rowsUpdated == 0) {

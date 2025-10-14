@@ -1,7 +1,10 @@
 package com.example.application.common.ui;
 
 import com.vaadin.flow.component.icon.SvgIcon;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public enum AppIcon {
     ACCESSIBLE("icons/accessible.svg"),
     APARTMENT("icons/apartment.svg"),
@@ -31,6 +34,27 @@ public enum AppIcon {
     }
 
     public SvgIcon create() {
-        return new SvgIcon(source);
+        return create(Size.UNDEFINED);
+    }
+
+    public SvgIcon create(Size size) {
+        var icon = new SvgIcon(source);
+        icon.setSize(size.size);
+        return icon;
+    }
+
+    public enum Size {
+        UNDEFINED(null),
+        XS("16px"),
+        S("24px"),
+        M("32px"),
+        L("48px"),
+        XL("60px");
+
+        private final @Nullable String size;
+
+        Size(@Nullable String size) {
+            this.size = size;
+        }
     }
 }

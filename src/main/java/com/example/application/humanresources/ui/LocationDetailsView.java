@@ -8,7 +8,6 @@ import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -53,8 +52,9 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         var editButton = new Button("Edit", e -> edit());
         editButton.setVisible(canCreate);
         // TODO Delete button?
-        var closeButton = new Button(AppIcon.CLOSE.create(), e -> HumanResourcesNavigation.navigateToLocationList());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_ICON);
+        var closeButton = new Button();
+        closeButton.getElement().appendChild(AppIcon.CLOSE.create().getElement()); // Until we get an icon-only button variant for Aura
+        closeButton.addClickListener(e -> HumanResourcesNavigation.navigateToLocationList());
 
         var about = new AboutSection();
         var summary = new SummarySection();

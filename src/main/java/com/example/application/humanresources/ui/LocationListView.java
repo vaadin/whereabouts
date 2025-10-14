@@ -87,8 +87,8 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
             addLocationButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             addLocationButton.setVisible(canCreate);
 
-            var refreshButton = new Button(AppIcon.REFRESH.create());
-            refreshButton.addThemeVariants(ButtonVariant.LUMO_ICON);
+            var refreshButton = new Button();
+            refreshButton.getElement().appendChild(AppIcon.REFRESH.create().getElement()); // Until we get an icon-only button variant for Aura
 
             grid = new TreeGrid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);

@@ -13,8 +13,11 @@ public final class SectionToolbar extends Composite<VerticalLayout> {
     public SectionToolbar(Component... components) {
         var layout = getContent();
         layout.setPadding(true);
-        layout.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
         addRow(components);
+    }
+
+    public void setPadding(boolean padding) {
+        getContent().setPadding(padding);
     }
 
     public void addRow(Component... components) {

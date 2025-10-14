@@ -55,6 +55,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
         setMaster(projectList);
         setMasterSize(400, Unit.PIXELS);
+        projectList.setWidth(400, Unit.PIXELS); // Workaround for https://github.com/vaadin/web-components/issues/10318
         setDetailMinSize(400, Unit.PIXELS);
         addBackdropClickListener(event -> projectList.grid.deselectAll());
     }
@@ -169,8 +170,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
 
     private class ProjectListEmptyComponent extends VerticalLayout {
         ProjectListEmptyComponent() {
-            var icon = AppIcon.FOLDER_CHECK_2.create();
-            icon.setSize("60px");
+            var icon = AppIcon.FOLDER_CHECK_2.create(AppIcon.Size.XL);
             var title = new H4("No projects found");
             var instruction = new Span("Change the search criteria or add a project");
 

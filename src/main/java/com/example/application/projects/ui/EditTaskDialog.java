@@ -43,7 +43,7 @@ public class EditTaskDialog extends Dialog {
                 saveCallback.save(task.withData(data));
                 close();
             } catch (OptimisticLockingFailureException ex) {
-                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(),
+                Notifications.createCriticalNotification(AppIcon.PERSON_PLAY.create(AppIcon.Size.M),
                         "Another user has edited the task. Please refresh and try again.",
                         NotificationVariant.LUMO_WARNING).open();
             }

@@ -45,6 +45,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
         // Layout components
         setMaster(employeeList);
         setMasterSize(400, Unit.PIXELS);
+        employeeList.setWidth(400, Unit.PIXELS); // Workaround for https://github.com/vaadin/web-components/issues/10318
         setDetailMinSize(400, Unit.PIXELS);
     }
 
@@ -113,6 +114,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
                     SectionToolbar.group(new DrawerToggle(), title),
                     addEmployeeButton
             ).withRow(searchField);
+            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
             setSizeFull();
             setPadding(false);
             setSpacing(false);
@@ -120,9 +122,14 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
 
             add(toolbar, grid);
         }
-    }
 
-    private void addEmployee() {
-        // TODO Implement me!
+        private void addEmployee() {
+            var dialog = new AddEmployeeDialog(employeeData -> {
+                var id = employeeService.insert(employeeData);
+                grid.getDataProvider().refreshAll();
+                HumanResourcesNavigation.navigateToEmployeeDetails(id);
+            });
+            dialog.open();
+        }
     }
 }

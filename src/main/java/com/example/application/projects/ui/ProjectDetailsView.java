@@ -357,8 +357,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         }
 
         private Component createEmptyComponent() {
-            var icon = AppIcon.LIST_ALT_CHECK.create();
-            icon.setSize("60px");
+            var icon = AppIcon.LIST_ALT_CHECK.create(AppIcon.Size.XL);
             var title = new H4("No tasks found");
             var instruction = new Span("Change the search criteria or add a task");
 

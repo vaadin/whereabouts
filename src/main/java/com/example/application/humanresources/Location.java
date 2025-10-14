@@ -3,8 +3,6 @@ package com.example.application.humanresources;
 import com.example.application.common.Entity;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Objects;
-
 /**
  * Represents an office location in the organization's network of facilities.
  * <p>
@@ -34,18 +32,5 @@ public record Location(LocationId id, long version,
      */
     public Location withData(LocationData data) {
         return new Location(id, version, data);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
-            return false;
-        var that = (Location) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }

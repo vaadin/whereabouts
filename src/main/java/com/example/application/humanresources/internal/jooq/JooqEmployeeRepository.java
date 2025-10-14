@@ -127,6 +127,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employee.data().mobilePhone()))
                 .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employee.data().homePhone()))
                 .set(EMPLOYEE.WORK_EMAIL, emailConverter.to(employee.data().workEmail()))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id().toLong()).and(EMPLOYEE.VERSION.eq(employee.version())))
                 .execute();
 
         if (rowsUpdated == 0) {
