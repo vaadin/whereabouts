@@ -37,11 +37,11 @@ class TaskDataForm extends Composite<FormLayout> {
 
         var statusField = new ComboBox<TaskStatus>("Status");
         statusField.setItems(TaskStatus.values());
-        statusField.setItemLabelGenerator(TaskStatus::getDisplayName);
+        statusField.setItemLabelGenerator(TaskStatusFormatter.ofLocale(getLocale())::getDisplayName);
 
         var priorityField = new ComboBox<TaskPriority>("Priority");
         priorityField.setItems(TaskPriority.values());
-        priorityField.setItemLabelGenerator(TaskPriority::getDisplayName);
+        priorityField.setItemLabelGenerator(TaskPriorityFormatter.ofLocale(getLocale())::getDisplayName);
 
         var assigneesField = createAssigneesField(assigneeLookupBySearchTerm);
 

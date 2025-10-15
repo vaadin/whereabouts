@@ -223,7 +223,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         }
 
         private Component createStatusBadge(Task task) {
-            var displayName = task.data().status().getDisplayName();
+            var displayName = TaskStatusFormatter.ofLocale(getLocale()).getDisplayName(task.data().status());
             return switch (task.data().status()) {
                 case PENDING -> Badges.create(displayName);
                 case PLANNED, IN_PROGRESS -> Badges.createBlue(displayName);
@@ -233,11 +233,12 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
         }
 
         private Component createPriorityBadge(Task task) {
+            var displayName = TaskPriorityFormatter.ofLocale(getLocale()).getDisplayName(task.data().priority());
             return switch (task.data().priority()) {
-                case URGENT -> Badges.createRed(TaskPriority.URGENT.getDisplayName());
-                case HIGH -> Badges.createYellow(TaskPriority.HIGH.getDisplayName());
-                case NORMAL -> Badges.createBlue(TaskPriority.NORMAL.getDisplayName());
-                case LOW -> Badges.createGreen(TaskPriority.LOW.getDisplayName());
+                case URGENT -> Badges.createRed(displayName);
+                case HIGH -> Badges.createYellow(displayName);
+                case NORMAL -> Badges.createBlue(displayName);
+                case LOW -> Badges.createGreen(displayName);
             };
         }
 
@@ -321,8 +322,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
             var subMenu = item.getSubMenu();
 
+            var statusFormatter = TaskStatusFormatter.ofLocale(getLocale());
             for (var status : TaskStatus.values()) {
-                subMenu.addItem(status.getDisplayName(), event -> {
+                subMenu.addItem(statusFormatter.getDisplayName(status), event -> {
                     if (event.getSource().isChecked()) {
                         filterSignal.update(old -> old.withStatus(status));
                     } else {
@@ -331,8 +333,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 }).setCheckable(true);
             }
             subMenu.addSeparator();
+            var priorityFormatter = TaskPriorityFormatter.ofLocale(getLocale());
             for (var priority : TaskPriority.values()) {
-                subMenu.addItem(priority.getDisplayName(), event -> {
+                subMenu.addItem(priorityFormatter.getDisplayName(priority), event -> {
                     if (event.getSource().isChecked()) {
                         filterSignal.update(old -> old.withPriority(priority));
                     } else {

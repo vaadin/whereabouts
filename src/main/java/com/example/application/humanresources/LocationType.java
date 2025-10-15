@@ -1,9 +1,7 @@
 package com.example.application.humanresources;
 
 import com.example.application.common.ValueObject;
-import org.jspecify.annotations.NullMarked;
 
-@NullMarked
 public enum LocationType implements ValueObject {
     /**
      * The organization's primary global headquarters.
