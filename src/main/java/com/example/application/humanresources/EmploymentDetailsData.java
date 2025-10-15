@@ -14,6 +14,7 @@ public record EmploymentDetailsData(
         EmploymentStatus status,
         WorkArrangement workArrangement,
         LocationId location,
+        @Nullable EmployeeId manager,
         LocalDate hireDate,
         @Nullable LocalDate terminationDate
 ) implements ValueObject {
@@ -22,6 +23,7 @@ public record EmploymentDetailsData(
     public static final String PROP_STATUS = "status";
     public static final String PROP_WORK_ARRANGEMENT = "workArrangement";
     public static final String PROP_LOCATION = "location";
+    public static final String PROP_MANAGER = "manager";
     public static final String PROP_HIRE_DATE = "hireDate";
     public static final String PROP_TERMINATION_DATE = "terminationDate";
 

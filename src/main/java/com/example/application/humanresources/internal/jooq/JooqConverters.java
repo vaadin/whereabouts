@@ -4,10 +4,7 @@ import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
 import com.example.application.common.address.JooqPostalAddressConverter;
-import com.example.application.humanresources.EmploymentStatus;
-import com.example.application.humanresources.EmploymentType;
-import com.example.application.humanresources.LocationType;
-import com.example.application.humanresources.WorkArrangement;
+import com.example.application.humanresources.*;
 import org.jooq.Converter;
 
 import java.time.ZoneId;
@@ -64,5 +61,13 @@ final class JooqConverters {
 
     public static final Converter<String, EmailAddress> emailConverter = Converter.ofNullable(
             String.class, EmailAddress.class, EmailAddress::of, EmailAddress::toString
+    );
+
+    public static final Converter<Long, LocationId> locationIdConverter = Converter.ofNullable(
+            Long.class, LocationId.class, LocationId::of, LocationId::toLong
+    );
+
+    public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
+            Long.class, EmployeeId.class, EmployeeId::of, EmployeeId::toLong
     );
 }

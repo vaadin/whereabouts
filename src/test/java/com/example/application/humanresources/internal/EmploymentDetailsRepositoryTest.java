@@ -27,6 +27,7 @@ class EmploymentDetailsRepositoryTest {
     @Test
     void insert_get_and_update_include_all_properties() {
         var employeeId = employeeRepository.insert(EmployeeRepositoryTest.createEmployeeData(0));
+        var managerId = employeeRepository.insert(EmployeeRepositoryTest.createEmployeeData(1));
         var locationId = locationRepository.insert(LocationRepositoryTest.createLocationData());
         var originalData = new EmploymentDetailsData(
                 "Title",
@@ -34,6 +35,7 @@ class EmploymentDetailsRepositoryTest {
                 EmploymentStatus.ACTIVE,
                 WorkArrangement.HYBRID,
                 locationId,
+                managerId,
                 LocalDate.of(2023, 5, 31),
                 null
         );
@@ -54,6 +56,7 @@ class EmploymentDetailsRepositoryTest {
                 EmploymentStatus.TERMINATED,
                 WorkArrangement.REMOTE,
                 locationId,
+                managerId,
                 LocalDate.of(2024, 6, 1),
                 LocalDate.of(2025, 10, 8)
         );

@@ -6,6 +6,9 @@ import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
 import com.example.application.common.address.*;
 import com.example.application.humanresources.internal.EmployeeRepository;
+import com.example.application.humanresources.internal.EmploymentDetailsRepository;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,15 +17,22 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
+@NullMarked
 public class EmployeeTestDataService {
 
     private final Random rnd = new Random();
     private final EmployeeRepository employeeRepository;
+    private final EmploymentDetailsRepository employmentDetailsRepository;
+    private final LocationTestDataService locationTestDataService;
 
-    EmployeeTestDataService(EmployeeRepository employeeRepository) {
+    EmployeeTestDataService(EmployeeRepository employeeRepository, EmploymentDetailsRepository employmentDetailsRepository,
+                            LocationTestDataService locationTestDataService) {
         this.employeeRepository = employeeRepository;
+        this.employmentDetailsRepository = employmentDetailsRepository;
+        this.locationTestDataService = locationTestDataService;
     }
 
     @Transactional
@@ -46,21 +56,30 @@ public class EmployeeTestDataService {
     }
 
     private <T> T pickRandom(T[] values) {
+        if (values.length == 0) {
+            throw new IllegalArgumentException("Cannot pick from empty array");
+        }
         return values[rnd.nextInt(values.length)];
     }
 
     private <T> T pickRandom(List<T> items) {
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException("Cannot pick from empty list");
+        }
         return items.get(rnd.nextInt(items.size()));
     }
 
     private <T> T pickRandom(Set<T> items) {
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException("Cannot pick from empty set");
+        }
         return items.stream().sorted().toList().get(rnd.nextInt(items.size()));
     }
 
     @Transactional
     public void createTestEmployees() {
         // Finland
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Mikko",
                 "Tapani",
                 "Korhonen",
@@ -80,7 +99,8 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("mikko.korhonen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+
+        insert(new EmployeeData(
                 "Anna",
                 "Maria",
                 "Lehtinen",
@@ -100,7 +120,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("anna.lehtinen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Jari",
                 "Olavi",
                 "Virtanen",
@@ -120,7 +140,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("jari.virtanen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sanna",
                 "Elina",
                 "Miettinen",
@@ -140,7 +160,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("sanna.miettinen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Oskari",
                 "Juhani",
                 "Niemi",
@@ -160,7 +180,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("oskari.niemi@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Laura",
                 "Helena",
                 "Koskinen",
@@ -180,7 +200,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("laura.koskinen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Petri",
                 "Johannes",
                 "Salmi",
@@ -200,7 +220,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("petri.salmi@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Emilia",
                 "Sofia",
                 "Räsänen",
@@ -220,7 +240,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("emilia.rasanen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Ville",
                 "Kalevi",
                 "Laine",
@@ -240,7 +260,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("ville.laine@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Noora",
                 "Kristiina",
                 "Heikkilä",
@@ -260,7 +280,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("noora.heikkila@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Alex",
                 "Mikael",
                 "Johansson",
@@ -280,7 +300,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("alex.johansson@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sam",
                 "Leevi",
                 "Nguyen",
@@ -300,7 +320,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("sam.nguyen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Eero",
                 "Juhani",
                 "Lehto",
@@ -320,7 +340,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("eero.lehto@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Linnea",
                 "Kristina",
                 "Sundström",
@@ -340,7 +360,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("linnea.sundstrom@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Amir",
                 "Hassan",
                 "Al-Mansur",
@@ -360,7 +380,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("amir.almansur@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Mai",
                 "Thi",
                 "Nguyen",
@@ -380,7 +400,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("mai.nguyen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Noora",
                 "Katariina",
                 "Hakala",
@@ -400,7 +420,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("noora.hakala@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Ivan",
                 "Sergei",
                 "Petrov",
@@ -420,7 +440,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("ivan.petrov@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Kaisa",
                 "Marleen",
                 "Tamm",
@@ -440,7 +460,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("kaisa.tamm@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "João",
                 "Miguel",
                 "Silva",
@@ -460,7 +480,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("joao.silva@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Aisha",
                 "Fatima",
                 "Khan",
@@ -480,7 +500,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("aisha.khan@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Alex",
                 "Mika",
                 "Korventausta",
@@ -500,7 +520,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("alex.korventausta@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Robin",
                 "Alvar",
                 "Sjöberg",
@@ -520,7 +540,7 @@ public class EmployeeTestDataService {
                 null,
                 EmailAddress.of("robin.sjoberg@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Yasmin",
                 "Hodan",
                 "Warsame",
@@ -542,7 +562,7 @@ public class EmployeeTestDataService {
         ));
 
         // Germany
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Lukas",
                 "Johann",
                 "Müller",
@@ -562,7 +582,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111222"),
                 EmailAddress.of("lukas.mueller@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sophie",
                 "Maria",
                 "Schneider",
@@ -582,7 +602,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111223"),
                 EmailAddress.of("sophie.schneider@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Emre",
                 "Can",
                 "Yılmaz",
@@ -602,7 +622,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111224"),
                 EmailAddress.of("emre.yilmaz@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Magda",
                 "Ewa",
                 "Kowalska",
@@ -622,7 +642,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111225"),
                 EmailAddress.of("magda.kowalska@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Oliver",
                 "James",
                 "Brown",
@@ -642,7 +662,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111226"),
                 EmailAddress.of("oliver.brown@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Claire",
                 "Louise",
                 "Dubois",
@@ -662,7 +682,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111227"),
                 EmailAddress.of("claire.dubois@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Alex",
                 "Robin",
                 "Krämer",
@@ -682,7 +702,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111228"),
                 EmailAddress.of("alex.kraemer@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Adrián",
                 "Santos",
                 "López",
@@ -702,7 +722,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111229"),
                 EmailAddress.of("adrian.lopez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Giulia",
                 "Rosa",
                 "Moretti",
@@ -722,7 +742,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111230"),
                 EmailAddress.of("giulia.moretti@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Jonas",
                 "Matthias",
                 "Becker",
@@ -742,7 +762,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+49301111231"),
                 EmailAddress.of("jonas.becker@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sebastian",
                 "Karl",
                 "Wagner",
@@ -762,7 +782,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+498932100001"),
                 EmailAddress.of("sebastian.wagner@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Elena",
                 "Maria",
                 "Schäfer",
@@ -782,7 +802,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+496969100002"),
                 EmailAddress.of("elena.schaefer@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Can",
                 "Emre",
                 "Öztürk",
@@ -802,7 +822,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+494040100003"),
                 EmailAddress.of("can.oeztuerk@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Julia",
                 "Anne",
                 "Keller",
@@ -822,7 +842,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+492219900004"),
                 EmailAddress.of("julia.keller@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Matteo",
                 "Luca",
                 "Rossi",
@@ -842,7 +862,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+497119900005"),
                 EmailAddress.of("matteo.rossi@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Svenja",
                 "Lina",
                 "Krämer",
@@ -862,7 +882,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+492119900006"),
                 EmailAddress.of("svenja.kraemer@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Jonas",
                 "Peter",
                 "Becker",
@@ -882,7 +902,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+492319900007"),
                 EmailAddress.of("jonas.p.becker@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Agnieszka",
                 "Ewa",
                 "Nowak",
@@ -902,7 +922,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+499119900008"),
                 EmailAddress.of("agnieszka.nowak@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Lukas",
                 "Peter",
                 "Vogel",
@@ -924,7 +944,7 @@ public class EmployeeTestDataService {
         ));
 
         // Canada
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Lucas",
                 "Daniel",
                 "Moreau",
@@ -945,7 +965,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+14169000002"),
                 EmailAddress.of("lucas.moreau@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sophie",
                 "Marie",
                 "Lefebvre",
@@ -966,7 +986,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16137200003"),
                 EmailAddress.of("sophie.lefebvre@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Noah",
                 "James",
                 "Singh",
@@ -987,7 +1007,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16137200004"),
                 EmailAddress.of("noah.singh@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Clara",
                 "Isabelle",
                 "Gagnon",
@@ -1008,7 +1028,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+15144200005"),
                 EmailAddress.of("clara.gagnon@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Mateo",
                 "Andrés",
                 "Rodriguez",
@@ -1029,7 +1049,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+15144200006"),
                 EmailAddress.of("mateo.rodriguez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Emma",
                 "Rose",
                 "MacDonald",
@@ -1050,7 +1070,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+14032900007"),
                 EmailAddress.of("emma.macdonald@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Arjun",
                 "Vikram",
                 "Patel",
@@ -1071,7 +1091,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+14032900008"),
                 EmailAddress.of("arjun.patel@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Michelle",
                 "Anne",
                 "Wong",
@@ -1092,7 +1112,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16046200009"),
                 EmailAddress.of("michelle.wong@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Kai",
                 "River",
                 "Thompson",
@@ -1115,7 +1135,7 @@ public class EmployeeTestDataService {
         ));
 
         // United States
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Ethan",
                 "James",
                 "Park",
@@ -1136,7 +1156,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+14155880001"),
                 EmailAddress.of("ethan.park@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Maya",
                 "Arielle",
                 "Sanchez",
@@ -1157,7 +1177,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+14155880002"),
                 EmailAddress.of("maya.sanchez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Noah",
                 "Alexander",
                 "Nguyen",
@@ -1178,7 +1198,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12065880003"),
                 EmailAddress.of("noah.nguyen@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Harper",
                 "Skye",
                 "Bennett",
@@ -1199,7 +1219,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12065880004"),
                 EmailAddress.of("harper.bennett@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Aaliyah",
                 "Marie",
                 "Johnson",
@@ -1220,7 +1240,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12135880005"),
                 EmailAddress.of("aaliyah.johnson@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Diego",
                 "Luis",
                 "Martinez",
@@ -1241,7 +1261,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12135880006"),
                 EmailAddress.of("diego.martinez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Olivia",
                 "Grace",
                 "Lee",
@@ -1262,7 +1282,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12125880007"),
                 EmailAddress.of("olivia.lee@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Liam",
                 "Thomas",
                 "O'Connor",
@@ -1283,7 +1303,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+12125880008"),
                 EmailAddress.of("liam.oconnor@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Emma",
                 "Rose",
                 "Murphy",
@@ -1304,7 +1324,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16175880009"),
                 EmailAddress.of("emma.murphy@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Carter",
                 "James",
                 "Patel",
@@ -1325,7 +1345,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16175880010"),
                 EmailAddress.of("carter.patel@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Isabella",
                 "Sofia",
                 "Rodriguez",
@@ -1346,7 +1366,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13055880011"),
                 EmailAddress.of("isabella.rodriguez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Mateo",
                 "Andres",
                 "Gonzalez",
@@ -1367,7 +1387,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13055880012"),
                 EmailAddress.of("mateo.gonzalez@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Sophia",
                 "Anne",
                 "Kowalski",
@@ -1388,7 +1408,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13125880013"),
                 EmailAddress.of("sophia.kowalski@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Jackson",
                 "Michael",
                 "Reed",
@@ -1409,7 +1429,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13125880014"),
                 EmailAddress.of("jackson.reed@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Asha",
                 "Priya",
                 "Desai",
@@ -1430,7 +1450,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+15125880015"),
                 EmailAddress.of("asha.desai@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Wyatt",
                 "Cole",
                 "Henderson",
@@ -1451,7 +1471,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+15125880016"),
                 EmailAddress.of("wyatt.henderson@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Aiden",
                 "Christopher",
                 "Miller",
@@ -1472,7 +1492,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13035880017"),
                 EmailAddress.of("aiden.miller@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Zoe",
                 "Elizabeth",
                 "Garcia",
@@ -1493,7 +1513,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+13035880018"),
                 EmailAddress.of("zoe.garcia@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Kai",
                 "River",
                 "Thompson",
@@ -1514,7 +1534,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16025880019"),
                 EmailAddress.of("kai.thompson.us@company.com")
         ));
-        employeeRepository.insert(new EmployeeData(
+        insert(new EmployeeData(
                 "Daniela",
                 "María",
                 "Hernandez",
@@ -1535,6 +1555,551 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+16025880020"),
                 EmailAddress.of("daniela.hernandez@company.com")
         ));
-        // TODO Generate bulk data using Faker
+
+        // Argentina
+        insert(new EmployeeData(
+                "María",
+                "Soledad",
+                "Fernández",
+                "Sol",
+                LocalDate.of(1992, 7, 15),
+                Gender.FEMALE,
+                "Vegetarian",
+                ZoneId.of("America/Argentina/Buenos_Aires"),
+                new InternationalPostalAddress(
+                        "Avenida Corrientes 1234, Piso 8, Departamento B",
+                        "Buenos Aires",
+                        "Buenos Aires",
+                        "C1043AAZ",
+                        Country.ofIsoCode("AR")
+                ),
+                PhoneNumber.of("+541143219876"),
+                PhoneNumber.of("+5491165432109"),
+                PhoneNumber.of("+541147654321"),
+                EmailAddress.of("maria.fernandez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Santiago",
+                "Martín",
+                "Rodríguez",
+                "Santi",
+                LocalDate.of(1988, 11, 23),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Argentina/Cordoba"),
+                new InternationalPostalAddress(
+                        "San Martín 567, 2° Piso",
+                        "Córdoba",
+                        "Córdoba",
+                        "X5000KQN",
+                        Country.ofIsoCode("AR")
+                ),
+                PhoneNumber.of("+543514876543"),
+                PhoneNumber.of("+5493515123456"),
+                PhoneNumber.of("+543514234567"),
+                EmailAddress.of("santiago.rodriguez@company.com")
+        ));
+
+        // Bolivia
+        insert(new EmployeeData(
+                "Carlos",
+                "Eduardo",
+                "Mamani",
+                "Carlos",
+                LocalDate.of(1990, 4, 12),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/La_Paz"),
+                new InternationalPostalAddress(
+                        "Avenida 6 de Agosto 2345, Zona San Miguel",
+                        "La Paz",
+                        null,
+                        null,
+                        Country.ofIsoCode("BO")
+                ),
+                PhoneNumber.of("+59122765432"),
+                PhoneNumber.of("+59171234567"),
+                PhoneNumber.of("+59122123456"),
+                EmailAddress.of("carlos.mamani@company.com")
+        ));
+        insert(new EmployeeData(
+                "Andrea",
+                "Paola",
+                "Quispe",
+                "Andi",
+                LocalDate.of(1994, 9, 8),
+                Gender.FEMALE,
+                "No pork",
+                ZoneId.of("America/La_Paz"),
+                new InternationalPostalAddress(
+                        "Calle Libertad 789, Zona Central",
+                        "Santa Cruz de la Sierra",
+                        null,
+                        null,
+                        Country.ofIsoCode("BO")
+                ),
+                PhoneNumber.of("+59133456789"),
+                PhoneNumber.of("+59176543210"),
+                PhoneNumber.of("+59133234567"),
+                EmailAddress.of("andrea.quispe@company.com")
+        ));
+
+        // Brazil
+        insert(new EmployeeData(
+                "Lucas",
+                "Henrique",
+                "Silva",
+                "Lucas",
+                LocalDate.of(1991, 6, 20),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Sao_Paulo"),
+                new InternationalPostalAddress(
+                        "Rua Augusta 1500, Apartamento 302",
+                        "São Paulo",
+                        "SP",
+                        "01304-001",
+                        Country.ofIsoCode("BR")
+                ),
+                PhoneNumber.of("+551132345678"),
+                PhoneNumber.of("+5511987654321"),
+                PhoneNumber.of("+551131234567"),
+                EmailAddress.of("lucas.silva@company.com")
+        ));
+        insert(new EmployeeData(
+                "Juliana",
+                "Cristina",
+                "Santos",
+                "Ju",
+                LocalDate.of(1987, 2, 14),
+                Gender.FEMALE,
+                "Lactose intolerant",
+                ZoneId.of("America/Sao_Paulo"),
+                new InternationalPostalAddress(
+                        "Avenida Paulista 2000, Conjunto 1504",
+                        "Rio de Janeiro",
+                        "RJ",
+                        "22071-000",
+                        Country.ofIsoCode("BR")
+                ),
+                PhoneNumber.of("+552121234567"),
+                PhoneNumber.of("+5521998765432"),
+                PhoneNumber.of("+552122345678"),
+                EmailAddress.of("juliana.santos@company.com")
+        ));
+
+        // Chile
+        insert(new EmployeeData(
+                "Alejandro",
+                "José",
+                "González",
+                "Ale",
+                LocalDate.of(1993, 10, 5),
+                Gender.MALE,
+                "Vegan",
+                ZoneId.of("America/Santiago"),
+                new InternationalPostalAddress(
+                        "Avenida Providencia 1234, Oficina 901",
+                        "Santiago",
+                        "Región Metropolitana",
+                        "7500000",
+                        Country.ofIsoCode("CL")
+                ),
+                PhoneNumber.of("+56223456789"),
+                PhoneNumber.of("+56987654321"),
+                PhoneNumber.of("+56221234567"),
+                EmailAddress.of("alejandro.gonzalez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Valentina",
+                "Isabel",
+                "Muñoz",
+                "Vale",
+                LocalDate.of(1995, 1, 18),
+                Gender.FEMALE,
+                null,
+                ZoneId.of("America/Santiago"),
+                new InternationalPostalAddress(
+                        "Calle Merced 567, Departamento 405",
+                        "Valparaíso",
+                        "Región de Valparaíso",
+                        "2340000",
+                        Country.ofIsoCode("CL")
+                ),
+                PhoneNumber.of("+56322345678"),
+                PhoneNumber.of("+56976543210"),
+                PhoneNumber.of("+56321234567"),
+                EmailAddress.of("valentina.munoz@company.com")
+        ));
+
+        // Colombia
+        insert(new EmployeeData(
+                "Andrés",
+                "Felipe",
+                "Ramírez",
+                "Andrés",
+                LocalDate.of(1989, 8, 30),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Bogota"),
+                new InternationalPostalAddress(
+                        "Carrera 7 No. 71-21, Torre B, Oficina 1205",
+                        "Bogotá",
+                        "Cundinamarca",
+                        "110231",
+                        Country.ofIsoCode("CO")
+                ),
+                PhoneNumber.of("+5716012345"),
+                PhoneNumber.of("+573201234567"),
+                PhoneNumber.of("+5716011234"),
+                EmailAddress.of("andres.ramirez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Camila",
+                "Andrea",
+                "Vargas",
+                "Cami",
+                LocalDate.of(1992, 12, 9),
+                Gender.FEMALE,
+                "Gluten-free",
+                ZoneId.of("America/Bogota"),
+                new InternationalPostalAddress(
+                        "Calle 10 No. 5-61, Apartamento 302",
+                        "Medellín",
+                        "Antioquia",
+                        "050021",
+                        Country.ofIsoCode("CO")
+                ),
+                PhoneNumber.of("+5744123456"),
+                PhoneNumber.of("+573109876543"),
+                PhoneNumber.of("+5744234567"),
+                EmailAddress.of("camila.vargas@company.com")
+        ));
+
+        // Ecuador
+        insert(new EmployeeData(
+                "Diego",
+                "Alejandro",
+                "Morales",
+                "Diego",
+                LocalDate.of(1990, 5, 25),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Guayaquil"),
+                new InternationalPostalAddress(
+                        "Avenida Amazonas N24-123 y Colón, Edificio España, Piso 6",
+                        "Quito",
+                        "Pichincha",
+                        "170143",
+                        Country.ofIsoCode("EC")
+                ),
+                PhoneNumber.of("+59322345678"),
+                PhoneNumber.of("+593987654321"),
+                PhoneNumber.of("+59322123456"),
+                EmailAddress.of("diego.morales@company.com")
+        ));
+        insert(new EmployeeData(
+                "Gabriela",
+                "Sofía",
+                "Jaramillo",
+                "Gaby",
+                LocalDate.of(1994, 3, 17),
+                Gender.FEMALE,
+                "Pescatarian",
+                ZoneId.of("America/Guayaquil"),
+                new InternationalPostalAddress(
+                        "Avenida 9 de Octubre 456, Oficina 803",
+                        "Guayaquil",
+                        "Guayas",
+                        "090313",
+                        Country.ofIsoCode("EC")
+                ),
+                PhoneNumber.of("+59342345678"),
+                PhoneNumber.of("+593976543210"),
+                PhoneNumber.of("+59342234567"),
+                EmailAddress.of("gabriela.jaramillo@company.com")
+        ));
+
+        // Guyana
+        insert(new EmployeeData(
+                "Ryan",
+                "Christopher",
+                "Singh",
+                "Ryan",
+                LocalDate.of(1991, 7, 11),
+                Gender.MALE,
+                "No beef",
+                ZoneId.of("America/Guyana"),
+                new InternationalPostalAddress(
+                        "123 Main Street, Queenstown",
+                        "Georgetown",
+                        null,
+                        null,
+                        Country.ofIsoCode("GY")
+                ),
+                PhoneNumber.of("+5922225678"),
+                PhoneNumber.of("+5926123456"),
+                PhoneNumber.of("+5922234567"),
+                EmailAddress.of("ryan.singh@company.com")
+        ));
+        insert(new EmployeeData(
+                "Priya",
+                "Michelle",
+                "Persaud",
+                "Priya",
+                LocalDate.of(1993, 11, 28),
+                Gender.FEMALE,
+                "Vegetarian",
+                ZoneId.of("America/Guyana"),
+                new InternationalPostalAddress(
+                        "67 Robb Street, Bourda",
+                        "Georgetown",
+                        null,
+                        null,
+                        Country.ofIsoCode("GY")
+                ),
+                PhoneNumber.of("+5922267890"),
+                PhoneNumber.of("+5926987654"),
+                PhoneNumber.of("+5922223456"),
+                EmailAddress.of("priya.persaud@company.com")
+        ));
+
+        // Paraguay
+        insert(new EmployeeData(
+                "Miguel",
+                "Ángel",
+                "Benítez",
+                "Miguel",
+                LocalDate.of(1988, 4, 22),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Asuncion"),
+                new InternationalPostalAddress(
+                        "Avenida Mariscal López 1234, Edificio San Rafael, Piso 5",
+                        "Asunción",
+                        null,
+                        "1209",
+                        Country.ofIsoCode("PY")
+                ),
+                PhoneNumber.of("+595212345678"),
+                PhoneNumber.of("+595981234567"),
+                PhoneNumber.of("+595211234567"),
+                EmailAddress.of("miguel.benitez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Laura",
+                "Beatriz",
+                "Cardozo",
+                "Lau",
+                LocalDate.of(1996, 9, 3),
+                Gender.FEMALE,
+                "Dairy-free",
+                ZoneId.of("America/Asuncion"),
+                new InternationalPostalAddress(
+                        "Calle Palma 567, Villa Morra",
+                        "Asunción",
+                        null,
+                        "1536",
+                        Country.ofIsoCode("PY")
+                ),
+                PhoneNumber.of("+595213456789"),
+                PhoneNumber.of("+595971234567"),
+                PhoneNumber.of("+595212345678"),
+                EmailAddress.of("laura.cardozo@company.com")
+        ));
+
+        // Peru
+        insert(new EmployeeData(
+                "José",
+                "Luis",
+                "Flores",
+                "Pepe",
+                LocalDate.of(1990, 2, 16),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Lima"),
+                new InternationalPostalAddress(
+                        "Avenida Arequipa 1234, Oficina 601, Santa Beatriz",
+                        "Lima",
+                        "Lima",
+                        "15046",
+                        Country.ofIsoCode("PE")
+                ),
+                PhoneNumber.of("+5114567890"),
+                PhoneNumber.of("+51987654321"),
+                PhoneNumber.of("+5114123456"),
+                EmailAddress.of("jose.flores@company.com")
+        ));
+        insert(new EmployeeData(
+                "Ana",
+                "María",
+                "Castillo",
+                "Anita",
+                LocalDate.of(1992, 8, 7),
+                Gender.FEMALE,
+                "Halal meals only",
+                ZoneId.of("America/Lima"),
+                new InternationalPostalAddress(
+                        "Jirón de la Unión 890, Centro Histórico",
+                        "Cusco",
+                        "Cusco",
+                        "08002",
+                        Country.ofIsoCode("PE")
+                ),
+                PhoneNumber.of("+51842345678"),
+                PhoneNumber.of("+51976543210"),
+                PhoneNumber.of("+51841234567"),
+                EmailAddress.of("ana.castillo@company.com")
+        ));
+
+        // Uruguay
+        insert(new EmployeeData(
+                "Martín",
+                "Sebastián",
+                "Pérez",
+                "Martín",
+                LocalDate.of(1989, 6, 13),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Montevideo"),
+                new InternationalPostalAddress(
+                        "Avenida 18 de Julio 1234, Piso 8, Oficina 802",
+                        "Montevideo",
+                        null,
+                        "11100",
+                        Country.ofIsoCode("UY")
+                ),
+                PhoneNumber.of("+59822345678"),
+                PhoneNumber.of("+59894123456"),
+                PhoneNumber.of("+59822234567"),
+                EmailAddress.of("martin.perez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Sofía",
+                "Valentina",
+                "García",
+                "Sofi",
+                LocalDate.of(1995, 12, 1),
+                Gender.FEMALE,
+                "Vegetarian",
+                ZoneId.of("America/Montevideo"),
+                new InternationalPostalAddress(
+                        "Rambla República de México 5678, Punta Carretas",
+                        "Montevideo",
+                        null,
+                        "11400",
+                        Country.ofIsoCode("UY")
+                ),
+                PhoneNumber.of("+59827123456"),
+                PhoneNumber.of("+59899876543"),
+                PhoneNumber.of("+59826234567"),
+                EmailAddress.of("sofia.garcia@company.com")
+        ));
+
+        // Venezuela
+        insert(new EmployeeData(
+                "Rafael",
+                "Antonio",
+                "Méndez",
+                "Rafa",
+                LocalDate.of(1987, 10, 24),
+                Gender.MALE,
+                null,
+                ZoneId.of("America/Caracas"),
+                new InternationalPostalAddress(
+                        "Avenida Francisco de Miranda, Centro Lido, Torre A, Piso 12",
+                        "Caracas",
+                        "Distrito Capital",
+                        "1060",
+                        Country.ofIsoCode("VE")
+                ),
+                PhoneNumber.of("+582122345678"),
+                PhoneNumber.of("+584141234567"),
+                PhoneNumber.of("+582121234567"),
+                EmailAddress.of("rafael.mendez@company.com")
+        ));
+        insert(new EmployeeData(
+                "Isabella",
+                "Carolina",
+                "Rivas",
+                "Isa",
+                LocalDate.of(1994, 5, 19),
+                Gender.FEMALE,
+                "No shellfish",
+                ZoneId.of("America/Caracas"),
+                new InternationalPostalAddress(
+                        "Avenida 5 de Julio con Calle 72, Edificio Empresarial, Oficina 503",
+                        "Maracaibo",
+                        "Zulia",
+                        "4001",
+                        Country.ofIsoCode("VE")
+                ),
+                PhoneNumber.of("+582612345678"),
+                PhoneNumber.of("+584246543210"),
+                PhoneNumber.of("+582611234567"),
+                EmailAddress.of("isabella.rivas@company.com")
+        ));
+    }
+
+    private static final String[] JOB_TITLES = {
+            "Software Engineer",
+            "Product Manager",
+            "Data Analyst",
+            "UX Designer",
+            "Marketing Manager",
+            "Content Writer",
+            "Financial Analyst",
+            "HR Manager",
+            "Project Manager",
+            "Business Analyst",
+            "DevOps Engineer",
+            "Sales Representative",
+            "Graphic Designer",
+            "Accountant",
+            "Legal Counsel",
+            "Customer Success Manager",
+            "Technical Writer",
+            "Recruiter",
+            "Social Media Manager",
+            "Operations Manager"
+    };
+
+    private final AtomicInteger terminatedEmployees = new AtomicInteger(0);
+
+    private void insert(EmployeeData employeeData) {
+        var id = employeeRepository.insert(employeeData);
+        var employmentStatus = pickRandom(EmploymentStatus.values());
+        if (employmentStatus.equals(EmploymentStatus.TERMINATED)) {
+            if (terminatedEmployees.get() > 10) {
+                employmentStatus = EmploymentStatus.ACTIVE;
+            } else {
+                terminatedEmployees.incrementAndGet();
+            }
+        }
+        var hireDate = LocalDate.of(2010, 1, 1).plusDays(rnd.nextLong(5000));
+        var terminationDate = generateTerminationDate(employmentStatus, hireDate);
+        var employmentDetails = new EmploymentDetailsData(
+                pickRandom(JOB_TITLES),
+                pickRandom(EmploymentType.values()),
+                employmentStatus,
+                pickRandom(WorkArrangement.values()),
+                pickRandom(locationTestDataService.getLocationsOfCountry(employeeData.homeAddress().country())),
+                null, // TODO Pick manager
+                hireDate,
+                terminationDate
+        );
+        employmentDetailsRepository.insert(id, employmentDetails);
+    }
+
+    private @Nullable LocalDate generateTerminationDate(EmploymentStatus employmentStatus, LocalDate hireDate) {
+        if (employmentStatus != EmploymentStatus.TERMINATED) {
+            return null;
+        }
+        var date = hireDate.plusMonths(rnd.nextInt(47) + 1);
+        if (date.isAfter(LocalDate.now())) {
+            return LocalDate.now();
+        } else {
+            return date;
+        }
     }
 }
