@@ -29,12 +29,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
-    public boolean isEmpty() {
-        return dsl.selectCount().from(EMPLOYEE).fetchSingle().value1() == 0;
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    @Override
     public Optional<Employee> findById(EmployeeId id) {
         var GENDER = EMPLOYEE.GENDER.convert(genderConverter);
         var HOME_ADDRESS = EMPLOYEE.HOME_ADDRESS.convert(postalAddressConverter);

@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class TestUserService {
+public class UserTestDataService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    TestUserService(UserRepository userRepository) {
+    UserTestDataService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

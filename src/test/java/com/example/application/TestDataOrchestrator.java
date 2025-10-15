@@ -1,6 +1,8 @@
 package com.example.application;
 
-import com.example.application.security.TestUserService;
+import com.example.application.humanresources.EmployeeTestDataService;
+import com.example.application.humanresources.LocationTestDataService;
+import com.example.application.security.UserTestDataService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -8,14 +10,20 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("!integration-test")
 class TestDataOrchestrator {
-    private final TestUserService testUserService;
+    private final UserTestDataService userTestDataService;
+    private final LocationTestDataService locationTestDataService;
+    private final EmployeeTestDataService employeeTestDataService;
 
-    TestDataOrchestrator(TestUserService testUserService) {
-        this.testUserService = testUserService;
+    TestDataOrchestrator(UserTestDataService userTestDataService, LocationTestDataService locationTestDataService, EmployeeTestDataService employeeTestDataService) {
+        this.userTestDataService = userTestDataService;
+        this.locationTestDataService = locationTestDataService;
+        this.employeeTestDataService = employeeTestDataService;
     }
 
     @PostConstruct
     void generateTestData() {
-        testUserService.createTestUsers();
+        userTestDataService.createTestUsers();
+        locationTestDataService.createTestLocations();
+        employeeTestDataService.createTestEmployees();
     }
 }

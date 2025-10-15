@@ -1,7 +1,7 @@
 package com.example.application.projects.internal;
 
 import com.example.application.IntegrationTest;
-import com.example.application.humanresources.EmployeeTestData;
+import com.example.application.humanresources.EmployeeTestDataService;
 import com.example.application.projects.TaskAssignee;
 import com.example.application.projects.TaskData;
 import com.example.application.projects.TaskPriority;
@@ -22,15 +22,15 @@ class TaskRepositoryTest {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
-    private EmployeeTestData employeeTestData;
+    private EmployeeTestDataService employeeTestDataService;
     @Autowired
     private TaskRepository repository;
 
     @Test
     void insert_get_and_update_include_all_properties() {
-        var employee1 = employeeTestData.createEmployee();
-        var employee2 = employeeTestData.createEmployee();
-        var employee3 = employeeTestData.createEmployee();
+        var employee1 = employeeTestDataService.createEmployee();
+        var employee2 = employeeTestDataService.createEmployee();
+        var employee3 = employeeTestDataService.createEmployee();
         var project = projectRepository.insert(ProjectRepositoryTest.createProjectData());
         var originalData = new TaskData(project,
                 "Description",

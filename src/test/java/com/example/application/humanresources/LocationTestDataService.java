@@ -1,16 +1,10 @@
-package com.example.application.humanresources.internal;
+package com.example.application.humanresources;
 
 import com.example.application.common.Country;
 import com.example.application.common.address.*;
-import com.example.application.humanresources.Location;
-import com.example.application.humanresources.LocationData;
-import com.example.application.humanresources.LocationFacility;
-import com.example.application.humanresources.LocationType;
-import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Profile;
+import com.example.application.humanresources.internal.LocationRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -18,19 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Generates {@link Location} test data at application startup if the database is empty.
- */
+
 @Component
-@Profile("!integration-test")
-class LocationTestDataGenerator {
+public class LocationTestDataService {
 
     private final Random rnd = new Random();
-    private final TransactionTemplate txTemplate;
     private final LocationRepository locationRepository;
 
-    LocationTestDataGenerator(PlatformTransactionManager transactionManager, LocationRepository locationRepository) {
-        this.txTemplate = new TransactionTemplate(transactionManager);
+    LocationTestDataService(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
 
@@ -50,16 +39,8 @@ class LocationTestDataGenerator {
         return facilities;
     }
 
-    @PostConstruct
-    public void generate() {
-        txTemplate.executeWithoutResult(tx -> {
-            if (locationRepository.isEmpty()) {
-                insertData();
-            }
-        });
-    }
-
-    private void insertData() {
+    @Transactional
+    public void createTestLocations() {
         // Argentina locations
         locationRepository.insert(new LocationData(
                 "Buenos Aires",

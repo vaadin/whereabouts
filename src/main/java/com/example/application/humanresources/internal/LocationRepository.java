@@ -11,8 +11,6 @@ import java.util.Optional;
 @NullMarked
 public interface LocationRepository extends Repository {
 
-    boolean isEmpty();
-
     Optional<Location> findById(LocationId id);
 
     LocationId insert(LocationData data);

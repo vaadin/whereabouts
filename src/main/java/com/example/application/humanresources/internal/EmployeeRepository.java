@@ -11,8 +11,6 @@ import java.util.Optional;
 @NullMarked
 public interface EmployeeRepository extends Repository {
 
-    boolean isEmpty();
-
     Optional<Employee> findById(EmployeeId id);
 
     EmployeeId insert(EmployeeData data);

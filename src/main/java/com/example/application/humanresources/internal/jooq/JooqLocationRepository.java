@@ -35,12 +35,6 @@ class JooqLocationRepository implements LocationRepository {
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
-    public boolean isEmpty() {
-        return dsl.selectCount().from(LOCATION).fetchSingle().value1() == 0;
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    @Override
     public Optional<Location> findById(LocationId id) {
         var LOCATION_TYPE = LOCATION.LOCATION_TYPE.convert(locationTypeConverter);
         var FACILITIES = DSL.multiset(

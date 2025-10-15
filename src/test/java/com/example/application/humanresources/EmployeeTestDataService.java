@@ -1,46 +1,64 @@
-package com.example.application.humanresources.internal;
+package com.example.application.humanresources;
 
 import com.example.application.common.Country;
 import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
 import com.example.application.common.address.*;
-import com.example.application.humanresources.Employee;
-import com.example.application.humanresources.EmployeeData;
-import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Profile;
+import com.example.application.humanresources.internal.EmployeeRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
-/**
- * Generates {@link Employee} test data at application startup if the database is empty.
- */
 @Component
-@Profile("!integration-test")
-class EmployeeTestDataGenerator {
+public class EmployeeTestDataService {
 
-    private final TransactionTemplate txTemplate;
+    private final Random rnd = new Random();
     private final EmployeeRepository employeeRepository;
 
-    EmployeeTestDataGenerator(PlatformTransactionManager transactionManager, EmployeeRepository employeeRepository) {
-        this.txTemplate = new TransactionTemplate(transactionManager);
+    EmployeeTestDataService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
-    @PostConstruct
-    public void generate() {
-        txTemplate.executeWithoutResult(tx -> {
-            if (employeeRepository.isEmpty()) {
-                insertData();
-            }
-        });
+    @Transactional
+    public EmployeeId createEmployee() {
+        var r = rnd.nextInt();
+        return employeeRepository.insert(new EmployeeData(
+                "First" + r,
+                "Middle" + r,
+                "Last" + r,
+                "Preferred" + r,
+                LocalDate.of(1983, 12, 31),
+                pickRandom(Gender.values()),
+                "Dietary" + r,
+                ZoneId.of(pickRandom(ZoneId.getAvailableZoneIds())),
+                new InternationalPostalAddress("Street" + r, "City" + r, "State" + r, "Postal" + r, pickRandom(Country.isoCountries())),
+                PhoneNumber.of("12345678"),
+                PhoneNumber.of("23456789"),
+                PhoneNumber.of("34567890"),
+                EmailAddress.of("email" + r + "@foo.bar")
+        ));
     }
 
-    private void insertData() {
+    private <T> T pickRandom(T[] values) {
+        return values[rnd.nextInt(values.length)];
+    }
+
+    private <T> T pickRandom(List<T> items) {
+        return items.get(rnd.nextInt(items.size()));
+    }
+
+    private <T> T pickRandom(Set<T> items) {
+        return items.stream().sorted().toList().get(rnd.nextInt(items.size()));
+    }
+
+    @Transactional
+    public void createTestEmployees() {
         // Finland
         employeeRepository.insert(new EmployeeData(
                 "Mikko",
