@@ -80,7 +80,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
         ComponentEffect.effect(this, () -> {
             var location = locationSignal.value();
             if (location != null) {
-                title.setText("%s (%s)".formatted(location.data().name(), locationTypeFormatter.getDisplayName(location.data().locationType())));
+                title.setText("%s (%s) %s".formatted(location.data().name(), locationTypeFormatter.getDisplayName(location.data().locationType()), location.data().address().country().flagUnicode()));
                 about.setAbout(location.data().about());
                 summary.setEmployees(locationService.getLocationNodeById(location.id())
                         .map(LocationTreeNode.LocationNode::employees)

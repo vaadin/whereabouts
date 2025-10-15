@@ -72,6 +72,22 @@ public final class Country implements ValueObject {
         return locale.getDisplayCountry(displayIn == null ? Locale.getDefault() : displayIn);
     }
 
+    public String flagUnicode() {
+        var countryCode = locale.getCountry();
+        if (countryCode.length() != 2) {
+            return "";
+        }
+        int firstChar = Character.codePointAt(countryCode, 0);
+        int secondChar = Character.codePointAt(countryCode, 1);
+
+        // Convert to Regional Indicator Symbols
+        int firstFlag = 0x1F1E6 + (firstChar - 'A');
+        int secondFlag = 0x1F1E6 + (secondChar - 'A');
+
+        return new String(Character.toChars(firstFlag)) +
+                new String(Character.toChars(secondFlag));
+    }
+
     @Override
     public String toString() {
         return locale.getCountry();

@@ -107,7 +107,8 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
             var locationTypeFormatter = LocationTypeFormatter.ofLocale(getLocale());
             grid.addHierarchyColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode -> locationNode.name();
-                case LocationTreeNode.CountryNode countryNode -> countryNode.country().displayName();
+                case LocationTreeNode.CountryNode countryNode ->
+                        countryNode.country().displayName() + " " + countryNode.country().flagUnicode();
             }).setHeader("Branches").setSortProperty(LocationService.SORT_BY_LOCATION).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode -> Integer.toString(locationNode.employees());

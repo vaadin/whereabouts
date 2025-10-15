@@ -79,8 +79,9 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         ComponentEffect.effect(this, () -> {
             var employee = employeeSignal.value();
             if (employee != null) {
-                title.setText(PersonNameFormatter.firstLast().toFullName(employee.data().firstName(), employee.data().lastName()));
-                avatar.setName(title.getText());
+                var fullName = PersonNameFormatter.firstLast().toFullName(employee.data().firstName(), employee.data().lastName());
+                title.setText(fullName + " " + employee.data().homeAddress().country().flagUnicode());
+                avatar.setName(fullName);
                 avatar.setImageHandler(employeePictureService.findEmployeePicture(employee.id()));
             }
         });
