@@ -4,6 +4,7 @@ import com.example.application.common.ui.PostalAddressField;
 import com.example.application.common.ui.TimeZoneField;
 import com.example.application.humanresources.LocationData;
 import com.example.application.humanresources.LocationType;
+import com.example.application.humanresources.LocationTypeFormatter;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -31,7 +32,7 @@ class LocationDataForm extends Composite<FormLayout> {
         var locationTypeField = new Select<LocationType>();
         locationTypeField.setLabel("Type");
         locationTypeField.setItems(LocationType.values());
-        locationTypeField.setItemLabelGenerator(LocationType::displayName);
+        locationTypeField.setItemLabelGenerator(LocationTypeFormatter.ofLocale(getLocale())::getDisplayName);
 
         var addressField = new PostalAddressField();
         addressField.setLabel("Address");

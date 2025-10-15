@@ -3,10 +3,8 @@ package com.example.application.humanresources.ui;
 import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.MainLayout;
 import com.example.application.common.ui.SectionToolbar;
+import com.example.application.humanresources.*;
 import com.example.application.humanresources.Location;
-import com.example.application.humanresources.LocationId;
-import com.example.application.humanresources.LocationService;
-import com.example.application.humanresources.LocationTreeNode;
 import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -106,6 +104,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                     return locationService.getChildren(query.getParent(), VaadinSpringDataHelpers.toSpringPageRequest(query)).stream();
                 }
             });
+            var locationTypeFormatter = LocationTypeFormatter.ofLocale(getLocale());
             grid.addHierarchyColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode -> locationNode.name();
                 case LocationTreeNode.CountryNode countryNode -> countryNode.country().displayName();
@@ -115,7 +114,8 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                 case LocationTreeNode.CountryNode countryNode -> Integer.toString(countryNode.employees());
             }).setHeader("Employees").setSortProperty(LocationService.SORT_BY_EMPLOYEES).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
-                case LocationTreeNode.LocationNode locationNode -> locationNode.locationType().displayName();
+                case LocationTreeNode.LocationNode locationNode ->
+                        locationTypeFormatter.getDisplayName(locationNode.locationType());
                 case LocationTreeNode.CountryNode ignored -> "";
             }).setHeader("Type").setSortProperty(LocationService.SORT_BY_TYPE).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
