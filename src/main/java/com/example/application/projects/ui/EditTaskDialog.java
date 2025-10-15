@@ -15,12 +15,13 @@ public class EditTaskDialog extends Dialog {
     private final Task task;
 
     public EditTaskDialog(TaskDataForm.AssigneeLookupBySearchTerm assigneeLookupBySearchTerm,
+                          TaskDataForm.AssigneeLookupById assigneeLookupById,
                           Task task,
                           SaveCallback saveCallback) {
         this.task = task;
         this.saveCallback = saveCallback;
 
-        form = new TaskDataForm(assigneeLookupBySearchTerm);
+        form = new TaskDataForm(assigneeLookupBySearchTerm, assigneeLookupById);
         form.setFormDataObject(task.data());
 
         var saveBtn = new Button("Save", event -> save());

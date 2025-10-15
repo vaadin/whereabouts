@@ -1,5 +1,8 @@
 package com.example.application.projects.ui;
 
+import com.example.application.humanresources.EmployeeId;
+import com.example.application.humanresources.EmployeeReference;
+import com.example.application.humanresources.PersonNameFormatter;
 import com.example.application.projects.*;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -10,15 +13,20 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ReadOnlyHasValue;
+import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Pageable;
 
 import java.time.ZoneId;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @NullMarked
 class TaskDataForm extends Composite<FormLayout> {
@@ -26,7 +34,7 @@ class TaskDataForm extends Composite<FormLayout> {
     private final Binder<TaskData> binder;
     private final TimePicker dueTimeField;
 
-    TaskDataForm(AssigneeLookupBySearchTerm assigneeLookupBySearchTerm) {
+    TaskDataForm(AssigneeLookupBySearchTerm assigneeLookupBySearchTerm, AssigneeLookupById assigneeLookupById) {
         // Create the components
         var descriptionField = new TextField("Description");
         descriptionField.setPlaceholder("Enter a description");
@@ -70,15 +78,20 @@ class TaskDataForm extends Composite<FormLayout> {
         dueTimeField.addValueChangeListener(event -> dueDateFieldBinding.validate());
         binder.forField(statusField).asRequired().bind(TaskData.PROP_STATUS);
         binder.forField(priorityField).asRequired().bind(TaskData.PROP_PRIORITY);
-        binder.forField(assigneesField).bind(TaskData.PROP_ASSIGNEES);
+        binder.forField(assigneesField).withConverter(createAssigneesConverter(assigneeLookupById)).bind(TaskData.PROP_ASSIGNEES);
     }
 
-    private static MultiSelectComboBox<TaskAssignee> createAssigneesField(AssigneeLookupBySearchTerm assigneeLookupBySearchTerm) {
-        var assigneesField = new MultiSelectComboBox<TaskAssignee>("Assignees");
-        assigneesField.setItemLabelGenerator(TaskAssignee::displayName);
-        assigneesField.setItems(query -> assigneeLookupBySearchTerm.findAssignees(query.getFilter().orElse(null),
-                query.getLimit(), query.getOffset()));
+    private static MultiSelectComboBox<EmployeeReference> createAssigneesField(AssigneeLookupBySearchTerm assigneeLookupBySearchTerm) {
+        var assigneesField = new MultiSelectComboBox<EmployeeReference>("Assignees");
+        var nameFormatter = PersonNameFormatter.firstLast();
+        assigneesField.setItemLabelGenerator(nameFormatter::toFullName);
+        assigneesField.setItemsPageable(assigneeLookupBySearchTerm::findAssignees);
         return assigneesField;
+    }
+
+    private static Converter<Set<EmployeeReference>, Set<EmployeeId>> createAssigneesConverter(AssigneeLookupById assigneeLookupById) {
+        return Converter.from(employeeReferences -> Result.ok(employeeReferences.stream().map(EmployeeReference::id).collect(Collectors.toSet())),
+                assigneeLookupById::findByIds);
     }
 
     public void setFormDataObject(TaskData taskData) {
@@ -96,6 +109,11 @@ class TaskDataForm extends Composite<FormLayout> {
 
     @FunctionalInterface
     public interface AssigneeLookupBySearchTerm {
-        Stream<TaskAssignee> findAssignees(@Nullable String searchTerm, int limit, int offset);
+        List<EmployeeReference> findAssignees(Pageable pageable, @Nullable String searchTerm);
+    }
+
+    @FunctionalInterface
+    public interface AssigneeLookupById {
+        Set<EmployeeReference> findByIds(Set<EmployeeId> ids);
     }
 }

@@ -1,6 +1,9 @@
 package com.example.application.projects.internal.jooq;
 
-import com.example.application.common.EmailAddress;
+import com.example.application.common.Country;
+import com.example.application.humanresources.EmployeeId;
+import com.example.application.projects.ProjectId;
+import com.example.application.projects.TaskId;
 import com.example.application.projects.TaskPriority;
 import com.example.application.projects.TaskStatus;
 import org.jooq.Converter;
@@ -32,11 +35,23 @@ final class JooqConverters {
             String.class, ZoneId.class, ZoneId::of, ZoneId::getId
     );
 
-    public static final Converter<String, EmailAddress> emailConverter = Converter.ofNullable(
-            String.class, EmailAddress.class, EmailAddress::of, EmailAddress::toString
+    public static final Converter<String, Country> countryConverter = Converter.ofNullable(
+            String.class, Country.class, Country::ofIsoCode, Country::toString
     );
 
     public static final Converter<OffsetDateTime, ZonedDateTime> zonedDateTimeConverter = Converter.ofNullable(
             OffsetDateTime.class, ZonedDateTime.class, OffsetDateTime::toZonedDateTime, ZonedDateTime::toOffsetDateTime
+    );
+
+    public static final Converter<Long, TaskId> taskIdConverter = Converter.ofNullable(
+            Long.class, TaskId.class, TaskId::of, TaskId::toLong
+    );
+
+    public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
+            Long.class, EmployeeId.class, EmployeeId::of, EmployeeId::toLong
+    );
+
+    public static final Converter<Long, ProjectId> projectIdConverter = Converter.ofNullable(
+            Long.class, ProjectId.class, ProjectId::of, ProjectId::toLong
     );
 }

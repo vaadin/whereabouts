@@ -1,5 +1,6 @@
 package com.example.application.humanresources.internal.jooq;
 
+import com.example.application.common.Country;
 import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
@@ -69,5 +70,9 @@ final class JooqConverters {
 
     public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
             Long.class, EmployeeId.class, EmployeeId::of, EmployeeId::toLong
+    );
+
+    public static final Converter<String, Country> countryConverter = Converter.ofNullable(
+            String.class, Country.class, Country::ofIsoCode, Country::toString
     );
 }

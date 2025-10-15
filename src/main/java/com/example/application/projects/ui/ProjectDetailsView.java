@@ -1,6 +1,8 @@
 package com.example.application.projects.ui;
 
 import com.example.application.common.ui.*;
+import com.example.application.humanresources.EmployeeService;
+import com.example.application.humanresources.PersonNameFormatter;
 import com.example.application.projects.*;
 import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.AttachEvent;
@@ -48,6 +50,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     public static final String PARAM_PROJECT_ID = "projectId";
 
     private final TaskService taskService;
+    private final EmployeeService employeeService;
     private final boolean canUpdate;
     private final boolean canDelete;
 
@@ -55,8 +58,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     private final ValueSignal<Project> projectSignal = new ValueSignal<>(Project.class);
 
     ProjectDetailsView(AuthenticationContext authenticationContext,
-                       TaskService taskService) {
+                       TaskService taskService, EmployeeService employeeService) {
         this.taskService = taskService;
+        this.employeeService = employeeService;
         var canCreate = authenticationContext.hasRole(AppRoles.TASK_CREATE);
         canUpdate = authenticationContext.hasRole(AppRoles.TASK_UPDATE);
         canDelete = authenticationContext.hasRole(AppRoles.TASK_DELETE);
@@ -106,7 +110,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     }
 
     private void addTask(Project project, ZoneId timeZone, SerializableRunnable refresh) {
-        var dialog = new AddTaskDialog(taskService::findAssigneesBySearchTerm, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
+        var dialog = new AddTaskDialog(employeeService::findEmployees, employeeService::getEmployeesById, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
             taskService.insertTask(newTaskData);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
@@ -116,7 +120,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     }
 
     private void editTask(Task task, SerializableRunnable refresh) {
-        var dialog = new EditTaskDialog(taskService::findAssigneesBySearchTerm, task, editedTask -> {
+        var dialog = new EditTaskDialog(employeeService::findEmployees, employeeService::getEmployeesById, task, editedTask -> {
             var saved = taskService.updateTask(editedTask);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));
@@ -262,8 +266,9 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
             }
 
             var assignees = new AvatarGroup();
-            task.data().assignees().stream()
-                    .map(assignee -> new AvatarGroup.AvatarGroupItem(assignee.displayName()))
+            var nameFormatter = PersonNameFormatter.firstLast();
+            employeeService.getEmployeesById(task.data().assignees()).stream()
+                    .map(assignee -> new AvatarGroup.AvatarGroupItem(nameFormatter.toFullName(assignee)))
                     .forEach(assignees::add);
             return assignees;
         }

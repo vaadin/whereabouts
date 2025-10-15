@@ -1,5 +1,6 @@
 package com.example.application.humanresources.internal.jooq;
 
+import com.example.application.common.Country;
 import com.example.application.humanresources.EmployeeId;
 import com.example.application.humanresources.EmployeeReference;
 import com.example.application.humanresources.EmployeeSortableProperty;
@@ -15,8 +16,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
+import static com.example.application.humanresources.internal.jooq.JooqConverters.countryConverter;
+import static com.example.application.humanresources.internal.jooq.JooqConverters.employeeIdConverter;
 import static com.example.application.jooq.Tables.EMPLOYEE;
 import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 
@@ -24,6 +27,9 @@ import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 @NullMarked
 class JooqEmployeeQuery implements EmployeeQuery {
 
+    private static final Field<EmployeeId> EMPLOYEE_ID = EMPLOYEE.EMPLOYEE_ID.convert(employeeIdConverter);
+    private static final Field<EmployeeId> EMPLOYMENT_DETAILS_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
+    private static final Field<Country> COUNTRY = EMPLOYEE.COUNTRY.convert(countryConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
             EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
@@ -34,7 +40,7 @@ class JooqEmployeeQuery implements EmployeeQuery {
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
-    public List<EmployeeReference> findEmployees(@Nullable String searchTerm, Pageable pageable) {
+    public List<EmployeeReference> findEmployees(Pageable pageable, @Nullable String searchTerm) {
         var condition = searchTerm != null
                 ? EMPLOYEE.FIRST_NAME.containsIgnoreCase(searchTerm)
                 .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(searchTerm))
@@ -50,20 +56,22 @@ class JooqEmployeeQuery implements EmployeeQuery {
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
-    public Optional<EmployeeReference> findEmployeeById(EmployeeId id) {
+    public Set<EmployeeReference> findEmployeesByIds(Set<EmployeeId> ids) {
         return selectEmployee()
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(id.toLong()))
-                .fetchOptional(Records.mapping(EmployeeReference::new));
+                .where(EMPLOYEE.EMPLOYEE_ID.in(ids))
+                .fetchSet(Records.mapping(EmployeeReference::new));
     }
 
-    private SelectOnConditionStep<Record4<EmployeeId, String, String, String>> selectEmployee() {
+    private SelectOnConditionStep<Record6<EmployeeId, String, String, String, Country, String>> selectEmployee() {
         return dsl.select(
-                        EMPLOYEE.EMPLOYEE_ID.convertFrom(EmployeeId::of),
+                        EMPLOYEE_ID,
                         EMPLOYEE.FIRST_NAME,
+                        EMPLOYEE.MIDDLE_NAME,
                         EMPLOYEE.LAST_NAME,
+                        COUNTRY,
                         EMPLOYMENT_DETAILS.JOB_TITLE)
                 .from(EMPLOYEE)
-                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID));
+                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS_ID.eq(EMPLOYEE_ID));
     }
 
     private List<? extends OrderField<?>> toOrderFields(Sort sort) {

@@ -2,7 +2,6 @@ package com.example.application.projects.internal;
 
 import com.example.application.IntegrationTest;
 import com.example.application.humanresources.EmployeeTestDataService;
-import com.example.application.projects.TaskAssignee;
 import com.example.application.projects.TaskData;
 import com.example.application.projects.TaskPriority;
 import com.example.application.projects.TaskStatus;
@@ -39,7 +38,7 @@ class TaskRepositoryTest {
                 ZoneId.of("Europe/Helsinki"),
                 TaskStatus.PENDING,
                 TaskPriority.URGENT,
-                Set.of(TaskAssignee.of(employee1), TaskAssignee.of(employee2)));
+                Set.of(employee1, employee2));
         var id = repository.insert(originalData);
 
         var retrieved = repository.findById(id).orElseThrow();
@@ -54,7 +53,7 @@ class TaskRepositoryTest {
                 ZoneId.of("Europe/Stockholm"),
                 TaskStatus.PLANNED,
                 TaskPriority.LOW,
-                Set.of(TaskAssignee.of(employee3)));
+                Set.of(employee3));
 
         var updated = repository.update(retrieved.withData(updatedData));
         assertThat(updated.id()).isEqualTo(id);

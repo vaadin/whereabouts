@@ -1,6 +1,7 @@
 package com.example.application.projects;
 
 import com.example.application.common.ValueObject;
+import com.example.application.humanresources.EmployeeId;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -20,7 +21,7 @@ public record TaskData(
         ZoneId timeZone,
         TaskStatus status,
         TaskPriority priority,
-        Set<TaskAssignee> assignees
+        Set<EmployeeId> assignees
 ) implements ValueObject {
 
     public static final String PROP_PROJECT = "project";

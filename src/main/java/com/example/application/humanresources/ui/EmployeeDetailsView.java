@@ -79,7 +79,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         ComponentEffect.effect(this, () -> {
             var employee = employeeSignal.value();
             if (employee != null) {
-                var fullName = PersonNameFormatter.firstLast().toFullName(employee.data().firstName(), employee.data().lastName());
+                var fullName = PersonNameFormatter.firstLast().toFullName(employee.data());
                 title.setText(fullName + " " + employee.data().homeAddress().country().flagUnicode());
                 avatar.setName(fullName);
                 avatar.setImageHandler(employeePictureService.findEmployeePicture(employee.id()));
@@ -193,7 +193,9 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
 
     @Override
     public String getPageTitle() {
-        return "Employee Details - " + Optional.ofNullable(employeeSignal.value()).map(employee -> PersonNameFormatter.firstLast().toFullName(employee.data().firstName(), employee.data().lastName())).orElse("");
+        return "Employee Details - " + Optional.ofNullable(employeeSignal.value())
+                .map(employee -> PersonNameFormatter.firstLast().toFullName(employee.data()))
+                .orElse("");
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_READ + "')")
@@ -32,13 +33,18 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeReference> findEmployees(@Nullable String searchTerm, Pageable pageable) {
-        return employeeQuery.findEmployees(searchTerm, pageable);
+    public List<EmployeeReference> findEmployees(Pageable pageable, @Nullable String searchTerm) {
+        return employeeQuery.findEmployees(pageable, searchTerm);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<EmployeeReference> getEmployeesById(Set<EmployeeId> ids) {
+        return employeeQuery.findEmployeesByIds(ids);
     }
 
     @Transactional(readOnly = true)
     public Optional<EmployeeReference> getEmployeeById(EmployeeId id) {
-        return employeeQuery.findEmployeeById(id);
+        return employeeQuery.findEmployeesByIds(Set.of(id)).stream().findFirst();
     }
 
     @Transactional

@@ -95,7 +95,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> employeeService.findEmployees(searchField.getValue(), PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())));
+            grid.setItemsPageable(pageable -> employeeService.findEmployees(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort()), searchField.getValue()));
             grid.addColumn(new ComponentRenderer<>(employee -> EmployeeTitleCard.of(
                     employee,
                     employeePictureService::findEmployeePicture)
