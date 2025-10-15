@@ -49,7 +49,7 @@ class EmployeeDataForm extends Composite<FormLayout> {
         var workPhoneField = new TextField("Work Phone");
         var mobilePhoneField = new TextField("Mobile Phone");
         var homePhoneField = new TextField("Home Phone");
-        var workEmailField = new EmailField("Work Email");
+        var workEmailField = new EmailField("Work Email"); // TODO Should include a unique validator
 
         // Configure the form
         var formLayout = getContent();
