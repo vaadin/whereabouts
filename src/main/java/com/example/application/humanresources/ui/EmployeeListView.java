@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -19,6 +20,8 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @ParentLayout(MainLayout.class)
 @Route(value = "employees", layout = MainLayout.class)
@@ -84,11 +87,15 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
             searchField.setValueChangeMode(ValueChangeMode.LAZY);
             searchField.setWidthFull();
 
-            // TODO Add sort
+            var sortField = new Select<EmployeeSortOrder>();
+            sortField.setItems(EmployeeSortOrder.values());
+            sortField.setValue(EmployeeSortOrder.LAST_NAME_ASC);
+            sortField.setItemLabelGenerator(EmployeeSortOrder::getDisplayName);
+            sortField.setWidthFull();
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> employeeService.findEmployees(searchField.getValue(), pageable));
+            grid.setItemsPageable(pageable -> employeeService.findEmployees(searchField.getValue(), PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort())));
             grid.addColumn(new ComponentRenderer<>(employee -> EmployeeTitleCard.of(
                     employee,
                     employeePictureService::findEmployeePicture)
@@ -98,6 +105,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
 
             // Add listeners
             searchField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());
+            sortField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());
             grid.addSelectionListener(e -> e.getFirstSelectedItem()
                     .map(EmployeeReference::id)
                     .ifPresentOrElse(
@@ -110,7 +118,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
             var toolbar = new SectionToolbar(
                     SectionToolbar.group(new DrawerToggle(), title),
                     addEmployeeButton
-            ).withRow(searchField);
+            ).withRow(searchField).withRow(sortField);
             toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
             setSizeFull();
             setPadding(false);
@@ -127,6 +135,30 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
                 HumanResourcesNavigation.navigateToEmployeeDetails(id);
             });
             dialog.open();
+        }
+    }
+
+    private enum EmployeeSortOrder {
+        LAST_NAME_ASC("Sort by last name (A-Z)", Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(), EmployeeSortableProperty.FIRST_NAME.name())),
+        LAST_NAME_DESC("Sort by last name (Z-A)", Sort.by(Sort.Direction.DESC, EmployeeSortableProperty.LAST_NAME.name(), EmployeeSortableProperty.FIRST_NAME.name())),
+        FIRST_NAME_ASC("Sort by first name (A-Z)", Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.FIRST_NAME.name(), EmployeeSortableProperty.LAST_NAME.name())),
+        FIRST_NAME_DESC("Sort by first name (Z-A)", Sort.by(Sort.Direction.DESC, EmployeeSortableProperty.FIRST_NAME.name(), EmployeeSortableProperty.LAST_NAME.name())),
+        ;
+
+        private final String displayName;
+        private final Sort sort;
+
+        EmployeeSortOrder(String displayName, Sort sort) {
+            this.displayName = displayName;
+            this.sort = sort;
+        }
+
+        String getDisplayName() {
+            return displayName;
+        }
+
+        Sort getSort() {
+            return sort;
         }
     }
 }

@@ -2,15 +2,14 @@ package com.example.application.humanresources.internal.jooq;
 
 import com.example.application.humanresources.EmployeeId;
 import com.example.application.humanresources.EmployeeReference;
+import com.example.application.humanresources.EmployeeSortableProperty;
 import com.example.application.humanresources.internal.EmployeeQuery;
-import org.jooq.DSLContext;
-import org.jooq.Record4;
-import org.jooq.Records;
-import org.jooq.SelectOnConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,8 @@ import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 @NullMarked
 class JooqEmployeeQuery implements EmployeeQuery {
 
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
+            EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
 
     JooqEmployeeQuery(DSLContext dsl) {
@@ -38,9 +39,10 @@ class JooqEmployeeQuery implements EmployeeQuery {
                 ? EMPLOYEE.FIRST_NAME.containsIgnoreCase(searchTerm)
                 .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(searchTerm))
                 : DSL.trueCondition();
+
         return selectEmployee()
                 .where(condition)
-                .orderBy(EMPLOYEE.LAST_NAME.asc(), EMPLOYEE.FIRST_NAME.asc()) // TODO Sort from pageable
+                .orderBy(toOrderFields(pageable.getSortOr(DEFAULT_SORT)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch(Records.mapping(EmployeeReference::new));
@@ -62,5 +64,17 @@ class JooqEmployeeQuery implements EmployeeQuery {
                         EMPLOYMENT_DETAILS.JOB_TITLE)
                 .from(EMPLOYEE)
                 .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID));
+    }
+
+    private List<? extends OrderField<?>> toOrderFields(Sort sort) {
+        return sort.stream().map(this::toOrderField).toList();
+    }
+
+    private OrderField<?> toOrderField(Sort.Order order) {
+        var property = EmployeeSortableProperty.valueOf(order.getProperty());
+        return switch (property) {
+            case FIRST_NAME -> order.isAscending() ? EMPLOYEE.FIRST_NAME.asc() : EMPLOYEE.FIRST_NAME.desc();
+            case LAST_NAME -> order.isAscending() ? EMPLOYEE.LAST_NAME.asc() : EMPLOYEE.LAST_NAME.desc();
+        };
     }
 }
