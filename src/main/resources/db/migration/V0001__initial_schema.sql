@@ -86,6 +86,7 @@ create table employee
     user_id bigint,
     primary key (employee_id),
     unique (user_id),
+    unique (work_email),
     foreign key (user_id) references app_user (user_id)
 );
 

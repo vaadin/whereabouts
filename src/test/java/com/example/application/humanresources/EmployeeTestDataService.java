@@ -864,7 +864,7 @@ public class EmployeeTestDataService {
         ));
         employeeRepository.insert(new EmployeeData(
                 "Jonas",
-                "Matthias",
+                "Peter",
                 "Becker",
                 "Jonas",
                 LocalDate.of(1997, 5, 2),
@@ -880,7 +880,7 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+492311234507"),
                 PhoneNumber.of("+491511700007"),
                 PhoneNumber.of("+492319900007"),
-                EmailAddress.of("jonas.becker@company.com")
+                EmailAddress.of("jonas.p.becker@company.com")
         ));
         employeeRepository.insert(new EmployeeData(
                 "Agnieszka",
@@ -921,26 +921,6 @@ public class EmployeeTestDataService {
                 PhoneNumber.of("+491511700009"),
                 PhoneNumber.of("+493419900009"),
                 EmailAddress.of("lukas.vogel@company.com")
-        ));
-        employeeRepository.insert(new EmployeeData(
-                "Adrián",
-                "Santos",
-                "López",
-                "Adri",
-                LocalDate.of(1996, 6, 6),
-                Gender.OTHER,
-                "Vegetarian, oat milk OK",
-                ZoneId.of("Europe/Berlin"),
-                new GermanPostalAddress(
-                        "Neumarkt 3",
-                        GermanPostalCode.of("50667"),
-                        "Köln",
-                        Country.ofIsoCode("DE")
-                ),
-                PhoneNumber.of("+49221345010"),
-                PhoneNumber.of("+491511700010"),
-                PhoneNumber.of("+492219900010"),
-                EmailAddress.of("adrian.lopez@company.com")
         ));
 
         // Canada
