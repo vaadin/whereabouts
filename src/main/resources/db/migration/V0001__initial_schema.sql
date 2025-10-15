@@ -101,58 +101,19 @@ create table employment_details
     employment_status employment_status not null,
     work_arrangement  work_arrangement  not null,
     location_id       bigint            not null,
+    manager_id bigint,
     hire_date         date              not null,
     termination_date  date,
     primary key (employee_id),
     foreign key (employee_id) references employee (employee_id),
     foreign key (location_id) references location (location_id),
+    foreign key (manager_id) references employee (employee_id),
     constraint termination_date_matches_status check ((termination_date is null and not employment_status = 'TERMINATED') or
                                                       (termination_date is not null and employment_status = 'TERMINATED'))
 );
 
 create index employment_details_location_id_idx on employment_details (location_id);
-
----------
--- Teams
----------
-
-create sequence team_id_seq start 100 increment 1;
-
-create table team
-(
-    team_id             bigint not null,
-    version             bigint not null,
-    name                text   not null,
-    summary             text,
-    manager_employee_id bigint,
-    primary key (team_id),
-    foreign key (manager_employee_id) references employee (employee_id)
-);
-
-create table team_membership
-(
-    employee_id bigint not null,
-    version     bigint not null,
-    team_id     bigint not null,
-    since       date   not null,
-    primary key (employee_id),
-    foreign key (employee_id) references employee (employee_id),
-    foreign key (team_id) references team (team_id)
-);
-
-create index team_membership_team_id_idx on team_membership (team_id);
-
-create table team_membership_history
-(
-    employee_id bigint not null,
-    version     bigint not null,
-    team_id     bigint not null,
-    since       date   not null,
-    until       date   not null,
-    primary key (employee_id, version),
-    foreign key (employee_id) references employee (employee_id),
-    foreign key (team_id) references team (team_id)
-);
+create index employment_details_manager_id_idx on employment_details (manager_id);
 
 ------------
 -- Projects
