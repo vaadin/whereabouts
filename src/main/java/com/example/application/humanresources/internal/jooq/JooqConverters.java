@@ -9,11 +9,9 @@ import com.example.application.humanresources.EmploymentType;
 import com.example.application.humanresources.LocationType;
 import com.example.application.humanresources.WorkArrangement;
 import org.jooq.Converter;
-import org.jspecify.annotations.NullMarked;
 
 import java.time.ZoneId;
 
-@NullMarked
 final class JooqConverters {
 
     private JooqConverters() {

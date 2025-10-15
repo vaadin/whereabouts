@@ -26,7 +26,7 @@ class EmploymentDetailsRepositoryTest {
 
     @Test
     void insert_get_and_update_include_all_properties() {
-        var employeeId = employeeRepository.insert(EmployeeRepositoryTest.createEmployeeData());
+        var employeeId = employeeRepository.insert(EmployeeRepositoryTest.createEmployeeData(0));
         var locationId = locationRepository.insert(LocationRepositoryTest.createLocationData());
         var originalData = new EmploymentDetailsData(
                 "Title",

@@ -5,17 +5,17 @@ import com.example.application.common.Country;
 import com.example.application.common.EmailAddress;
 import com.example.application.common.Gender;
 import com.example.application.common.PhoneNumber;
-import com.example.application.common.address.FinnishPostalAddress;
-import com.example.application.common.address.FinnishPostalCode;
-import com.example.application.common.address.InternationalPostalAddress;
+import com.example.application.common.address.*;
 import com.example.application.humanresources.EmployeeData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @IntegrationTest
 class EmployeeRepositoryTest {
@@ -23,31 +23,53 @@ class EmployeeRepositoryTest {
     @Autowired
     EmployeeRepository repository;
 
-    static EmployeeData createEmployeeData() {
-        return new EmployeeData("First",
-                "Middle",
-                "Last",
-                "Preferred",
-                LocalDate.of(1984, 2, 1),
-                Gender.OTHER,
-                "Dietary",
-                ZoneId.of("UTC"),
-                new FinnishPostalAddress(
-                        "Street",
-                        FinnishPostalCode.of("12345"),
-                        "Post",
-                        Country.ofIsoCode("FI")
-                ),
-                PhoneNumber.of("+358401234567"),
-                PhoneNumber.of("+358509876543"),
-                PhoneNumber.of("+358441357900"),
-                EmailAddress.of("email@work.foo")
+    static EmployeeData createEmployeeData(int increment) {
+        PostalAddress postalAddress = switch (increment % 5) {
+            case 0 -> new InternationalPostalAddress("Street" + increment,
+                    "City" + increment,
+                    "State" + increment,
+                    "Postal" + increment,
+                    Country.isoCountries().get(increment % Country.isoCountries().size()));
+            case 1 -> new FinnishPostalAddress("Street" + increment,
+                    FinnishPostalCode.of(Integer.toString((10000 + increment) % 100000)),
+                    "Post" + increment,
+                    Country.ofIsoCode("FI"));
+            case 2 -> new GermanPostalAddress("Street" + increment,
+                    GermanPostalCode.of(Integer.toString((10000 + increment) % 100000)),
+                    "City" + increment,
+                    Country.ofIsoCode("DE"));
+            case 3 -> new USPostalAddress("Street" + increment,
+                    "City" + increment,
+                    USState.values()[increment % USState.values().length],
+                    USZipCode.of(Integer.toString((10000 + increment) % 100000)),
+                    Country.ofIsoCode("US"));
+            default -> new CanadianPostalAddress("Street" + increment, "City" + increment,
+                    CanadianProvince.values()[increment % CanadianProvince.values().length],
+                    CanadianPostalCode.of("A1A-2B2"), Country.ofIsoCode("CA"));
+        };
+
+        var zones = ZoneId.getAvailableZoneIds().stream().toList();
+        var zone = ZoneId.of(zones.get(increment & zones.size()));
+
+        return new EmployeeData("First" + increment,
+                "Middle" + increment,
+                "Last" + increment,
+                "Preferred" + increment,
+                LocalDate.of(1984, 2, 1).plusDays(increment),
+                Gender.values()[increment % Gender.values().length],
+                "Dietary" + increment,
+                zone,
+                postalAddress,
+                PhoneNumber.of("+12301234" + increment),
+                PhoneNumber.of("+12305678" + increment),
+                PhoneNumber.of("+12309012" + increment),
+                EmailAddress.of("email" + increment + "@work.foo")
         );
     }
 
     @Test
     void insert_get_and_update_include_all_properties() {
-        var originalData = createEmployeeData();
+        var originalData = createEmployeeData(0);
         var id = repository.insert(originalData);
         var retrieved = repository.findById(id).orElseThrow();
 
@@ -55,26 +77,7 @@ class EmployeeRepositoryTest {
         assertThat(retrieved.version()).isEqualTo(1);
         assertThat(retrieved.data()).isEqualTo(originalData);
 
-        var updatedData = new EmployeeData("First2",
-                "Middle2",
-                "Last2",
-                "Preferred2",
-                LocalDate.of(1985, 3, 2),
-                Gender.MALE,
-                "Dietary2",
-                ZoneId.of("Europe/Stockholm"),
-                new InternationalPostalAddress(
-                        "Street2",
-                        "City2",
-                        null,
-                        "23456",
-                        Country.ofIsoCode("SE")
-                ),
-                PhoneNumber.of("0401234567"),
-                PhoneNumber.of("0509876543"),
-                PhoneNumber.of("0441357900"),
-                EmailAddress.of("email2@work.foo")
-        );
+        var updatedData = createEmployeeData(1);
 
         var updated = repository.update(retrieved.withData(updatedData));
         assertThat(updated.id()).isEqualTo(id);
@@ -87,4 +90,29 @@ class EmployeeRepositoryTest {
         assertThat(retrieved.data()).isEqualTo(updatedData);
     }
 
+    @Test
+    void update_uses_optimistic_locking() {
+        var originalData = createEmployeeData(0);
+        var id = repository.insert(originalData);
+        var retrieved = repository.findById(id).orElseThrow();
+
+        repository.update(retrieved);
+        assertThatThrownBy(() -> repository.update(retrieved)).isInstanceOf(OptimisticLockingFailureException.class);
+    }
+
+    @Test
+    void update_affects_only_one_employee() {
+        var originalData = createEmployeeData(0);
+        var id = repository.insert(originalData);
+        var retrieved = repository.findById(id).orElseThrow();
+
+        var id1 = repository.insert(createEmployeeData(1));
+        var id2 = repository.insert(createEmployeeData(2));
+
+        var updatedData = createEmployeeData(3);
+        repository.update(retrieved.withData(updatedData));
+
+        assertThat(updatedData).isNotEqualTo(repository.findById(id1).orElseThrow().data());
+        assertThat(updatedData).isNotEqualTo(repository.findById(id2).orElseThrow().data());
+    }
 }
