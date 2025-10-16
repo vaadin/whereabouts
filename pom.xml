@@ -206,7 +206,7 @@
                                         <recordVersionFields>version</recordVersionFields>
                                     </database>
                                     <target>
-                                        <packageName>com.example.application.jooq</packageName>
+                                        <packageName>com.example.whereabouts.jooq</packageName>
                                         <directory>target/generated-sources/jooq</directory>
                                     </target>
                                 </generator>
