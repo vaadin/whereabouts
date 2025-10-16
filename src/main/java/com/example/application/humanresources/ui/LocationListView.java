@@ -109,16 +109,16 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                 case LocationTreeNode.LocationNode locationNode -> locationNode.name();
                 case LocationTreeNode.CountryNode countryNode ->
                         countryNode.country().displayName() + " " + countryNode.country().flagUnicode();
-            }).setHeader("Branches").setSortProperty(LocationService.SORT_BY_LOCATION).setAutoWidth(true);
+            }).setHeader("Branches").setSortProperty(LocationSortableProperty.NAME.name()).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode -> Integer.toString(locationNode.employees());
                 case LocationTreeNode.CountryNode countryNode -> Integer.toString(countryNode.employees());
-            }).setHeader("Employees").setSortProperty(LocationService.SORT_BY_EMPLOYEES).setAutoWidth(true);
+            }).setHeader("Employees").setSortProperty(LocationSortableProperty.EMPLOYEES.name()).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode ->
                         locationTypeFormatter.getDisplayName(locationNode.locationType());
                 case LocationTreeNode.CountryNode ignored -> "";
-            }).setHeader("Type").setSortProperty(LocationService.SORT_BY_TYPE).setAutoWidth(true);
+            }).setHeader("Type").setSortProperty(LocationSortableProperty.LOCATION_TYPE.name()).setAutoWidth(true);
             grid.addColumn(node -> switch (node) {
                 case LocationTreeNode.LocationNode locationNode -> locationNode.address().toFormattedString();
                 case LocationTreeNode.CountryNode ignored -> "";

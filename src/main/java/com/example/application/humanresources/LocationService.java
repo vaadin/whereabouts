@@ -19,10 +19,6 @@ import java.util.Optional;
 @NullMarked
 public class LocationService {
 
-    public static final String SORT_BY_LOCATION = "location";
-    public static final String SORT_BY_TYPE = "locationType";
-    public static final String SORT_BY_EMPLOYEES = "employees";
-
     private final LocationRepository locationRepository;
     private final LocationTreeNodeQuery locationTreeNodeQuery;
 
