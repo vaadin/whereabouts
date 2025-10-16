@@ -130,12 +130,4 @@ class JooqEmployeeRepository implements EmployeeRepository {
 
         return new Employee(employee.id(), newVersion, employee.data());
     }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    @Override
-    public void deleteById(EmployeeId employeeId) {
-        dsl.deleteFrom(EMPLOYEE)
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId.toLong()))
-                .execute();
-    }
 }

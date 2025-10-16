@@ -53,7 +53,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
         afterNavigationEvent.getRouteParameters()
                 .getLong(LocationDetailsView.PARAM_LOCATION_ID)
                 .map(LocationId::of)
-                .flatMap(locationService::getLocationNodeById)
+                .flatMap(locationService::findLocationNodeById)
                 .ifPresentOrElse(locationList.grid::select, locationList.grid::deselectAll);
     }
 
@@ -68,7 +68,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
                 .isPresent();
         locationList.grid.getDataProvider().refreshAll();
         if (isSelected) {
-            locationService.getLocationNodeById(location.id()).ifPresent(locationList.grid::select);
+            locationService.findLocationNodeById(location.id()).ifPresent(locationList.grid::select);
         }
     }
 
@@ -91,7 +91,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
 
                 @Override
                 public int getChildCount(HierarchicalQuery<LocationTreeNode, Object> query) {
-                    return locationService.getChildCount(query.getParent());
+                    return locationService.countChildren(query.getParent());
                 }
 
                 @Override
@@ -101,7 +101,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
 
                 @Override
                 protected Stream<LocationTreeNode> fetchChildrenFromBackEnd(HierarchicalQuery<LocationTreeNode, Object> query) {
-                    return locationService.getChildren(query.getParent(), VaadinSpringDataHelpers.toSpringPageRequest(query)).stream();
+                    return locationService.findChildren(query.getParent(), VaadinSpringDataHelpers.toSpringPageRequest(query)).stream();
                 }
             });
             var locationTypeFormatter = LocationTypeFormatter.ofLocale(getLocale());

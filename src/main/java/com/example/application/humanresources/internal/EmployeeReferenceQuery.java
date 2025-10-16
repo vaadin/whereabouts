@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Set;
 
 @NullMarked
-public interface EmployeeQuery {
+public interface EmployeeReferenceQuery {
 
-    List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter);
+    List<EmployeeReference> findByFilter(Pageable pageable, EmployeeFilter filter);
 
-    Set<EmployeeReference> findEmployeesByIds(Set<EmployeeId> ids);
+    Set<EmployeeReference> findByIds(Set<EmployeeId> ids);
 }

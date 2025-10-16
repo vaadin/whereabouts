@@ -21,6 +21,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Route(value = "employees/:employeeId", layout = EmployeeListView.class)
 @RolesAllowed(AppRoles.EMPLOYEE_READ)
@@ -28,18 +29,22 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
 
     public static final String PARAM_EMPLOYEE_ID = "employeeId";
     private final EmployeeService employeeService;
+    private final LocationService locationService;
 
     // TODO Make this view responsive
     // TODO Make this view accessible
 
     private final ValueSignal<Employee> employeeSignal = new ValueSignal<>(Employee.class);
+    private final ValueSignal<EmploymentDetails> employmentDetailsSignal = new ValueSignal<>(EmploymentDetails.class);
     private final ValueSignal<Boolean> editModeSignal = new ValueSignal<>(false);
     private final ValueSignal<Integer> selectedTabIndexSignal = new ValueSignal<>(-1);
     private final TabSheet tabs;
     private final boolean canUpdate;
 
-    EmployeeDetailsView(AuthenticationContext authenticationContext, EmployeeService employeeService, EmployeePictureService employeePictureService) {
+    EmployeeDetailsView(AuthenticationContext authenticationContext, EmployeeService employeeService,
+                        EmployeePictureService employeePictureService, LocationService locationService) {
         this.employeeService = employeeService;
+        this.locationService = locationService;
         canUpdate = authenticationContext.hasRole(AppRoles.EMPLOYEE_UPDATE);
 
         // Create components
@@ -82,7 +87,11 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
                 var fullName = PersonNameFormatter.firstLast().toFullName(employee.data());
                 title.setText(fullName + " " + employee.data().homeAddress().country().flagUnicode());
                 avatar.setName(fullName);
-                avatar.setImageHandler(employeePictureService.findEmployeePicture(employee.id()));
+                avatar.setImageHandler(employeePictureService.findPicture(employee.id()));
+                employmentDetailsSignal.value(employeeService.findDetailsById(employee.id()).orElse(null));
+                // TODO add job title to header
+            } else {
+                employmentDetailsSignal.value(null);
             }
         });
         ComponentEffect.effect(this, () -> {
@@ -159,7 +168,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
                     var saved = employeeService.update(employeeSignal.value().withData(employeeData));
                     employeeSignal.value(saved);
                     editModeSignal.value(false);
-                    getEmployeeListView().ifPresent(employeeListView -> employeeListView.onEmployeeUpdated(saved));
+                    getEmployeeListView().ifPresent(employeeListView -> employeeListView.onEmployeeUpdated(saved.id()));
                 } catch (OptimisticLockingFailureException e) {
                     Notifications.createOptimisticLockingFailureNotification().open();
                 }
@@ -173,9 +182,61 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         }
     }
 
-    private class JobTab extends VerticalLayout {
+    private class JobTab extends VerticalLayout implements EditableTab {
+
+        // TODO Could this tab be made more elegant?
+
+        private final EmploymentDetailsDataForm form;
+
         JobTab() {
-            add("This tab has not been implemented yet");
+            form = new EmploymentDetailsDataForm(
+                    locationService::findReferencesBySearchTerm,
+                    locationService::getReferenceById,
+                    (pageable, searchTerm) -> employeeService.findReferencesByFilter(pageable, new EmployeeFilter(searchTerm, Set.of(EmploymentStatus.ACTIVE), Set.of())),
+                    employeeService::findReferenceById
+            );
+            add(form);
+            setPadding(false);
+            setSpacing(false);
+
+            ComponentEffect.effect(this, () -> {
+                var details = employmentDetailsSignal.value();
+                if (details != null) {
+                    form.setFormDataObject(details.data());
+                } else {
+                    form.setFormDataObject(null);
+                }
+                form.setReadOnly(!editModeSignal.value());
+            });
+        }
+
+        @Override
+        public void save() {
+            form.getFormDataObject().ifPresent(detailsData -> {
+                try {
+                    var saved = save(detailsData);
+                    employmentDetailsSignal.value(saved);
+                    editModeSignal.value(false);
+                    getEmployeeListView().ifPresent(employeeListView -> employeeListView.onEmployeeUpdated(saved.id()));
+                } catch (OptimisticLockingFailureException e) {
+                    Notifications.createOptimisticLockingFailureNotification().open();
+                }
+            });
+        }
+
+        private EmploymentDetails save(EmploymentDetailsData data) {
+            var existing = employmentDetailsSignal.peek();
+            if (existing != null) {
+                return employeeService.updateDetails(existing.withData(data));
+            } else {
+                return employeeService.insertDetails(employeeSignal.peek().id(), data);
+            }
+        }
+
+        @Override
+        public void discard() {
+            form.setFormDataObject(Optional.ofNullable(employmentDetailsSignal.value()).map(EmploymentDetails::data).orElse(null));
+            editModeSignal.value(false);
         }
     }
 

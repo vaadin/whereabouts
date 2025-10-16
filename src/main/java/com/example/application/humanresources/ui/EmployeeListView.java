@@ -60,19 +60,19 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
         afterNavigationEvent.getRouteParameters()
                 .getLong(EmployeeDetailsView.PARAM_EMPLOYEE_ID)
                 .map(EmployeeId::of)
-                .flatMap(employeeService::getEmployeeById)
+                .flatMap(employeeService::findReferenceById)
                 .ifPresentOrElse(employeeList.grid::select, employeeList.grid::deselectAll);
     }
 
-    void onEmployeeUpdated(Employee employee) {
+    void onEmployeeUpdated(EmployeeId employeeId) {
         var isSelected = employeeList.grid
                 .getSelectionModel()
                 .getFirstSelectedItem()
-                .filter(row -> row.id().equals(employee.id()))
+                .filter(row -> row.id().equals(employeeId))
                 .isPresent();
         employeeList.grid.getDataProvider().refreshAll();
         if (isSelected) {
-            employeeService.getEmployeeById(employee.id()).ifPresent(employeeList.grid::select);
+            employeeService.findReferenceById(employeeId).ifPresent(employeeList.grid::select);
         }
     }
 
@@ -101,10 +101,10 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> employeeService.findEmployees(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort()), filterSignal.peek()));
+            grid.setItemsPageable(pageable -> employeeService.findReferencesByFilter(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort()), filterSignal.peek()));
             grid.addColumn(new ComponentRenderer<>(employee -> EmployeeTitleCard.of(
                     employee,
-                    employeePictureService::findEmployeePicture)
+                    employeePictureService::findPicture)
             ));
             grid.setSizeFull();
             grid.addThemeName("no-border");

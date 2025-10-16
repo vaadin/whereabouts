@@ -105,12 +105,4 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 
         return new EmploymentDetails(employmentDetails.id(), newVersion, employmentDetails.data());
     }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    @Override
-    public void deleteById(@NonNull EmployeeId id) {
-        dsl.delete(EMPLOYMENT_DETAILS)
-                .where(EMPLOYEE_ID.eq(id))
-                .execute();
-    }
 }

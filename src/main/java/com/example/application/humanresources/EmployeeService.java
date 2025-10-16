@@ -1,6 +1,6 @@
 package com.example.application.humanresources;
 
-import com.example.application.humanresources.internal.EmployeeQuery;
+import com.example.application.humanresources.internal.EmployeeReferenceQuery;
 import com.example.application.humanresources.internal.EmployeeRepository;
 import com.example.application.humanresources.internal.EmploymentDetailsRepository;
 import com.example.application.security.AppRoles;
@@ -21,29 +21,29 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final EmploymentDetailsRepository employmentDetailsRepository;
-    private final EmployeeQuery employeeQuery;
+    private final EmployeeReferenceQuery employeeReferenceQuery;
 
     public EmployeeService(EmployeeRepository employeeRepository,
                            EmploymentDetailsRepository employmentDetailsRepository,
-                           EmployeeQuery employeeQuery) {
+                           EmployeeReferenceQuery employeeReferenceQuery) {
         this.employeeRepository = employeeRepository;
         this.employmentDetailsRepository = employmentDetailsRepository;
-        this.employeeQuery = employeeQuery;
+        this.employeeReferenceQuery = employeeReferenceQuery;
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter) {
-        return employeeQuery.findEmployees(pageable, filter);
+    public List<EmployeeReference> findReferencesByFilter(Pageable pageable, EmployeeFilter filter) {
+        return employeeReferenceQuery.findByFilter(pageable, filter);
     }
 
     @Transactional(readOnly = true)
-    public Set<EmployeeReference> getEmployeesById(Set<EmployeeId> ids) {
-        return employeeQuery.findEmployeesByIds(ids);
+    public Set<EmployeeReference> findReferencesByIds(Set<EmployeeId> ids) {
+        return employeeReferenceQuery.findByIds(ids);
     }
 
     @Transactional(readOnly = true)
-    public Optional<EmployeeReference> getEmployeeById(EmployeeId id) {
-        return employeeQuery.findEmployeesByIds(Set.of(id)).stream().findFirst();
+    public Optional<EmployeeReference> findReferenceById(EmployeeId id) {
+        return employeeReferenceQuery.findByIds(Set.of(id)).stream().findFirst();
     }
 
     @Transactional
@@ -61,5 +61,22 @@ public class EmployeeService {
     @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_UPDATE + "')")
     public Employee update(Employee employee) {
         return employeeRepository.update(employee);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<EmploymentDetails> findDetailsById(EmployeeId id) {
+        return employmentDetailsRepository.findById(id);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_CREATE + "')")
+    public EmploymentDetails insertDetails(EmployeeId id, EmploymentDetailsData data) {
+        return employmentDetailsRepository.insert(id, data);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('" + AppRoles.EMPLOYEE_UPDATE + "')")
+    public EmploymentDetails updateDetails(EmploymentDetails details) {
+        return employmentDetailsRepository.update(details);
     }
 }

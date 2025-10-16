@@ -2,7 +2,7 @@ package com.example.application.humanresources.internal.jooq;
 
 import com.example.application.common.Country;
 import com.example.application.humanresources.*;
-import com.example.application.humanresources.internal.EmployeeQuery;
+import com.example.application.humanresources.internal.EmployeeReferenceQuery;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.NullMarked;
@@ -21,7 +21,7 @@ import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 
 @Component
 @NullMarked
-class JooqEmployeeQuery implements EmployeeQuery {
+class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
 
     private static final Field<EmployeeId> EMPLOYEE_ID = EMPLOYEE.EMPLOYEE_ID.convert(employeeIdConverter);
     private static final Field<EmployeeId> EMPLOYMENT_DETAILS_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
@@ -32,13 +32,13 @@ class JooqEmployeeQuery implements EmployeeQuery {
             EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
 
-    JooqEmployeeQuery(DSLContext dsl) {
+    JooqEmployeeReferenceQuery(DSLContext dsl) {
         this.dsl = dsl;
     }
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
-    public List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter) {
+    public List<EmployeeReference> findByFilter(Pageable pageable, EmployeeFilter filter) {
         Condition condition = DSL.trueCondition();
         if (filter.searchTerm() != null && !filter.searchTerm().isBlank()) {
             // TODO Should the search term be split by spaces and used individually?
@@ -62,9 +62,9 @@ class JooqEmployeeQuery implements EmployeeQuery {
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
-    public Set<EmployeeReference> findEmployeesByIds(Set<EmployeeId> ids) {
+    public Set<EmployeeReference> findByIds(Set<EmployeeId> ids) {
         return selectEmployee()
-                .where(EMPLOYEE.EMPLOYEE_ID.in(ids))
+                .where(EMPLOYEE_ID.in(ids))
                 .fetchSet(Records.mapping(EmployeeReference::new));
     }
 

@@ -1,5 +1,6 @@
 package com.example.application.humanresources;
 
+import com.example.application.humanresources.internal.LocationReferenceQuery;
 import com.example.application.humanresources.internal.LocationRepository;
 import com.example.application.humanresources.internal.LocationTreeNodeQuery;
 import com.example.application.security.AppRoles;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @PreAuthorize("hasRole('" + AppRoles.LOCATION_READ + "')")
@@ -21,14 +23,16 @@ public class LocationService {
 
     private final LocationRepository locationRepository;
     private final LocationTreeNodeQuery locationTreeNodeQuery;
+    private final LocationReferenceQuery locationReferenceQuery;
 
-    LocationService(LocationRepository locationRepository, LocationTreeNodeQuery locationTreeNodeQuery) {
+    LocationService(LocationRepository locationRepository, LocationTreeNodeQuery locationTreeNodeQuery, LocationReferenceQuery locationReferenceQuery) {
         this.locationRepository = locationRepository;
         this.locationTreeNodeQuery = locationTreeNodeQuery;
+        this.locationReferenceQuery = locationReferenceQuery;
     }
 
     @Transactional(readOnly = true)
-    public int getChildCount(@Nullable LocationTreeNode node) {
+    public int countChildren(@Nullable LocationTreeNode node) {
         if (node == null) {
             return locationTreeNodeQuery.countCountriesWithLocations();
         } else if (node instanceof LocationTreeNode.CountryNode countryNode) {
@@ -44,7 +48,7 @@ public class LocationService {
     }
 
     @Transactional(readOnly = true)
-    public List<LocationTreeNode> getChildren(@Nullable LocationTreeNode node, Pageable pageable) {
+    public List<LocationTreeNode> findChildren(@Nullable LocationTreeNode node, Pageable pageable) {
         if (node == null) {
             return locationTreeNodeQuery.findCountries(pageable);
         } else if (node instanceof LocationTreeNode.CountryNode countryNode) {
@@ -55,7 +59,7 @@ public class LocationService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<LocationTreeNode.LocationNode> getLocationNodeById(LocationId locationId) {
+    public Optional<LocationTreeNode.LocationNode> findLocationNodeById(LocationId locationId) {
         return locationTreeNodeQuery.findLocationById(locationId);
     }
 
@@ -74,5 +78,15 @@ public class LocationService {
     @PreAuthorize("hasRole('" + AppRoles.LOCATION_UPDATE + "')")
     public Location update(Location location) {
         return locationRepository.update(location);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationReference> findReferencesBySearchTerm(Pageable pageable, @Nullable String searchTerm) {
+        return locationReferenceQuery.findBySearchTerm(pageable, searchTerm);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<LocationReference> getReferenceById(LocationId id) {
+        return locationReferenceQuery.findByIds(Set.of(id)).stream().findFirst();
     }
 }

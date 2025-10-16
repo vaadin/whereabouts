@@ -81,7 +81,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
             if (location != null) {
                 title.setText("%s (%s) %s".formatted(location.data().name(), locationTypeFormatter.getDisplayName(location.data().locationType()), location.data().address().country().flagUnicode()));
                 about.setAbout(location.data().about());
-                summary.setEmployees(locationService.getLocationNodeById(location.id())
+                summary.setEmployees(locationService.findLocationNodeById(location.id())
                         .map(LocationTreeNode.LocationNode::employees)
                         .orElse(0)); // TODO This is a bit quick and dirty
                 summary.setEstablished(location.data().established());

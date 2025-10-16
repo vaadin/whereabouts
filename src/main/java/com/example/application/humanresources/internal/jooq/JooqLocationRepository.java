@@ -138,17 +138,6 @@ class JooqLocationRepository implements LocationRepository {
         dsl.batchInsert(batch).execute();
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
-    @Override
-    public void deleteById(LocationId locationId) {
-        dsl.deleteFrom(LOCATION_FACILITY)
-                .where(LOCATION.LOCATION_ID.eq(locationId.toLong()))
-                .execute();
-        dsl.deleteFrom(LOCATION)
-                .where(LOCATION.LOCATION_ID.eq(locationId.toLong()))
-                .execute();
-    }
-
     private LocationFacility fromRecord(LocationFacilityRecord record) {
         return switch (record.getFacilityType()) {
             case ACCESSIBLE_OFFICE -> new LocationFacility.AccessibleOffice();

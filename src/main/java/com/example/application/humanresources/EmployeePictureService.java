@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @NullMarked
 public class EmployeePictureService {
 
-    public @Nullable DownloadHandler findEmployeePicture(EmployeeId employeeId) {
+    public @Nullable DownloadHandler findPicture(EmployeeId employeeId) {
         return null; // TODO Implement me!
     }
 }

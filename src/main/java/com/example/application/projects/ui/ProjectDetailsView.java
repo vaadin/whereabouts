@@ -113,11 +113,11 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     }
 
     private List<EmployeeReference> findAssignees(Pageable pageable, @Nullable String searchTerm) {
-        return employeeService.findEmployees(pageable, new EmployeeFilter(searchTerm, Set.of(EmploymentStatus.ACTIVE), Set.of()));
+        return employeeService.findReferencesByFilter(pageable, new EmployeeFilter(searchTerm, Set.of(EmploymentStatus.ACTIVE), Set.of()));
     }
 
     private void addTask(Project project, ZoneId timeZone, SerializableRunnable refresh) {
-        var dialog = new AddTaskDialog(this::findAssignees, employeeService::getEmployeesById, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
+        var dialog = new AddTaskDialog(this::findAssignees, employeeService::findReferencesByIds, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
             taskService.insertTask(newTaskData);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
@@ -127,7 +127,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     }
 
     private void editTask(Task task, SerializableRunnable refresh) {
-        var dialog = new EditTaskDialog(this::findAssignees, employeeService::getEmployeesById, task, editedTask -> {
+        var dialog = new EditTaskDialog(this::findAssignees, employeeService::findReferencesByIds, task, editedTask -> {
             var saved = taskService.updateTask(editedTask);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));
@@ -274,7 +274,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
 
             var assignees = new AvatarGroup();
             var nameFormatter = PersonNameFormatter.firstLast();
-            employeeService.getEmployeesById(task.data().assignees()).stream()
+            employeeService.findReferencesByIds(task.data().assignees()).stream()
                     .map(assignee -> new AvatarGroup.AvatarGroupItem(nameFormatter.toFullName(assignee)))
                     .forEach(assignees::add);
             return assignees;

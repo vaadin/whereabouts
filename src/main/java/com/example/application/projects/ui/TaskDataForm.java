@@ -96,7 +96,7 @@ class TaskDataForm extends Composite<FormLayout> {
 
     public void setFormDataObject(TaskData taskData) {
         dueTimeField.setHelperText(taskData.timeZone().getDisplayName(TextStyle.NARROW, getLocale()));
-        binder.readBean(taskData);
+        binder.readRecord(taskData);
     }
 
     public Optional<TaskData> getFormDataObject() {
