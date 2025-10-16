@@ -1,7 +1,7 @@
 package com.example.application.security.ui;
 
+import com.example.application.common.ui.AppIcon;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Style;
@@ -30,8 +30,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         login.setAction("login");
         login.setForgotPasswordButtonVisible(false);
 
-        var appLogo = VaadinIcon.CUBES.create();
-        appLogo.setSize("48px");
+        var appLogo = AppIcon.ENGINEERING.create(AppIcon.Size.XL, AppIcon.Color.PURPLE);
 
         var appName = new Span("Whereabouts");
         appName.getStyle().setFontWeight(Style.FontWeight.BOLD);

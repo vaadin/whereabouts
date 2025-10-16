@@ -14,6 +14,7 @@ public enum AppIcon {
     DELETE_SWEEP("icons/delete_sweep.svg"),
     DESK("icons/desk.svg"),
     DIVERSITY("icons/diversity.svg"),
+    ENGINEERING("icons/engineering.svg"),
     ERROR("icons/error.svg"),
     FILTER_LIST("icons/filter_list.svg"),
     FILTER_NONE("icons/filter_none.svg"),

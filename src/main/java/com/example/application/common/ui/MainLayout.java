@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.SvgIcon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,8 +28,7 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createHeader() {
-        var appLogo = VaadinIcon.CUBES.create();
-        appLogo.setSize("48px");
+        var appLogo = AppIcon.ENGINEERING.create(AppIcon.Size.XL, AppIcon.Color.PURPLE);
 
         var appName = new Span("Whereabouts");
         appName.getStyle().setFontWeight(Style.FontWeight.BOLD);
