@@ -59,21 +59,32 @@ class EmploymentDetailsDataForm extends Composite<FormLayout> {
 
         // Setup binder
         binder = new Binder<>(EmploymentDetailsData.class);
-        binder.forField(jobTitle).asRequired().bind(EmploymentDetailsData.PROP_JOB_TITLE);
-        binder.forField(type).asRequired().bind(EmploymentDetailsData.PROP_TYPE);
-        binder.forField(status).asRequired().bind(EmploymentDetailsData.PROP_STATUS);
-        binder.forField(workArrangement).asRequired().bind(EmploymentDetailsData.PROP_WORK_ARRANGEMENT);
+        binder.forField(jobTitle).asRequired("Enter job title").bind(EmploymentDetailsData.PROP_JOB_TITLE);
+        binder.forField(type).asRequired("Select employment type").bind(EmploymentDetailsData.PROP_TYPE);
+        binder.forField(status).asRequired("Select employment status").bind(EmploymentDetailsData.PROP_STATUS);
+        binder.forField(workArrangement).asRequired("Select work arrangement").bind(EmploymentDetailsData.PROP_WORK_ARRANGEMENT);
         binder.forField(location)
-                .asRequired()
+                .asRequired("Select primary location")
                 .withConverter(createLocationConverter(locationLookupById))
                 .bind(EmploymentDetailsData.PROP_LOCATION);
         binder.forField(manager)
                 .withConverter(createManagerConverter(managerLookupById))
                 .bind(EmploymentDetailsData.PROP_MANAGER);
-        binder.forField(hireDate).asRequired().bind(EmploymentDetailsData.PROP_HIRE_DATE);
-        binder.forField(terminationDate).bind(EmploymentDetailsData.PROP_TERMINATION_DATE);
+        binder.forField(hireDate).asRequired("Enter hire date").bind(EmploymentDetailsData.PROP_HIRE_DATE);
+        var terminationDateBinding = binder.forField(terminationDate)
+                .asRequired("Enter termination date")
+                .withValidator(date -> date == null || hireDate.isEmpty() || date.isAfter(hireDate.getValue()), "Termination date must be after hire date")
+                .bind(EmploymentDetailsData.PROP_TERMINATION_DATE);
 
-        // TODO Termination date logic
+        status.addValueChangeListener(e -> {
+            var isTerminated = e.getValue() == EmploymentStatus.TERMINATED;
+            terminationDateBinding.setAsRequiredEnabled(isTerminated);
+            terminationDate.setVisible(isTerminated);
+            if (!isTerminated) {
+                terminationDate.clear();
+            }
+        });
+        hireDate.addValueChangeListener(e -> terminationDateBinding.validate());
     }
 
     private static ComboBox<EmployeeReference> createManagerField(ManagerLookupBySearchTerm managerLookupBySearchTerm) {

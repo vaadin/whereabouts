@@ -36,6 +36,7 @@ public record EmploymentDetailsData(
         }
 
         if (terminationDate != null) {
+            // TODO You could be hired and terminated at the same date...
             Validate.isTrue(terminationDate.isAfter(hireDate), "Termination date must be after hire date");
         }
     }
