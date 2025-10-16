@@ -23,7 +23,7 @@ class SecurityConfig {
                 .with(VaadinSecurityConfigurer.vaadin(), configurer ->
                         configurer.loginView(LoginView.class)
                 )
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/*.css", "/icons/**", "/@vaadin/aura/**").permitAll())
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/*.css", "/icons/**").permitAll())
                 .build();
     }
 }
