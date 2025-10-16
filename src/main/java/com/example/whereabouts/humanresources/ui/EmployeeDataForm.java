@@ -85,15 +85,15 @@ class EmployeeDataForm extends Composite<FormLayout> {
 
         // Setup binder
         binder = new Binder<>(EmployeeData.class);
-        binder.forField(firstNameField).asRequired().bind(EmployeeData.PROP_FIRST_NAME);
+        binder.forField(firstNameField).asRequired("Enter first name").bind(EmployeeData.PROP_FIRST_NAME);
         binder.forField(middleNameField).bind(EmployeeData.PROP_MIDDLE_NAME);
-        binder.forField(lastNameField).asRequired().bind(EmployeeData.PROP_LAST_NAME);
-        binder.forField(preferredNameField).asRequired().bind(EmployeeData.PROP_PREFERRED_NAME);
-        binder.forField(birthDateField).asRequired().bind(EmployeeData.PROP_BIRTH_DATE);
-        binder.forField(genderField).asRequired().bind(EmployeeData.PROP_GENDER);
+        binder.forField(lastNameField).asRequired("Enter last name").bind(EmployeeData.PROP_LAST_NAME);
+        binder.forField(preferredNameField).asRequired("Enter preferred name").bind(EmployeeData.PROP_PREFERRED_NAME);
+        binder.forField(birthDateField).asRequired("Enter birth date").bind(EmployeeData.PROP_BIRTH_DATE);
+        binder.forField(genderField).asRequired("Select gender").bind(EmployeeData.PROP_GENDER);
         binder.forField(dietaryNotesField).bind(EmployeeData.PROP_DIETARY_NOTES);
-        binder.forField(homeAddressField).asRequired().bind(EmployeeData.PROP_HOME_ADDRESS);
-        binder.forField(timeZoneField).asRequired().bind(EmployeeData.PROP_TIME_ZONE);
+        binder.forField(homeAddressField).asRequired("Enter home address").bind(EmployeeData.PROP_HOME_ADDRESS);
+        binder.forField(timeZoneField).asRequired("Select time zone").bind(EmployeeData.PROP_TIME_ZONE);
         binder.forField(workPhoneField)
                 .withConverter(new ValueObjectStringConverter<>(PhoneNumber::of))
                 .bind(EmployeeData.PROP_WORK_PHONE);
@@ -104,8 +104,8 @@ class EmployeeDataForm extends Composite<FormLayout> {
                 .withConverter(new ValueObjectStringConverter<>(PhoneNumber::of))
                 .bind(EmployeeData.PROP_HOME_PHONE);
         binder.forField(workEmailField)
+                .asRequired("Enter work email")
                 .withConverter(new ValueObjectStringConverter<>(EmailAddress::of))
-                .asRequired()
                 .bind(EmployeeData.PROP_WORK_EMAIL);
     }
 

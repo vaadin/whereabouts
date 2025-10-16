@@ -68,7 +68,7 @@ class TaskDataForm extends Composite<FormLayout> {
         binder.forField(new ReadOnlyHasValue<ZoneId>(ignore -> {
         })).bind(TaskData.PROP_TIMEZONE);
         binder.forField(descriptionField)
-                .asRequired()
+                .asRequired("Enter task description")
                 .withValidator(new StringLengthValidator("Description is too long", 0, TaskData.DESCRIPTION_MAX_LENGTH))
                 .bind(TaskData.PROP_DESCRIPTION);
         var dueDateFieldBinding = binder.forField(dueDateField)

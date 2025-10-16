@@ -63,12 +63,12 @@ class LocationDataForm extends Composite<FormLayout> {
 
         // Setup binder
         binder = new Binder<>(LocationData.class);
-        binder.forField(nameField).asRequired().bind(LocationData.PROP_NAME);
-        binder.forField(locationTypeField).asRequired().bind(LocationData.PROP_LOCATION_TYPE);
-        binder.forField(addressField).asRequired().bind(LocationData.PROP_ADDRESS);
-        binder.forField(establishedField).asRequired().bind(LocationData.PROP_ESTABLISHED);
+        binder.forField(nameField).asRequired("Enter location name").bind(LocationData.PROP_NAME);
+        binder.forField(locationTypeField).asRequired("Select location type").bind(LocationData.PROP_LOCATION_TYPE);
+        binder.forField(addressField).asRequired("Enter location address").bind(LocationData.PROP_ADDRESS);
+        binder.forField(establishedField).asRequired("Enter established date").bind(LocationData.PROP_ESTABLISHED);
         binder.forField(aboutField).bind(LocationData.PROP_ABOUT);
-        binder.forField(timeZoneField).asRequired().bind(LocationData.PROP_TIME_ZONE);
+        binder.forField(timeZoneField).asRequired("Select time zone").bind(LocationData.PROP_TIME_ZONE);
         binder.forField(facilitiesField).bind(LocationData.PROP_FACILITIES);
     }
 

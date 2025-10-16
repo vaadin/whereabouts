@@ -34,7 +34,7 @@ class ProjectDataForm extends Composite<FormLayout> {
         // Setup binder
         binder = new Binder<>(ProjectData.class);
         binder.forField(nameField)
-                .asRequired()
+                .asRequired("Enter project name")
                 .withValidator(new StringLengthValidator("Project name is too long", 0, ProjectData.NAME_MAX_LENGTH))
                 .bind(ProjectData.PROP_NAME);
         binder.forField(descriptionField).bind(ProjectData.PROP_DESCRIPTION);
