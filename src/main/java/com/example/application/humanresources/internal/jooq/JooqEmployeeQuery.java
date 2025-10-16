@@ -1,14 +1,11 @@
 package com.example.application.humanresources.internal.jooq;
 
 import com.example.application.common.Country;
-import com.example.application.humanresources.EmployeeId;
-import com.example.application.humanresources.EmployeeReference;
-import com.example.application.humanresources.EmployeeSortableProperty;
+import com.example.application.humanresources.*;
 import com.example.application.humanresources.internal.EmployeeQuery;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -18,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.application.humanresources.internal.jooq.JooqConverters.countryConverter;
-import static com.example.application.humanresources.internal.jooq.JooqConverters.employeeIdConverter;
+import static com.example.application.humanresources.internal.jooq.JooqConverters.*;
 import static com.example.application.jooq.Tables.EMPLOYEE;
 import static com.example.application.jooq.Tables.EMPLOYMENT_DETAILS;
 
@@ -29,6 +25,8 @@ class JooqEmployeeQuery implements EmployeeQuery {
 
     private static final Field<EmployeeId> EMPLOYEE_ID = EMPLOYEE.EMPLOYEE_ID.convert(employeeIdConverter);
     private static final Field<EmployeeId> EMPLOYMENT_DETAILS_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
+    private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
+    private static final Field<EmploymentStatus> EMPLOYMENT_STATUS = EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.convert(employmentStatusConverter);
     private static final Field<Country> COUNTRY = EMPLOYEE.COUNTRY.convert(countryConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
             EmployeeSortableProperty.FIRST_NAME.name());
@@ -40,12 +38,18 @@ class JooqEmployeeQuery implements EmployeeQuery {
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
-    public List<EmployeeReference> findEmployees(Pageable pageable, @Nullable String searchTerm) {
-        var condition = searchTerm != null
-                ? EMPLOYEE.FIRST_NAME.containsIgnoreCase(searchTerm)
-                .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(searchTerm))
-                : DSL.trueCondition();
-
+    public List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter) {
+        Condition condition = DSL.trueCondition();
+        if (filter.searchTerm() != null && !filter.searchTerm().isBlank()) {
+            condition = condition.and(EMPLOYEE.FIRST_NAME.containsIgnoreCase(filter.searchTerm())
+                    .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(filter.searchTerm())));
+        }
+        if (!filter.statuses().isEmpty()) {
+            condition = condition.and(EMPLOYMENT_STATUS.in(filter.statuses()));
+        }
+        if (!filter.types().isEmpty()) {
+            condition = condition.and(EMPLOYMENT_TYPE.in(filter.types()));
+        }
         return selectEmployee()
                 .where(condition)
                 .orderBy(toOrderFields(pageable.getSortOr(DEFAULT_SORT)))

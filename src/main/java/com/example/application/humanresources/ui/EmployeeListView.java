@@ -1,9 +1,12 @@
 package com.example.application.humanresources.ui;
 
+import com.example.application.common.ui.AppIcon;
 import com.example.application.common.ui.MainLayout;
 import com.example.application.common.ui.SectionToolbar;
 import com.example.application.humanresources.*;
 import com.example.application.security.AppRoles;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -11,6 +14,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -19,6 +23,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import com.vaadin.signals.ValueSignal;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -74,6 +79,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
     private class EmployeeList extends VerticalLayout {
 
         private final Grid<EmployeeReference> grid;
+        private final ValueSignal<EmployeeFilter> filterSignal = new ValueSignal<>(EmployeeFilter.empty());
 
         EmployeeList(boolean canCreate) {
             var title = new H1("Employees");
@@ -91,11 +97,11 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
             sortField.setItems(EmployeeSortOrder.values());
             sortField.setValue(EmployeeSortOrder.LAST_NAME_ASC);
             sortField.setItemLabelGenerator(EmployeeSortOrder::getDisplayName);
-            sortField.setWidthFull();
+            sortField.getStyle().setFlexGrow("1");
 
             grid = new Grid<>();
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItemsPageable(pageable -> employeeService.findEmployees(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort()), searchField.getValue()));
+            grid.setItemsPageable(pageable -> employeeService.findEmployees(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortField.getValue().getSort()), filterSignal.peek()));
             grid.addColumn(new ComponentRenderer<>(employee -> EmployeeTitleCard.of(
                     employee,
                     employeePictureService::findEmployeePicture)
@@ -104,7 +110,8 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
             grid.addThemeName("no-border");
 
             // Add listeners
-            searchField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());
+            searchField.addValueChangeListener(e ->
+                    filterSignal.update(old -> old.withSearchTerm(e.getValue())));
             sortField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());
             grid.addSelectionListener(e -> e.getFirstSelectedItem()
                     .map(EmployeeReference::id)
@@ -113,12 +120,17 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
                             HumanResourcesNavigation::navigateToEmployeeList
                     ));
             addEmployeeButton.addClickListener(e -> addEmployee());
+            ComponentEffect.effect(this, () -> {
+                // Refresh the grid whenever the filter changes
+                filterSignal.value();
+                grid.getDataProvider().refreshAll();
+            });
 
             // Layout components
             var toolbar = new SectionToolbar(
                     SectionToolbar.group(new DrawerToggle(), title),
                     addEmployeeButton
-            ).withRow(searchField).withRow(sortField);
+            ).withRow(searchField).withRow(sortField, createFilterMenu());
             toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
             setSizeFull();
             setPadding(false);
@@ -136,14 +148,42 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
             });
             dialog.open();
         }
+
+        private Component createFilterMenu() {
+            var menuBar = new MenuBar();
+            var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
+            var subMenu = item.getSubMenu();
+
+            var statusFormatter = EmploymentStatusFormatter.ofLocale(getLocale());
+            for (var status : EmploymentStatus.values()) {
+                subMenu.addItem(statusFormatter.getDisplayName(status), event -> {
+                    if (event.getSource().isChecked()) {
+                        filterSignal.update(old -> old.withStatus(status));
+                    } else {
+                        filterSignal.update(old -> old.withoutStatus(status));
+                    }
+                }).setCheckable(true);
+            }
+            subMenu.addSeparator();
+            var typeFormatter = EmploymentTypeFormatter.ofLocale(getLocale());
+            for (var type : EmploymentType.values()) {
+                subMenu.addItem(typeFormatter.getDisplayName(type), event -> {
+                    if (event.getSource().isChecked()) {
+                        filterSignal.update(old -> old.withType(type));
+                    } else {
+                        filterSignal.update(old -> old.withoutType(type));
+                    }
+                }).setCheckable(true);
+            }
+            return menuBar;
+        }
     }
 
     private enum EmployeeSortOrder {
         LAST_NAME_ASC("Sort by last name (A-Z)", Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(), EmployeeSortableProperty.FIRST_NAME.name())),
         LAST_NAME_DESC("Sort by last name (Z-A)", Sort.by(Sort.Direction.DESC, EmployeeSortableProperty.LAST_NAME.name(), EmployeeSortableProperty.FIRST_NAME.name())),
         FIRST_NAME_ASC("Sort by first name (A-Z)", Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.FIRST_NAME.name(), EmployeeSortableProperty.LAST_NAME.name())),
-        FIRST_NAME_DESC("Sort by first name (Z-A)", Sort.by(Sort.Direction.DESC, EmployeeSortableProperty.FIRST_NAME.name(), EmployeeSortableProperty.LAST_NAME.name())),
-        ;
+        FIRST_NAME_DESC("Sort by first name (Z-A)", Sort.by(Sort.Direction.DESC, EmployeeSortableProperty.FIRST_NAME.name(), EmployeeSortableProperty.LAST_NAME.name()));
 
         private final String displayName;
         private final Sort sort;

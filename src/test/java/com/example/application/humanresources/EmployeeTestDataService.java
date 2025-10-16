@@ -17,7 +17,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @NullMarked
@@ -2064,18 +2063,20 @@ public class EmployeeTestDataService {
             "Operations Manager"
     };
 
-    private final AtomicInteger terminatedEmployees = new AtomicInteger(0);
+    private EmploymentStatus pickEmploymentStatus() {
+        var n = rnd.nextInt(100);
+        if (n < 5) {
+            return EmploymentStatus.TERMINATED;
+        } else if (n < 10) {
+            return EmploymentStatus.INACTIVE;
+        } else {
+            return EmploymentStatus.ACTIVE;
+        }
+    }
 
     private void insert(EmployeeData employeeData) {
         var id = employeeRepository.insert(employeeData);
-        var employmentStatus = pickRandom(EmploymentStatus.values());
-        if (employmentStatus.equals(EmploymentStatus.TERMINATED)) {
-            if (terminatedEmployees.get() > 10) {
-                employmentStatus = EmploymentStatus.ACTIVE;
-            } else {
-                terminatedEmployees.incrementAndGet();
-            }
-        }
+        var employmentStatus = pickEmploymentStatus();
         var hireDate = LocalDate.of(2010, 1, 1).plusDays(rnd.nextLong(5000));
         var terminationDate = generateTerminationDate(employmentStatus, hireDate);
         var employmentDetails = new EmploymentDetailsData(

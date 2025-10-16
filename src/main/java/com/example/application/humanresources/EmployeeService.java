@@ -5,7 +5,6 @@ import com.example.application.humanresources.internal.EmployeeRepository;
 import com.example.application.humanresources.internal.EmploymentDetailsRepository;
 import com.example.application.security.AppRoles;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -33,8 +32,8 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeReference> findEmployees(Pageable pageable, @Nullable String searchTerm) {
-        return employeeQuery.findEmployees(pageable, searchTerm);
+    public List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter) {
+        return employeeQuery.findEmployees(pageable, filter);
     }
 
     @Transactional(readOnly = true)

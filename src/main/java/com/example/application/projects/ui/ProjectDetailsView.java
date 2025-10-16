@@ -1,8 +1,7 @@
 package com.example.application.projects.ui;
 
 import com.example.application.common.ui.*;
-import com.example.application.humanresources.EmployeeService;
-import com.example.application.humanresources.PersonNameFormatter;
+import com.example.application.humanresources.*;
 import com.example.application.projects.*;
 import com.example.application.security.AppRoles;
 import com.vaadin.flow.component.AttachEvent;
@@ -34,14 +33,18 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.signals.ValueSignal;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.data.domain.Pageable;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Route(value = "projects/:projectId", layout = ProjectListView.class)
 @RolesAllowed(AppRoles.PROJECT_READ)
@@ -109,8 +112,12 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
                 ));
     }
 
+    private List<EmployeeReference> findAssignees(Pageable pageable, @Nullable String searchTerm) {
+        return employeeService.findEmployees(pageable, new EmployeeFilter(searchTerm, Set.of(EmploymentStatus.ACTIVE), Set.of()));
+    }
+
     private void addTask(Project project, ZoneId timeZone, SerializableRunnable refresh) {
-        var dialog = new AddTaskDialog(employeeService::findEmployees, employeeService::getEmployeesById, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
+        var dialog = new AddTaskDialog(this::findAssignees, employeeService::getEmployeesById, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
             taskService.insertTask(newTaskData);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
@@ -120,7 +127,7 @@ class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserv
     }
 
     private void editTask(Task task, SerializableRunnable refresh) {
-        var dialog = new EditTaskDialog(employeeService::findEmployees, employeeService::getEmployeesById, task, editedTask -> {
+        var dialog = new EditTaskDialog(this::findAssignees, employeeService::getEmployeesById, task, editedTask -> {
             var saved = taskService.updateTask(editedTask);
             refresh.run();
             getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));

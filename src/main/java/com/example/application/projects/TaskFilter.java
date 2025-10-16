@@ -1,10 +1,10 @@
 package com.example.application.projects;
 
+import com.example.application.common.SetUtil;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 @NullMarked
@@ -21,40 +21,22 @@ public record TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, 
     }
 
     public TaskFilter withStatus(TaskStatus status) {
-        return new TaskFilter(searchTerm, add(statuses, status), priorities);
+        return new TaskFilter(searchTerm, SetUtil.add(statuses, status), priorities);
     }
 
     public TaskFilter withoutStatus(TaskStatus status) {
-        return new TaskFilter(searchTerm, remove(statuses, status), priorities);
+        return new TaskFilter(searchTerm, SetUtil.remove(statuses, status), priorities);
     }
 
     public TaskFilter withPriority(TaskPriority priority) {
-        return new TaskFilter(searchTerm, statuses, add(priorities, priority));
+        return new TaskFilter(searchTerm, statuses, SetUtil.add(priorities, priority));
     }
 
     public TaskFilter withoutPriority(TaskPriority priority) {
-        return new TaskFilter(searchTerm, statuses, remove(priorities, priority));
+        return new TaskFilter(searchTerm, statuses, SetUtil.remove(priorities, priority));
     }
 
     public static TaskFilter empty() {
         return new TaskFilter(null, Collections.emptySet(), Collections.emptySet());
-    }
-
-    private static <T> Set<T> add(Set<T> items, T itemToAdd) {
-        if (items.contains(itemToAdd)) {
-            return items;
-        }
-        var newSet = new HashSet<>(items);
-        newSet.add(itemToAdd);
-        return newSet;
-    }
-
-    private static <T> Set<T> remove(Set<T> items, T itemToRemove) {
-        if (!items.contains(itemToRemove)) {
-            return items;
-        }
-        var newSet = new HashSet<>(items);
-        newSet.remove(itemToRemove);
-        return newSet;
     }
 }
