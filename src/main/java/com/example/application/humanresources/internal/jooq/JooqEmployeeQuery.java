@@ -41,6 +41,8 @@ class JooqEmployeeQuery implements EmployeeQuery {
     public List<EmployeeReference> findEmployees(Pageable pageable, EmployeeFilter filter) {
         Condition condition = DSL.trueCondition();
         if (filter.searchTerm() != null && !filter.searchTerm().isBlank()) {
+            // TODO Should the search term be split by spaces and used individually?
+            //  Searching for a first and last name would now result in no hits.
             condition = condition.and(EMPLOYEE.FIRST_NAME.containsIgnoreCase(filter.searchTerm())
                     .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(filter.searchTerm())));
         }

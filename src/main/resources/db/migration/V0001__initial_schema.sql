@@ -91,6 +91,9 @@ create table employee
 );
 
 create index employee_user_id_idx on employee (user_id);
+create index employee_user_first_name_idx on employee (first_name);
+create index employee_user_middle_name_idx on employee (middle_name);
+create index employee_user_last_name_idx on employee (last_name);
 
 create table employment_details
 (
@@ -114,6 +117,8 @@ create table employment_details
 
 create index employment_details_location_id_idx on employment_details (location_id);
 create index employment_details_manager_id_idx on employment_details (manager_id);
+create index employment_details_type_idx on employment_details (employment_type);
+create index employment_details_status_idx on employment_details (employment_status);
 
 ------------
 -- Projects
@@ -129,6 +134,8 @@ create table project
     description text,
     primary key (project_id)
 );
+
+create index project_name_idx on project (name);
 
 create sequence task_id_seq start 100 increment 1;
 
@@ -150,6 +157,10 @@ create table task
     primary key (task_id),
     foreign key (project_id) references project (project_id)
 );
+
+create index task_description_idx on task (description);
+create index task_status_idx on task (task_status);
+create index task_priority_idx on task (task_priority);
 
 create index task_project_id_idx on task (project_id);
 
