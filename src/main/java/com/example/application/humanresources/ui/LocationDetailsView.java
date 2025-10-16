@@ -34,7 +34,6 @@ import java.util.Optional;
 @RolesAllowed(AppRoles.LOCATION_READ)
 class LocationDetailsView extends VerticalLayout implements AfterNavigationObserver, HasDynamicTitle {
 
-    // TODO Style this view (using as little custom CSS as possible)
     // TODO Make this view responsive
     // TODO Make this view accessible
 

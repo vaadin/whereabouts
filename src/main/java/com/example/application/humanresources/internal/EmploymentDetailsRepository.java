@@ -16,6 +16,4 @@ public interface EmploymentDetailsRepository extends Repository {
     EmploymentDetails insert(EmployeeId id, EmploymentDetailsData data);
 
     EmploymentDetails update(EmploymentDetails employee);
-
-    void deleteById(EmployeeId id);
 }

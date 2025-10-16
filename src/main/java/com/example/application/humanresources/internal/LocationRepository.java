@@ -16,6 +16,4 @@ public interface LocationRepository extends Repository {
     LocationId insert(LocationData data);
 
     Location update(Location location);
-
-    void deleteById(LocationId id);
 }
