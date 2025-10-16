@@ -1,6 +1,7 @@
 package com.example.application.humanresources.ui;
 
 import com.example.application.common.ui.AppIcon;
+import com.example.application.common.ui.Badges;
 import com.example.application.common.ui.Notifications;
 import com.example.application.common.ui.SectionToolbar;
 import com.example.application.humanresources.*;
@@ -48,7 +49,8 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         canUpdate = authenticationContext.hasRole(AppRoles.EMPLOYEE_UPDATE);
 
         // Create components
-        var title = new H2();
+        var employeeNameHeader = new H2();
+        var employeeJobTitleHeader = Badges.create("");
         var avatar = new Avatar();
 
         var editButton = new Button("Edit", e -> edit());
@@ -72,7 +74,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
 
         // Layout components
         setSizeFull();
-        var upperToolbar = new SectionToolbar(SectionToolbar.group(avatar, title), SectionToolbar.group(closeButton));
+        var upperToolbar = new SectionToolbar(SectionToolbar.group(avatar, employeeNameHeader, employeeJobTitleHeader), SectionToolbar.group(closeButton));
         upperToolbar.setPadding(false);
         add(upperToolbar);
         add(tabs);
@@ -85,14 +87,19 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
             var employee = employeeSignal.value();
             if (employee != null) {
                 var fullName = PersonNameFormatter.firstLast().toFullName(employee.data());
-                title.setText(fullName + " " + employee.data().homeAddress().country().flagUnicode());
+                employeeNameHeader.setText(fullName + " " + employee.data().homeAddress().country().flagUnicode());
                 avatar.setName(fullName);
                 avatar.setImageHandler(employeePictureService.findPicture(employee.id()));
-                employmentDetailsSignal.value(employeeService.findDetailsById(employee.id()).orElse(null));
-                // TODO add job title to header
+                var details = employeeService.findDetailsById(employee.id()).orElse(null);
+                employmentDetailsSignal.value(details);
             } else {
                 employmentDetailsSignal.value(null);
             }
+        });
+        ComponentEffect.effect(this, () -> {
+            var details = employmentDetailsSignal.value();
+            employeeJobTitleHeader.setText(details == null ? "" : details.data().jobTitle());
+            employeeJobTitleHeader.setVisible(details != null);
         });
         ComponentEffect.effect(this, () -> {
             var editable = getSelectedTabComponent() instanceof EditableTab;
