@@ -84,3 +84,5 @@ You can also start the application from the command line by running:
 ```bash
 ./mvnw
 ```
+
+You can log in with the user `admin` and password `2smart4u`.
