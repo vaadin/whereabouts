@@ -50,6 +50,11 @@ you'll hopefully see the code improve.
 * Path parameters are used as the source of truth for grid selections. However, even more UI state could be moved to
   the URL. Sorting and filtering could be stored in query parameters. The selected tab within a view could be stored as
   a path parameter. However, we would have to come up with a smooth way of keeping this information in sync.
+* When working with jOOQ, it is natural to use IDs to refer to other entities. This is problematic when working with
+  e.g. Grids and ComboBoxes that contain the entities themselves. To select an item in a grid, you first have to fetch
+  the complete entity from the application service and then select it. To bind a combo box to a property that takes an
+  ID, you need to create a converter that maps between the entity and the ID (simple), and the ID and the entity (needs
+  a database call).
 * Java records are quite useful as DTOs. However, using them with Vaadin's Binder is problematic . First, you have to
   bind them by name, losing type safety in the process. Second, you have to bind every record component, including
   hidden fields.
