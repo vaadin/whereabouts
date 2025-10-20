@@ -83,7 +83,14 @@ you'll hopefully see the code improve.
 This application uses Testcontainers to start up PostgreSQL when running in development mode and in integration tests.
 You must have Docker installed and running to run the application.
 
-To start the application in development mode, import it into your IDE and run the `TestApplication` class. 
+Before you do anything else, you have to *make a priming build that generates the jOOQ classes*. Make sure Docker is
+installed and running, then run:
+
+```bash
+./mvnw package
+```
+
+To start the application in development mode, import it into your IDE and run the `TestApplication` class.
 You can also start the application from the command line by running: 
 
 ```bash
