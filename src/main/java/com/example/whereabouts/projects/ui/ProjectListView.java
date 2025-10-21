@@ -3,12 +3,10 @@ package com.example.whereabouts.projects.ui;
 import com.example.whereabouts.MainLayout;
 import com.example.whereabouts.common.ui.AppIcon;
 import com.example.whereabouts.common.ui.SectionToolbar;
-import com.example.whereabouts.projects.ProjectId;
-import com.example.whereabouts.projects.ProjectListItem;
-import com.example.whereabouts.projects.ProjectService;
-import com.example.whereabouts.projects.ProjectSortableProperty;
+import com.example.whereabouts.projects.*;
 import com.example.whereabouts.security.AppRoles;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -19,11 +17,13 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.provider.SortOrder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -31,7 +31,10 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import com.vaadin.signals.ValueSignal;
 import jakarta.annotation.security.RolesAllowed;
+
+import java.util.Optional;
 
 @ParentLayout(MainLayout.class)
 @Route(value = "projects", layout = MainLayout.class)
@@ -40,151 +43,177 @@ import jakarta.annotation.security.RolesAllowed;
 @RolesAllowed(AppRoles.PROJECT_READ)
 class ProjectListView extends MasterDetailLayout implements AfterNavigationObserver {
 
+    final static class ViewModel {
+
+        private final ProjectService projectService;
+        final DataProvider<ProjectListItem, Void> projects;
+        final ValueSignal<ProjectSortOrder> sortOrder = new ValueSignal<>(ProjectSortOrder.NAME_ASC);
+        final ValueSignal<String> searchTerm = new ValueSignal<>("");
+        final ValueSignal<ProjectId> selectedProjectId = new ValueSignal<>(ProjectId.class);
+
+        ViewModel(Component owner, ProjectService projectService) {
+            this.projectService = projectService;
+            projects = new CallbackDataProvider<>(
+                    query ->
+                            projectService.findProjectListItems(
+                                    searchTerm.peek(),
+                                    query.getLimit(), query.getOffset(),
+                                    sortOrder.peek().getSortOrder()
+                            ),
+                    query -> {
+                        throw new UnsupportedOperationException("Count not supported");
+                    },
+                    ProjectListItem::projectId
+            );
+            ComponentEffect.effect(owner, () -> {
+                // TODO This is a workaround until we get better API support. The data provider is not an effect,
+                //  nor is it a component, so it can't refresh itself when the sortOrder or searchTerm changes,
+                //  even though those signals are used in it.
+                sortOrder.value();
+                searchTerm.value();
+                projects.refreshAll();
+            });
+            ComponentEffect.effect(owner, () -> {
+                // TODO This effect, in combination with afterNavigation() further down, keeps the projectId route
+                //  parameter and the selectedProjectId signal in sync. We should get a proper API for this.
+                Optional.ofNullable(selectedProjectId.value()).ifPresentOrElse(
+                        ProjectsNavigation::navigateToProjectDetails,
+                        ProjectsNavigation::navigateToProjectList
+                );
+            });
+        }
+
+        void addProject(ProjectData newProjectData) {
+            var projectId = projectService.insert(newProjectData);
+            projects.refreshAll();
+            selectedProjectId.value(projectId);
+        }
+    }
+
+    final ViewModel viewModel;
     private final ProjectService projectService;
-    private final ProjectList projectList;
-    private final boolean canCreate;
 
     ProjectListView(AuthenticationContext authenticationContext, ProjectService projectService) {
         this.projectService = projectService;
+        this.viewModel = new ViewModel(this, projectService);
+        var canCreate = authenticationContext.hasRole(AppRoles.PROJECT_CREATE);
 
-        canCreate = authenticationContext.hasRole(AppRoles.PROJECT_CREATE);
-
-        projectList = new ProjectList();
-
+        var projectList = createProjectList(canCreate);
         setMaster(projectList);
         setMasterSize(400, Unit.PIXELS);
-        projectList.setWidth(400, Unit.PIXELS); // Workaround for https://github.com/vaadin/web-components/issues/10318
+        projectList.setWidth(400, Unit.PIXELS); // TODO Workaround for https://github.com/vaadin/web-components/issues/10318
         setDetailMinSize(400, Unit.PIXELS);
-        addBackdropClickListener(event -> projectList.grid.deselectAll());
-    }
-
-    void onProjectUpdated(ProjectId projectId) {
-        refreshProject(projectId);
+        addBackdropClickListener(e
+                -> viewModel.selectedProjectId.value(null));
     }
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        refresh();
-        event.getRouteParameters()
+        viewModel.selectedProjectId.value(event.getRouteParameters()
                 .getLong(ProjectDetailsView.PARAM_PROJECT_ID)
                 .map(ProjectId::of)
-                .flatMap(projectService::findProjectListItemById)
-                .ifPresentOrElse(projectList.grid::select, projectList.grid::deselectAll);
+                .orElse(null));
     }
 
-    private void refresh() {
-        projectList.grid.getDataProvider().refreshAll();
+    private void openAddProjectDialog() {
+        new AddProjectDialog(viewModel::addProject).open();
     }
 
-    private void refreshProject(ProjectId projectId) {
-        projectService.findProjectListItemById(projectId)
-                .ifPresentOrElse(
-                        projectList.grid.getDataProvider()::refreshItem,
-                        projectList.grid.getDataProvider()::refreshAll
-                );
-    }
-
-    private void showAll() {
-        projectList.searchField.clear();
-    }
-
-    private void addProject() {
-        var dialog = new AddProjectDialog(fdo -> {
-            var projectId = projectService.insert(fdo);
-            ProjectsNavigation.navigateToProjectDetails(projectId);
-        });
-        dialog.open();
-    }
-
-    private class ProjectList extends VerticalLayout {
-
-        private final Grid<ProjectListItem> grid;
-        private final TextField searchField;
-
-        ProjectList() {
-            var title = new H1("Projects");
-
-            var addProjectButton = new Button("Add Project", event -> addProject());
-            addProjectButton.setVisible(canCreate);
-
-            searchField = new TextField();
-            searchField.setPlaceholder("Search");
-            searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
-            searchField.setWidthFull();
-            searchField.setValueChangeMode(ValueChangeMode.LAZY);
-            searchField.addValueChangeListener(event -> refresh());
-
-            var sortField = new Select<ProjectSortOrder>();
-            sortField.setItems(ProjectSortOrder.values());
-            sortField.setValue(ProjectSortOrder.NAME_ASC);
-            sortField.setItemLabelGenerator(ProjectSortOrder::getDisplayName);
-            sortField.setWidthFull();
-            sortField.addValueChangeListener(event -> refresh());
-
-            grid = new Grid<>();
-            grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-            grid.setItems((CallbackDataProvider.FetchCallback<ProjectListItem, Void>) query ->
-                    projectService.findProjectListItems(searchField.getValue(), query.getLimit(), query.getOffset(),
-                            sortField.getValue().getSortOrder()));
-            grid.addColumn(new ComponentRenderer<>(this::createProjectCard));
-            grid.setSizeFull();
-            grid.addThemeName("no-border");
-            grid.addSelectionListener(event -> event.getFirstSelectedItem().map(ProjectListItem::projectId)
-                    .ifPresentOrElse(ProjectsNavigation::navigateToProjectDetails, ProjectsNavigation::navigateToProjectList));
-            grid.setEmptyStateComponent(new ProjectListEmptyComponent());
-
-            var toolbar = new SectionToolbar(
-                    SectionToolbar.group(new DrawerToggle(), title),
-                    addProjectButton
-            ).withRow(searchField).withRow(sortField);
-            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+    private VerticalLayout createProjectList(boolean canCreate) {
+        // TODO I'm not sure what I feel about this style of creating views
+        return new VerticalLayout(
+                new SectionToolbar(
+                        SectionToolbar.group(
+                                new DrawerToggle(),
+                                new H1("Projects")
+                        ),
+                        new Button("Add Project", e -> openAddProjectDialog()) {{
+                            setVisible(canCreate);
+                        }}) {{
+                    withRow(new TextField() {{
+                        setPlaceholder("Search");
+                        setPrefixComponent(VaadinIcon.SEARCH.create());
+                        setWidthFull();
+                        setValueChangeMode(ValueChangeMode.LAZY);
+                        // TODO Workaround until we get bind support into the API:
+                        addValueChangeListener(e -> viewModel.searchTerm.value(e.getValue()));
+                        ComponentEffect.effect(this, () -> setValue(viewModel.searchTerm.value()));
+                    }});
+                    withRow(new Select<ProjectSortOrder>() {
+                        {
+                            setItems(ProjectSortOrder.values());
+                            setItemLabelGenerator(ProjectSortOrder::getDisplayName);
+                            setWidthFull();
+                            // TODO Workaround until we get bind support into the API:
+                            addValueChangeListener(e -> viewModel.sortOrder.value(e.getValue()));
+                            ComponentEffect.effect(this, () -> setValue(viewModel.sortOrder.value()));
+                        }
+                    });
+                    getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+                }},
+                new Grid<ProjectListItem>() {{
+                    setSelectionMode(Grid.SelectionMode.SINGLE);
+                    setDataProvider(viewModel.projects);
+                    getLazyDataView().setItemCountUnknown(); // Because we don't provide a count callback
+                    addColumn(new ComponentRenderer<>(ProjectListView.this::createProjectCard));
+                    setEmptyStateComponent(createEmptyProjectListComponent(canCreate));
+                    setSizeFull();
+                    addThemeName("no-border");
+                    // TODO Workaround until we get bind support into the API
+                    addSelectionListener(e -> viewModel.selectedProjectId.value(
+                            e.getFirstSelectedItem().map(ProjectListItem::projectId).orElse(null)));
+                    ComponentEffect.effect(this, () -> Optional.ofNullable(viewModel.selectedProjectId.value())
+                            // TODO This could be simplified if we could select by ID instead of by item. We would not need
+                            //  an extra database call just for the selection.
+                            .flatMap(projectService::findProjectListItemById)
+                            .ifPresentOrElse(this::select, this::deselectAll)
+                    );
+                }}
+        ) {{
             setSizeFull();
             setPadding(false);
             setSpacing(false);
             getStyle().setOverflow(Style.Overflow.HIDDEN);
-
-            add(toolbar, grid);
-        }
-
-        private Component createProjectCard(ProjectListItem projectListItem) {
-            var card = new Card();
-            card.setTitle(projectListItem.projectName());
-
-            card.add(projectListItem.description());
-
-            var tasks = new Span(
-                    projectListItem.tasks() == 1 ? "1 task" : "%d tasks".formatted(projectListItem.tasks()));
-            tasks.getStyle().setColor("var(--vaadin-text-color-secondary)");
-
-            var assignees = new Span(projectListItem.assignees() == 1
-                    ? "1 assignee"
-                    : "%d assignees".formatted(projectListItem.assignees()));
-            assignees.getStyle().setColor("var(--vaadin-text-color-secondary)");
-
-            card.addToFooter(tasks, assignees);
-            return card;
-        }
+        }};
     }
 
-    private class ProjectListEmptyComponent extends VerticalLayout {
-        ProjectListEmptyComponent() {
-            var icon = AppIcon.FOLDER_CHECK_2.create(AppIcon.Size.XL);
-            var title = new H4("No projects found");
-            var instruction = new Span("Change the search criteria or add a project");
+    private Component createProjectCard(ProjectListItem projectListItem) {
+        return new Card() {{
+            setTitle(projectListItem.projectName());
+            add(projectListItem.description());
+            addToFooter(
+                    new Span(projectListItem.tasks() == 1
+                            ? "1 task" :
+                            "%d tasks".formatted(projectListItem.tasks())) {{
+                        getStyle().setColor("var(--vaadin-text-color-secondary)");
+                    }},
+                    new Span(projectListItem.assignees() == 1
+                            ? "1 assignee"
+                            : "%d assignees".formatted(projectListItem.assignees())) {{
+                        getStyle().setColor("var(--vaadin-text-color-secondary)");
+                    }}
+            );
+        }};
+    }
 
-            var addProject = new Button("Add Project", VaadinIcon.PLUS.create(), event -> addProject());
-            addProject.addThemeName("tertiary");
-            addProject.setVisible(canCreate);
-
-            var showAll = new Button("Show All", AppIcon.FILTER_NONE.create(), event -> showAll());
-            showAll.addThemeName("tertiary");
-
-            add(icon, title, instruction, new HorizontalLayout(addProject, showAll));
-
+    private Component createEmptyProjectListComponent(boolean canCreate) {
+        return new VerticalLayout(
+                AppIcon.FOLDER_CHECK_2.create(AppIcon.Size.XL),
+                new H4("No projects found"),
+                new Span("Change the search criteria or add a project"),
+                new HorizontalLayout(
+                        new Button("Add Project", VaadinIcon.PLUS.create(), e -> openAddProjectDialog()) {{
+                            addThemeName("tertiary");
+                            setVisible(canCreate);
+                        }},
+                        new Button("Show All", AppIcon.FILTER_NONE.create(), e -> viewModel.searchTerm.value("")) {{
+                            addThemeName("tertiary");
+                        }})
+        ) {{
             setSizeFull();
-            setAlignItems(Alignment.CENTER);
-            setJustifyContentMode(JustifyContentMode.CENTER);
-        }
+            setAlignItems(FlexComponent.Alignment.CENTER);
+            setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        }};
     }
 
     private enum ProjectSortOrder {

@@ -2,21 +2,20 @@ package com.example.whereabouts.projects;
 
 import com.example.whereabouts.common.SetUtil;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
 
 @NullMarked
-public record TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
+public record TaskFilter(String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
 
-    public TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
+    public TaskFilter(String searchTerm, Set<TaskStatus> statuses, Set<TaskPriority> priorities) {
         this.searchTerm = searchTerm;
         this.statuses = Set.copyOf(statuses);
         this.priorities = Set.copyOf(priorities);
     }
 
-    public TaskFilter withSearchTerm(@Nullable String searchTerm) {
+    public TaskFilter withSearchTerm(String searchTerm) {
         return new TaskFilter(searchTerm, statuses, priorities);
     }
 
@@ -37,6 +36,6 @@ public record TaskFilter(@Nullable String searchTerm, Set<TaskStatus> statuses, 
     }
 
     public static TaskFilter empty() {
-        return new TaskFilter(null, Collections.emptySet(), Collections.emptySet());
+        return new TaskFilter("", Collections.emptySet(), Collections.emptySet());
     }
 }

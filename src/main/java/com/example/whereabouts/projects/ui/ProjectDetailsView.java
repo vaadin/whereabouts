@@ -4,7 +4,6 @@ import com.example.whereabouts.common.ui.*;
 import com.example.whereabouts.humanresources.*;
 import com.example.whereabouts.projects.*;
 import com.example.whereabouts.security.AppRoles;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEffect;
 import com.vaadin.flow.component.UI;
@@ -24,12 +23,10 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.function.SerializableRunnable;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
-import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.signals.ValueSignal;
@@ -45,349 +42,358 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Route(value = "projects/:projectId", layout = ProjectListView.class)
 @RolesAllowed(AppRoles.PROJECT_READ)
-class ProjectDetailsView extends VerticalLayout implements AfterNavigationObserver, HasDynamicTitle {
+class ProjectDetailsView extends VerticalLayout {
 
     public static final String PARAM_PROJECT_ID = "projectId";
 
-    private final TaskService taskService;
-    private final EmployeeService employeeService;
-    private final boolean canUpdate;
-    private final boolean canDelete;
+    final static class ViewModel {
 
-    private final ValueSignal<ZoneId> timeZoneSignal = new ValueSignal<>(ZoneId.class);
-    private final ValueSignal<Project> projectSignal = new ValueSignal<>(Project.class);
+        private final TaskService taskService;
+        private final Supplier<ProjectListView.ViewModel> parentViewModel;
+        final ValueSignal<ZoneId> timeZone = new ValueSignal<>(ZoneId.class);
+        final ValueSignal<TaskFilter> filter = new ValueSignal<>(TaskFilter.empty());
+        final ValueSignal<Project> project = new ValueSignal<>(Project.class);
+        final DataProvider<Task, Void> tasks;
+
+        ViewModel(Component owner, Supplier<ProjectListView.ViewModel> parentViewModel,
+                  TaskService taskService) {
+            this.taskService = taskService;
+            this.parentViewModel = parentViewModel;
+            tasks = new CallbackDataProvider<>(
+                    query -> {
+                        // The data provider requires us to always call these methods, or it will throw an exception.
+                        var limit = query.getLimit();
+                        var offset = query.getOffset();
+                        var projectId = project.peek().id();
+                        //noinspection ConstantValue // TODO Can we get rid of this? It is caused by the @NullMarked annotation.
+                        if (projectId == null) {
+                            return Stream.empty();
+                        } else {
+                            return taskService.findTasks(projectId, filter.peek(), limit, offset,
+                                    SortOrderUtil.toSortOrderList(TaskSortableProperty::valueOf, query.getSortOrders()));
+                        }
+                    },
+                    query -> {
+                        throw new UnsupportedOperationException("Count not supported");
+                    },
+                    Task::id
+            );
+            owner.addAttachListener(event -> event.getUI().getPage()
+                    // TODO Would be awesome if we could access the extendedClientDetails directly as a signal
+                    .retrieveExtendedClientDetails(extendedClientDetails ->
+                            timeZone.value(
+                                    Optional.ofNullable(extendedClientDetails.getTimeZoneId())
+                                            .map(ZoneId::of)
+                                            .orElse(ZoneId.systemDefault())
+                            )));
+            ComponentEffect.effect(owner, () -> {
+                // TODO Is there a smarter way of getting access to a signal defined higher up in the route chain?
+                var projectId = parentViewModel.get().selectedProjectId.value();
+                project.value(Optional.ofNullable(projectId).flatMap(taskService::findProjectById).orElse(null));
+            });
+            ComponentEffect.effect(owner, () -> {
+                // TODO This is a workaround until we get better API support.
+                filter.value();
+                tasks.refreshAll();
+            });
+        }
+
+        void addTask(TaskData newTaskData) {
+            taskService.insertTask(newTaskData);
+            tasks.refreshAll();
+            parentViewModel.get().projects.refreshAll(); // To update task and assignee count
+            // TODO Not sure if it should be the view model that is responsible for showing notifications; should
+            //  probably be done with signals in some way ;-).
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task created successfully").open();
+        }
+
+        void updateTask(Task editedTask) {
+            taskService.updateTask(editedTask);
+            tasks.refreshAll();
+            parentViewModel.get().projects.refreshAll(); // To update task and assignee count
+            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task updated successfully").open();
+        }
+
+        void deleteTask(Task taskToDelete) {
+            taskService.deleteTask(taskToDelete.id());
+            tasks.refreshAll();
+            parentViewModel.get().projects.refreshAll(); // To update task and assignee count
+            Notifications.createNonCriticalNotification(AppIcon.DELETE_SWEEP.create(AppIcon.Size.M, AppIcon.Color.RED), "Task deleted successfully").open();
+        }
+    }
+
+    private final ViewModel viewModel;
+    private final EmployeeService employeeService;
 
     ProjectDetailsView(AuthenticationContext authenticationContext,
                        TaskService taskService, EmployeeService employeeService) {
-        this.taskService = taskService;
         this.employeeService = employeeService;
+        this.viewModel = new ViewModel(this, this::getParentViewModel, taskService);
         var canCreate = authenticationContext.hasRole(AppRoles.TASK_CREATE);
-        canUpdate = authenticationContext.hasRole(AppRoles.TASK_UPDATE);
-        canDelete = authenticationContext.hasRole(AppRoles.TASK_DELETE);
+        var canUpdate = authenticationContext.hasRole(AppRoles.TASK_UPDATE);
+        var canDelete = authenticationContext.hasRole(AppRoles.TASK_DELETE);
 
         setSizeFull();
         setPadding(false);
         setSpacing(false);
 
         ComponentEffect.effect(this, () -> {
-            var project = projectSignal.value();
-            var timeZone = timeZoneSignal.value();
+            var project = viewModel.project.value();
+            var timeZone = viewModel.timeZone.value();
             removeAll();
 
             if (project != null && timeZone != null) {
-                // Create components
-                var title = new H2(project.data().name());
-
-                var addTaskButton = new Button("Add Task");
-                addTaskButton.addThemeName("primary");
-                addTaskButton.setVisible(canCreate);
-
-                var closeButton = new Button();
-                closeButton.getElement().appendChild(AppIcon.CLOSE.create().getElement()); // Until we get an icon-only button variant for Aura
-                closeButton.addClickListener(e -> ProjectsNavigation.navigateToProjectList());
-
-                var taskList = new TaskList(project, timeZone);
-
-                // Add listeners
-                addTaskButton.addClickListener(e -> addTask(project, timeZone, taskList.grid.getDataProvider()::refreshAll));
-
-                // Layout components
-                var toolbar = new SectionToolbar(title, SectionToolbar.group(addTaskButton, closeButton));
-                toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
-                add(toolbar, taskList);
+                add(
+                        new SectionToolbar(
+                                new H2(project.data().name()),
+                                SectionToolbar.group(
+                                        new Button("Add Task", e -> openAddTaskDialog(project, timeZone)) {{
+                                            addThemeName("primary");
+                                            setVisible(canCreate);
+                                        }},
+                                        new Button() {{
+                                            getElement().appendChild(AppIcon.CLOSE.create().getElement()); // TODO Until we get an icon-only button variant for Aura
+                                            addClickListener(e -> getParentViewModel().selectedProjectId.value(null));
+                                        }})
+                        ) {{
+                            getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+                        }},
+                        createTaskListComponent(project, timeZone, canCreate, canUpdate, canDelete)
+                );
+                UI.getCurrent().getPage().setTitle("Project Tasks - " + project.data().name());
             }
         });
-    }
-
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails ->
-                timeZoneSignal.value(
-                        Optional.ofNullable(extendedClientDetails.getTimeZoneId())
-                                .map(ZoneId::of)
-                                .orElse(ZoneId.systemDefault())
-                ));
     }
 
     private List<EmployeeReference> findAssignees(Pageable pageable, @Nullable String searchTerm) {
         return employeeService.findReferencesByFilter(pageable, new EmployeeFilter(searchTerm, Set.of(EmploymentStatus.ACTIVE), Set.of()));
     }
 
-    private void addTask(Project project, ZoneId timeZone, SerializableRunnable refresh) {
-        var dialog = new AddTaskDialog(this::findAssignees, employeeService::findReferencesByIds, TaskData.createDefault(project.id(), timeZone), newTaskData -> {
-            taskService.insertTask(newTaskData);
-            refresh.run();
-            getProjectListView().ifPresent(view -> view.onProjectUpdated(newTaskData.project()));
-            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task created successfully").open();
-        });
-        dialog.open();
+    private void openAddTaskDialog(Project project, ZoneId timeZone) {
+        new AddTaskDialog(this::findAssignees, employeeService::findReferencesByIds, TaskData.createDefault(project.id(), timeZone), viewModel::addTask).open();
     }
 
-    private void editTask(Task task, SerializableRunnable refresh) {
-        var dialog = new EditTaskDialog(this::findAssignees, employeeService::findReferencesByIds, task, editedTask -> {
-            var saved = taskService.updateTask(editedTask);
-            refresh.run();
-            getProjectListView().ifPresent(view -> view.onProjectUpdated(saved.data().project()));
-            Notifications.createNonCriticalNotification(AppIcon.CHECK.create(AppIcon.Size.M, AppIcon.Color.GREEN), "Task updated successfully").open();
-        });
-        dialog.open();
+    private void openEditTaskDialog(Task task) {
+        new EditTaskDialog(this::findAssignees, employeeService::findReferencesByIds, task, viewModel::updateTask).open();
     }
 
-    private void deleteTask(Task task, SerializableRunnable refresh) {
-        var dialog = new ConfirmDialog("Delete Task", "Are you sure you want to delete this task?", "Delete", event -> {
-            taskService.deleteTask(task.id());
-            refresh.run();
-            getProjectListView().ifPresent(view -> view.onProjectUpdated(task.data().project()));
-            Notifications.createNonCriticalNotification(AppIcon.DELETE_SWEEP.create(AppIcon.Size.M, AppIcon.Color.RED), "Task deleted successfully").open();
-        }, "Cancel", event -> {
-        });
-        dialog.setConfirmButtonTheme("error primary");
-        dialog.open();
+    private void openDeleteTaskDialog(Task task) {
+        new ConfirmDialog(
+                "Delete Task", "Are you sure you want to delete this task?",
+                "Delete", e -> viewModel.deleteTask(task),
+                "Cancel", event -> { /* NOOP */ }) {{
+            setConfirmButtonTheme("error primary");
+        }}.open();
     }
 
-    private Optional<ProjectListView> getProjectListView() {
-        return getParent().filter(ProjectListView.class::isInstance).map(ProjectListView.class::cast);
+    private ProjectListView.ViewModel getParentViewModel() {
+        return getParent().filter(ProjectListView.class::isInstance).map(ProjectListView.class::cast).orElseThrow().viewModel;
     }
 
-    private class TaskList extends VerticalLayout {
+    private Component createTaskListComponent(Project project, ZoneId timeZone, boolean canCreate, boolean canUpdate, boolean canDelete) {
+        var dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
+        var timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocale());
+        // TODO I'm not sure what I feel about this style of creating views
+        return new VerticalLayout() {
+            {
+                add(
+                        new SectionToolbar(
+                                new TextField() {{
+                                    setPlaceholder("Search");
+                                    setPrefixComponent(AppIcon.SEARCH.create());
+                                    setValueChangeMode(ValueChangeMode.LAZY);
+                                    // TODO Workaround until we get bind support into the API:
+                                    addValueChangeListener(e -> viewModel.filter.update(old -> old.withSearchTerm(e.getValue())));
+                                    ComponentEffect.effect(this, () -> setValue(viewModel.filter.value().searchTerm()));
+                                }},
+                                createFilterMenu()) {{
+                            getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
+                        }},
+                        new Grid<Task>() {{
+                            setSelectionMode(Grid.SelectionMode.NONE);
+                            setDataProvider(viewModel.tasks);
+                            getLazyDataView().setItemCountUnknown(); // Because we don't provide a count callback
+                            addColumn(new ComponentRenderer<>(task -> createStatusBadge(task))).setHeader("Status").setWidth("150px")
+                                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.STATUS.name());
+                            addColumn(task -> task.data().description()).setHeader("Description").setFlexGrow(1)
+                                    .setSortProperty(TaskSortableProperty.DESCRIPTION.name());
+                            addColumn(new ComponentRenderer<>(task -> createDueDate(task)))
+                                    .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
+                                    .setWidth("200px").setFlexGrow(0).setSortProperty(TaskSortableProperty.DUE_DATE.name());
+                            addColumn(new ComponentRenderer<>(task -> createPriorityBadge(task))).setHeader("Priority").setWidth("150px")
+                                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.PRIORITY.name());
+                            addColumn(new ComponentRenderer<>(task -> createAssignees(task))).setHeader("Assignees");
+                            addColumn(new ComponentRenderer<>(task -> createActionMenu(task))).setTextAlign(ColumnTextAlign.END)
+                                    .setWidth("60px").setFlexGrow(0);
+                            var cardColumn = addColumn(new ComponentRenderer<>(task -> createTaskCard(task)));
+                            setEmptyStateComponent(createEmptyComponent(canCreate, project, timeZone));
+                            setSizeFull();
+                            createContextMenu(addContextMenu());
+                            addThemeName("no-border");
+                            // TODO We should get a product API for achieving something similar:
+                            var resizeObserver = new ResizeObserver(this);
+                            resizeObserver.addListener(e -> {
+                                boolean showCardView = e.width() < 800;
+                                cardColumn.setVisible(showCardView);
+                                getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!showCardView));
+                                if (showCardView) {
+                                    addClassName("card-view");
+                                    addThemeName("no-row-borders");
+                                } else {
+                                    removeClassName("card-view");
+                                    removeThemeName("no-row-borders");
+                                }
+                            });
+                        }}
+                );
+                setSizeFull();
+                setPadding(false);
+                setSpacing(false);
+            }
 
-        private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                .withLocale(getLocale());
-        private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-                .withLocale(getLocale());
-        private final Project project;
-        private final ZoneId timeZone;
-        private final Grid<Task> grid;
-        private final Grid.Column<Task> cardColumn;
-        private final ValueSignal<TaskFilter> filterSignal = new ValueSignal<>(TaskFilter.empty());
+            private Component createStatusBadge(Task task) {
+                var displayName = TaskStatusFormatter.ofLocale(getLocale()).getDisplayName(task.data().status());
+                return switch (task.data().status()) {
+                    case PENDING -> Badges.create(displayName);
+                    case PLANNED, IN_PROGRESS -> Badges.createBlue(displayName);
+                    case PAUSED -> Badges.createRed(displayName);
+                    case DONE -> Badges.createGreen(displayName);
+                };
+            }
 
-        TaskList(Project project, ZoneId timeZone) {
-            this.project = project;
-            this.timeZone = timeZone;
+            private Component createPriorityBadge(Task task) {
+                var displayName = TaskPriorityFormatter.ofLocale(getLocale()).getDisplayName(task.data().priority());
+                return switch (task.data().priority()) {
+                    case URGENT -> Badges.createRed(displayName);
+                    case HIGH -> Badges.createYellow(displayName);
+                    case NORMAL -> Badges.createBlue(displayName);
+                    case LOW -> Badges.createGreen(displayName);
+                };
+            }
 
-            var searchField = new TextField();
-            searchField.setPlaceholder("Search");
-            searchField.setPrefixComponent(AppIcon.SEARCH.create());
-            searchField.setValueChangeMode(ValueChangeMode.LAZY);
+            private Component createDueDate(Task task) {
+                var dueDateTime = task.data().dueDateTimeInZone(timeZone);
+                if (dueDateTime == null) {
+                    return Badges.create("Never");
+                }
 
-            var filterMenu = createFilterMenu();
+                return new Div(
+                        new Div(dateFormatter.format(dueDateTime)),
+                        new Div(timeFormatter.format(dueDateTime)) {{
+                            getStyle().setColor("var(--vaadin-text-color-secondary)");
+                        }}
+                );
+            }
 
-            grid = new Grid<>();
-            grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItems(query -> taskService.findTasks(project.id(), filterSignal.peek(),
-                    query.getLimit(), query.getOffset(),
-                    SortOrderUtil.toSortOrderList(TaskSortableProperty::valueOf, query.getSortOrders())));
-            grid.addThemeName("no-border");
-            grid.addColumn(new ComponentRenderer<>(this::createStatusBadge)).setHeader("Status").setWidth("150px")
-                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.STATUS.name());
-            grid.addColumn(task -> task.data().description()).setHeader("Description").setFlexGrow(1)
-                    .setSortProperty(TaskSortableProperty.DESCRIPTION.name());
-            grid.addColumn(new ComponentRenderer<>(this::createDueDate))
-                    .setHeader("Due Date (%s)".formatted(timeZone.getDisplayName(TextStyle.SHORT, getLocale())))
-                    .setWidth("200px").setFlexGrow(0).setSortProperty(TaskSortableProperty.DUE_DATE.name());
-            grid.addColumn(new ComponentRenderer<>(this::createPriorityBadge)).setHeader("Priority").setWidth("150px")
-                    .setFlexGrow(0).setSortProperty(TaskSortableProperty.PRIORITY.name());
-            grid.addColumn(new ComponentRenderer<>(this::createAssignees)).setHeader("Assignees");
-            grid.addColumn(new ComponentRenderer<>(this::createActionMenu)).setTextAlign(ColumnTextAlign.END)
-                    .setWidth("60px").setFlexGrow(0);
-            cardColumn = grid.addColumn(new ComponentRenderer<>(this::createTaskCard));
-            grid.setEmptyStateComponent(createEmptyComponent());
-            grid.setSizeFull();
-            createContextMenu(grid.addContextMenu());
+            private Component createAssignees(Task task) {
+                if (task.data().assignees().isEmpty()) {
+                    return Badges.create("None");
+                }
 
-            // Add listeners and effects
-            searchField.addValueChangeListener(event ->
-                    filterSignal.update(old -> old.withSearchTerm(event.getValue())));
+                var assignees = new AvatarGroup();
+                var nameFormatter = PersonNameFormatter.firstLast();
+                employeeService.findReferencesByIds(task.data().assignees()).stream()
+                        .map(assignee -> new AvatarGroup.AvatarGroupItem(nameFormatter.toFullName(assignee)))
+                        .forEach(assignees::add);
+                return assignees;
+            }
 
-            ComponentEffect.effect(this, () -> {
-                // Refresh the grid whenever the filter changes
-                filterSignal.value();
-                grid.getDataProvider().refreshAll();
-            });
+            private Component createActionMenu(Task task) {
+                var menuBar = new MenuBar();
+                menuBar.addThemeName("icon");
+                var item = menuBar.addItem(AppIcon.MORE_VERT.create());
+                var subMenu = item.getSubMenu();
+                if (canUpdate) {
+                    subMenu.addItem("Edit", e -> openEditTaskDialog(task));
+                }
+                if (canDelete) {
+                    var deleteItem = subMenu.addItem("Delete", e -> openDeleteTaskDialog(task));
+                    deleteItem.getStyle().setColor("var(--aura-red)");
+                }
+                return menuBar;
+            }
 
-            // Layout components
+            private Component createTaskCard(Task task) {
+                return new Card() {{
+                    setHeader(new HorizontalLayout(createStatusBadge(task), createPriorityBadge(task)));
+                    setHeaderSuffix(createActionMenu(task));
+                    add(task.data().description());
+                    addThemeName("outlined");
+                    var dueDateTime = task.data().dueDateTimeInZone(timeZone);
+                    if (dueDateTime != null) {
+                        add(
+                                new Div("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime))) {{
+                                    getStyle().setColor("var(--vaadin-text-color-secondary)");
+                                    getStyle().setPaddingTop("var(--vaadin-gap-m)");
+                                }});
+                    }
+                    addToFooter(createAssignees(task));
+                }};
+            }
+
+            private void createContextMenu(GridContextMenu<Task> contextMenu) {
+                if (canUpdate) {
+                    contextMenu.addItem("Edit", e -> e.getItem()
+                            .ifPresent(task -> openEditTaskDialog(task)));
+                }
+                if (canDelete) {
+                    var deleteItem = contextMenu.addItem("Delete", e -> e.getItem()
+                            .ifPresent(task -> openDeleteTaskDialog(task)));
+                    deleteItem.getStyle().setColor("var(--aura-red)");
+                }
+                // Don't show the menu unless opened on a row
+                contextMenu.setDynamicContentHandler(Objects::nonNull);
+            }
+
+            private Component createFilterMenu() {
+                var menuBar = new MenuBar();
+                var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
+                var subMenu = item.getSubMenu();
+
+                var statusFormatter = TaskStatusFormatter.ofLocale(getLocale());
+                for (var status : TaskStatus.values()) {
+                    subMenu.addItem(statusFormatter.getDisplayName(status), e -> {
+                        if (e.getSource().isChecked()) {
+                            viewModel.filter.update(old -> old.withStatus(status));
+                        } else {
+                            viewModel.filter.update(old -> old.withoutStatus(status));
+                        }
+                    }).setCheckable(true);
+                }
+                subMenu.addSeparator();
+                var priorityFormatter = TaskPriorityFormatter.ofLocale(getLocale());
+                for (var priority : TaskPriority.values()) {
+                    subMenu.addItem(priorityFormatter.getDisplayName(priority), e -> {
+                        if (e.getSource().isChecked()) {
+                            viewModel.filter.update(old -> old.withPriority(priority));
+                        } else {
+                            viewModel.filter.update(old -> old.withoutPriority(priority));
+                        }
+                    }).setCheckable(true);
+                }
+                return menuBar;
+            }
+        };
+    }
+
+    private Component createEmptyComponent(boolean canCreate, Project project, ZoneId timeZone) {
+        return new VerticalLayout(
+                AppIcon.LIST_ALT_CHECK.create(AppIcon.Size.XL),
+                new H4("No tasks found"),
+                new Span("Change the search criteria or add a task"),
+                new Button("Add Task", VaadinIcon.PLUS.create(), e -> openAddTaskDialog(project, timeZone)) {{
+                    addThemeName("tertiary");
+                    setVisible(canCreate);
+                }}
+        ) {{
             setSizeFull();
-            setPadding(false);
-            setSpacing(false);
-            var toolbar = new SectionToolbar(searchField, filterMenu);
-            toolbar.getStyle().setBorderBottom("1px solid var(--vaadin-border-color-secondary)");
-            add(toolbar, grid);
-
-            var resizeObserver = new ResizeObserver(this);
-            resizeObserver.addListener(this::adjustGridOnResize);
-        }
-
-        private void adjustGridOnResize(ResizeObserver.ResizeEvent resizeEvent) {
-            boolean showCardView = resizeEvent.width() < 800;
-            cardColumn.setVisible(showCardView);
-            grid.getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!showCardView));
-            if (showCardView) {
-                grid.addClassName("card-view");
-                grid.addThemeName("no-row-borders");
-            } else {
-                grid.removeClassName("card-view");
-                grid.removeThemeName("no-row-borders");
-            }
-        }
-
-        private Component createStatusBadge(Task task) {
-            var displayName = TaskStatusFormatter.ofLocale(getLocale()).getDisplayName(task.data().status());
-            return switch (task.data().status()) {
-                case PENDING -> Badges.create(displayName);
-                case PLANNED, IN_PROGRESS -> Badges.createBlue(displayName);
-                case PAUSED -> Badges.createRed(displayName);
-                case DONE -> Badges.createGreen(displayName);
-            };
-        }
-
-        private Component createPriorityBadge(Task task) {
-            var displayName = TaskPriorityFormatter.ofLocale(getLocale()).getDisplayName(task.data().priority());
-            return switch (task.data().priority()) {
-                case URGENT -> Badges.createRed(displayName);
-                case HIGH -> Badges.createYellow(displayName);
-                case NORMAL -> Badges.createBlue(displayName);
-                case LOW -> Badges.createGreen(displayName);
-            };
-        }
-
-        private Component createDueDate(Task task) {
-            var dueDateTime = task.data().dueDateTimeInZone(timeZone);
-            if (dueDateTime == null) {
-                return Badges.create("Never");
-            }
-
-            var dateDiv = new Div();
-            var date = new Div(dateFormatter.format(dueDateTime));
-            var time = new Div(timeFormatter.format(dueDateTime));
-            time.getStyle().setColor("var(--vaadin-text-color-secondary)");
-            dateDiv.add(date, time);
-            return dateDiv;
-        }
-
-        private Component createAssignees(Task task) {
-            if (task.data().assignees().isEmpty()) {
-                return Badges.create("None");
-            }
-
-            var assignees = new AvatarGroup();
-            var nameFormatter = PersonNameFormatter.firstLast();
-            employeeService.findReferencesByIds(task.data().assignees()).stream()
-                    .map(assignee -> new AvatarGroup.AvatarGroupItem(nameFormatter.toFullName(assignee)))
-                    .forEach(assignees::add);
-            return assignees;
-        }
-
-        private Component createActionMenu(Task task) {
-            var menuBar = new MenuBar();
-            menuBar.addThemeName("icon");
-            var item = menuBar.addItem(AppIcon.MORE_VERT.create());
-            var subMenu = item.getSubMenu();
-            if (canUpdate) {
-                subMenu.addItem("Edit", event -> editTask(task, grid.getDataProvider()::refreshAll));
-            }
-            if (canDelete) {
-                var deleteItem = subMenu.addItem("Delete", event -> deleteTask(task, grid.getDataProvider()::refreshAll));
-                deleteItem.getStyle().setColor("var(--aura-red)");
-            }
-            return menuBar;
-        }
-
-        private Component createTaskCard(Task task) {
-            var card = new Card();
-            card.addThemeName("outlined");
-
-            var header = new HorizontalLayout(createStatusBadge(task), createPriorityBadge(task));
-            card.setHeader(header);
-            card.setHeaderSuffix(createActionMenu(task));
-            card.add(task.data().description());
-            var dueDateTime = task.data().dueDateTimeInZone(timeZone);
-            if (dueDateTime != null) {
-                var dueDiv = new Div();
-                dueDiv.setText("Due on %s at %s".formatted(dateFormatter.format(dueDateTime), timeFormatter.format(dueDateTime)));
-                dueDiv.getStyle().setColor("var(--vaadin-text-color-secondary)");
-                dueDiv.getStyle().setPaddingTop("var(--vaadin-gap-m)");
-                card.add(dueDiv);
-            }
-            card.addToFooter(createAssignees(task));
-            return card;
-        }
-
-        private void createContextMenu(GridContextMenu<Task> contextMenu) {
-            if (canUpdate) {
-                contextMenu.addItem("Edit", event -> event.getItem()
-                        .ifPresent(task -> editTask(task, grid.getDataProvider()::refreshAll)));
-            }
-            if (canDelete) {
-                var deleteItem = contextMenu.addItem("Delete", event -> event.getItem()
-                        .ifPresent(task -> deleteTask(task, grid.getDataProvider()::refreshAll)));
-                deleteItem.getStyle().setColor("var(--aura-red)");
-            }
-            // Don't show the menu unless opened on a row
-            contextMenu.setDynamicContentHandler(Objects::nonNull);
-        }
-
-        private Component createFilterMenu() {
-            var menuBar = new MenuBar();
-            var item = menuBar.addItem(AppIcon.FILTER_LIST.create(), "Filters");
-            var subMenu = item.getSubMenu();
-
-            var statusFormatter = TaskStatusFormatter.ofLocale(getLocale());
-            for (var status : TaskStatus.values()) {
-                subMenu.addItem(statusFormatter.getDisplayName(status), event -> {
-                    if (event.getSource().isChecked()) {
-                        filterSignal.update(old -> old.withStatus(status));
-                    } else {
-                        filterSignal.update(old -> old.withoutStatus(status));
-                    }
-                }).setCheckable(true);
-            }
-            subMenu.addSeparator();
-            var priorityFormatter = TaskPriorityFormatter.ofLocale(getLocale());
-            for (var priority : TaskPriority.values()) {
-                subMenu.addItem(priorityFormatter.getDisplayName(priority), event -> {
-                    if (event.getSource().isChecked()) {
-                        filterSignal.update(old -> old.withPriority(priority));
-                    } else {
-                        filterSignal.update(old -> old.withoutPriority(priority));
-                    }
-                }).setCheckable(true);
-            }
-            return menuBar;
-        }
-
-        private Component createEmptyComponent() {
-            var icon = AppIcon.LIST_ALT_CHECK.create(AppIcon.Size.XL);
-            var title = new H4("No tasks found");
-            var instruction = new Span("Change the search criteria or add a task");
-
-            var addTask = new Button("Add Task", VaadinIcon.PLUS.create(), event -> addTask(project, timeZone, grid.getDataProvider()::refreshAll));
-            addTask.addThemeName("tertiary");
-
-            // TODO Add "Clear search criteria" button
-
-            var layout = new VerticalLayout();
-            layout.add(icon, title, instruction, addTask);
-            layout.setSizeFull();
-            layout.setAlignItems(Alignment.CENTER);
-            layout.setJustifyContentMode(JustifyContentMode.CENTER);
-            return layout;
-        }
-    }
-
-    @Override
-    public String getPageTitle() {
-        return "Project Tasks - " + Optional.ofNullable(projectSignal.value()).map(project -> project.data().name()).orElse("");
-    }
-
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        event.getRouteParameters()
-                .getLong(PARAM_PROJECT_ID)
-                .map(ProjectId::of)
-                .flatMap(taskService::findProjectById)
-                .ifPresentOrElse(projectSignal::value, ProjectsNavigation::navigateToProjectList);
+            setAlignItems(Alignment.CENTER);
+            setJustifyContentMode(JustifyContentMode.CENTER);
+        }};
     }
 }

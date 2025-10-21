@@ -149,7 +149,7 @@ class JooqTaskRepository implements TaskRepository {
     @Override
     public @NonNull Stream<Task> findByFilter(@NonNull ProjectId project, @NonNull TaskFilter filter, int limit, int offset, @NonNull List<SortOrder<TaskSortableProperty>> sortOrders) {
         Condition condition = DSL.trueCondition();
-        if (filter.searchTerm() != null && !filter.searchTerm().isBlank()) {
+        if (!filter.searchTerm().isBlank()) {
             condition = condition.and(TASK.DESCRIPTION.containsIgnoreCase(filter.searchTerm()));
         }
         if (!filter.statuses().isEmpty()) {

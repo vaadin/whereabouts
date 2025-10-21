@@ -8,7 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class SectionToolbar extends Composite<VerticalLayout> {
+public class SectionToolbar extends Composite<VerticalLayout> {
 
     public SectionToolbar(Component... components) {
         var layout = getContent();
