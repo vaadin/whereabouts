@@ -1,6 +1,13 @@
 @import 'aura/aura.css';
 @import 'badge.css';
 
+html {
+    /* Tweak your Aura theme here */
+    --aura-color-scheme: light dark;
+    --aura-content-color-scheme: light dark;
+    --aura-notification-color-scheme: light dark;
+}
+
 vaadin-master-detail-layout[orientation="horizontal"]::part(master) {
     border-right: 1px solid var(--vaadin-border-color-secondary);
 }
