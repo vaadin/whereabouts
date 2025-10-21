@@ -1,9 +1,12 @@
-package com.example.whereabouts.common.ui;
+package com.example.whereabouts;
 
+import com.example.whereabouts.common.ui.AppIcon;
+import com.example.whereabouts.security.UserPrincipal;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -21,6 +24,8 @@ import org.jspecify.annotations.NullMarked;
 @PermitAll
 @NullMarked
 public final class MainLayout extends AppLayout {
+
+    // TODO Which package should this layout really live in?
 
     MainLayout(AuthenticationContext authenticationContext) {
         setPrimarySection(Section.DRAWER);
@@ -56,6 +61,12 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createUserMenu(AuthenticationContext authenticationContext) {
-        return new UserMenu(authenticationContext);
+        var userMenu = new MenuBar();
+        var user = authenticationContext.getAuthenticatedUser(UserPrincipal.class).orElseThrow();
+
+        var userMenuItem = userMenu.addItem(user.getDisplayName());
+        userMenuItem.getSubMenu().addItem("Logout", event -> authenticationContext.logout());
+
+        return userMenu;
     }
 }

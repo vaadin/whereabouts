@@ -1,7 +1,7 @@
 package com.example.whereabouts.projects.ui;
 
+import com.example.whereabouts.MainLayout;
 import com.example.whereabouts.common.ui.AppIcon;
-import com.example.whereabouts.common.ui.MainLayout;
 import com.example.whereabouts.common.ui.SectionToolbar;
 import com.example.whereabouts.projects.ProjectId;
 import com.example.whereabouts.projects.ProjectListItem;

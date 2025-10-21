@@ -1,7 +1,7 @@
 package com.example.whereabouts.humanresources.ui;
 
+import com.example.whereabouts.MainLayout;
 import com.example.whereabouts.common.ui.AppIcon;
-import com.example.whereabouts.common.ui.MainLayout;
 import com.example.whereabouts.common.ui.SectionToolbar;
 import com.example.whereabouts.humanresources.*;
 import com.example.whereabouts.humanresources.Location;

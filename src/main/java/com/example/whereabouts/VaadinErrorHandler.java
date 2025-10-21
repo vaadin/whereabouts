@@ -1,5 +1,7 @@
-package com.example.whereabouts.common.ui;
+package com.example.whereabouts;
 
+import com.example.whereabouts.common.ui.AppIcon;
+import com.example.whereabouts.common.ui.Notifications;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import org.jspecify.annotations.NullMarked;
@@ -10,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @NullMarked
-class MainErrorHandler {
+class VaadinErrorHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(MainErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(VaadinErrorHandler.class);
 
     @Bean
     public VaadinServiceInitListener errorHandlerInitializer() {

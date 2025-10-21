@@ -30,6 +30,8 @@ class ArchitectureTest {
 
     @Test
     void verify_modulith_structure() {
-        ApplicationModules.of(Application.class).verify();
+        var modules = ApplicationModules.of(Application.class);
+        System.out.println(modules);
+        modules.verify();
     }
 }

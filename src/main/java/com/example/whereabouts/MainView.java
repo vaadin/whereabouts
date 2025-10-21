@@ -1,4 +1,4 @@
-package com.example.whereabouts.common.ui;
+package com.example.whereabouts;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
