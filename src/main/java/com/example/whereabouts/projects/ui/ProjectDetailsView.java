@@ -242,10 +242,8 @@ class ProjectDetailsView extends VerticalLayout {
                                 cardColumn.setVisible(showCardView);
                                 getColumns().stream().filter(c -> c != cardColumn).forEach(c -> c.setVisible(!showCardView));
                                 if (showCardView) {
-                                    addClassName("card-view");
                                     addThemeName("no-row-borders");
                                 } else {
-                                    removeClassName("card-view");
                                     removeThemeName("no-row-borders");
                                 }
                             });
