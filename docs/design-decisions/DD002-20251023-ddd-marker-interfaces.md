@@ -97,5 +97,5 @@ them throw `UnsupportedOperationException`. And I think having to throw an `Unsu
 symptom of a failed API design.
 
 And that is how `Repository` ended up an empty marker interface. I can use it in ArchUnit tests to make sure that e.g.
-all public repository methods are using the `@Transactional` interface, but I'm free to define (and implement) only
+all public repository methods are using the `@Transactional` annotation, but I'm free to define (and implement) only
 the repository methods I need for *every* repository.
