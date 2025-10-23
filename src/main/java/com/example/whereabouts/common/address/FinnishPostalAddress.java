@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
 /**
- * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ * @see "Design decision: DD003-20251023-value-objects-and-validation.md"
  */
 @NullMarked
 @JsonDeserialize

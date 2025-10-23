@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Value object representing an IP address (either IPv4 or IPv6).
  *
- * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ * @see "Design decision: DD003-20251023-value-objects-and-validation.md"
  */
 @NullMarked
 public sealed abstract class IpAddress implements ValueObject {
