@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ */
 @NullMarked
 public final class USZipCode implements ValueObject {
 

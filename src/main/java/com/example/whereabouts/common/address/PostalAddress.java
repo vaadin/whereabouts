@@ -5,6 +5,9 @@ import com.example.whereabouts.common.ValueObject;
 import org.jspecify.annotations.NullMarked;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
+/**
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ */
 @NullMarked
 @JsonDeserialize(using = JacksonPostalAddressDeserializer.class)
 public sealed interface PostalAddress extends ValueObject permits CanadianPostalAddress, FinnishPostalAddress,

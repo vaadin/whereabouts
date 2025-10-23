@@ -8,6 +8,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 
+/**
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ */
 public class ValueObjectStringConverter<T> implements Converter<String, T> {
 
     private final Function<String, T> factory;

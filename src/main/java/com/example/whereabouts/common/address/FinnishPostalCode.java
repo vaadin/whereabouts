@@ -10,6 +10,9 @@ import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ */
 @NullMarked
 public final class FinnishPostalCode implements ValueObject {
 

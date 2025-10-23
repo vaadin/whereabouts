@@ -5,6 +5,9 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
+/**
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
+ */
 @NullMarked
 @JsonDeserialize
 public record GermanPostalAddress(@Nullable String streetAddress, @Nullable GermanPostalCode postalCode,

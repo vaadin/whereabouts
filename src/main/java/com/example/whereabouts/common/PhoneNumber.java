@@ -11,6 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Value object representing a phone number.
+ *
+ * @see "Design decision: DD003-20241023-value-objects-and-validation.md"
  */
 @NullMarked
 public final class PhoneNumber implements ValueObject {
