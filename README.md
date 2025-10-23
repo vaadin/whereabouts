@@ -78,6 +78,15 @@ you'll hopefully see the code improve.
   changing passwords, granting and revoking access, and so on. For authorization, it uses quite fine-grained roles. In
   this area there is a lot of room for improvement (and alternative solutions).
 
+## Design Decisions
+
+Want to know why a certain thing looks like it looks? Check out the [Design Decision](docs/design-decisions) directory.
+It contains timestamped documents that explain the reasoning behind various design decisions. You might find links
+to them inside JavaDoc comments as well.
+
+Note the temporal nature of the design decisions - they were valid at the time they were written. As this application
+evolves, older design decisions will become outdated and overridden by new ones.
+
 ## Running the Application
 
 This application uses Testcontainers to start up PostgreSQL when running in development mode and in integration tests.
