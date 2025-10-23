@@ -1,4 +1,4 @@
-# Design Decision 001: Domain-Driven Design Marker Interfaces
+# Design Decision 002: Domain-Driven Design Marker Interfaces
 
 * Recorded: 2025-10-23
 * Recorded by: <petter@vaadin.com>
