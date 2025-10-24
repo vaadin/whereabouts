@@ -1,5 +1,7 @@
 # Whereabouts README
 
+![The Employees View](/docs/images/employees.png)
+
 _Whereabouts_ is an example application that demonstrates how to use Vaadin to build an enterprise application with
 the following tech stack:
 
@@ -30,6 +32,8 @@ a [pull request](https://github.com/vaadin/whereabouts/pulls)!
 
 ## A Work in Progress
 
+![The Projects View](/docs/images/projects.png)
+
 Whereabouts is not a finished application. Some features are missing, others only partially implemented. Some features
 are polished, others have rough edges. We want Whereabouts to become a collection of Vaadin best practices within this
 particular tech stack and fictional business use cases. As we gain new insights, you'll see the application evolve.
@@ -39,6 +43,8 @@ and creating [issues](https://github.com/vaadin/whereabouts/issues)
 and [pull requests](https://github.com/vaadin/whereabouts/pulls)!
 
 ## Dogfooding
+
+![The Locations View](/docs/images/locations.png)
 
 Whereabouts is also about "eating our own dogfood". When exploring the source code, you'll notice some things are more
 difficult to implement than you'd expect, or that you have to manually build some things that you'd expect would be
