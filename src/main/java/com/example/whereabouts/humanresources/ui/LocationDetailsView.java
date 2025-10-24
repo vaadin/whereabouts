@@ -30,6 +30,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
 
+/**
+ * @see "Design decision: DD008-20251024-master-detail.md"
+ */
 @Route(value = "locations/:locationId", layout = LocationListView.class)
 @RolesAllowed(AppRoles.LOCATION_READ)
 class LocationDetailsView extends VerticalLayout implements AfterNavigationObserver, HasDynamicTitle {

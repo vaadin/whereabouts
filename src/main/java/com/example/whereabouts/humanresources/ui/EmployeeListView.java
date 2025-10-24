@@ -28,6 +28,9 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+/**
+ * @see "Design decision: DD008-20251024-master-detail.md"
+ */
 @ParentLayout(MainLayout.class)
 @Route(value = "employees", layout = MainLayout.class)
 @PageTitle("Employees")

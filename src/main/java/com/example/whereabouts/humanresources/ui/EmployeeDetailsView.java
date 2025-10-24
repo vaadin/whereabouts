@@ -24,6 +24,9 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * @see "Design decision: DD008-20251024-master-detail.md"
+ */
 @Route(value = "employees/:employeeId", layout = EmployeeListView.class)
 @RolesAllowed(AppRoles.EMPLOYEE_READ)
 class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObserver, BeforeLeaveObserver, HasDynamicTitle {

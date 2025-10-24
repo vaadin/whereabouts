@@ -24,6 +24,9 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.util.stream.Stream;
 
+/**
+ * @see "Design decision: DD008-20251024-master-detail.md"
+ */
 @ParentLayout(MainLayout.class)
 @Route(value = "locations", layout = MainLayout.class)
 @PageTitle("Locations")
