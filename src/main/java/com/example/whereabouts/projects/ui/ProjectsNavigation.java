@@ -4,6 +4,9 @@ import com.example.whereabouts.projects.ProjectId;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.RouteParam;
 
+/**
+ * @see "Design decision: DD007-20251024-navigation-patterns.md"
+ */
 public final class ProjectsNavigation {
 
     private ProjectsNavigation() {
