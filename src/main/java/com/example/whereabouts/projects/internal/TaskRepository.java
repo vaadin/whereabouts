@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public interface TaskRepository extends Repository {
 

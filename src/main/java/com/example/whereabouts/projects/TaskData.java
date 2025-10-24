@@ -12,6 +12,9 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public record TaskData(
         ProjectId project,

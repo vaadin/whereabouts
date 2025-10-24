@@ -5,6 +5,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public record Task(TaskId id, long version, TaskData data) implements Entity<TaskId> {
 

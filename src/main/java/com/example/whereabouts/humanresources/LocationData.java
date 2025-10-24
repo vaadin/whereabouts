@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public record LocationData(String name, LocationType locationType, PostalAddress address, LocalDate established,
                            String about, ZoneId timeZone, Collection<LocationFacility> facilities

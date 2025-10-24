@@ -9,6 +9,7 @@ import java.io.Serializable;
  *
  * @param <ID> the type of identifier used by this entity
  * @see "Design decision: DD002-20251023-ddd-marker-interfaces.md"
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
  */
 @NullMarked
 public interface Entity<ID extends Identifier> extends Serializable {

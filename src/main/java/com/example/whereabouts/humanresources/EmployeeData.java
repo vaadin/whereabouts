@@ -11,6 +11,9 @@ import org.jspecify.annotations.Nullable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public record EmployeeData(
         String firstName,

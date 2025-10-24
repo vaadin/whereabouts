@@ -8,6 +8,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public interface LocationRepository extends Repository {
 

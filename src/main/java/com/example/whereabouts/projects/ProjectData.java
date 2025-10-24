@@ -4,6 +4,9 @@ import com.example.whereabouts.common.ValueObject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * @see "Design decision: DD005-20251024-records-as-entities.md"
+ */
 @NullMarked
 public record ProjectData(
         String name,
