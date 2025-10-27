@@ -262,7 +262,7 @@ class LocationDetailsView extends VerticalLayout implements AfterNavigationObser
     public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
         afterNavigationEvent.getRouteParameters()
                 .getLong(PARAM_LOCATION_ID)
-                .map(LocationId::of)
+                .map(LocationId::new)
                 .flatMap(locationService::findById)
                 .ifPresentOrElse(locationSignal::value, HumanResourcesNavigation::navigateToLocationList);
     }

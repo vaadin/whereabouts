@@ -65,11 +65,11 @@ final class JooqConverters {
     );
 
     public static final Converter<Long, LocationId> locationIdConverter = Converter.ofNullable(
-            Long.class, LocationId.class, LocationId::of, LocationId::toLong
+            Long.class, LocationId.class, LocationId::new, LocationId::value
     );
 
     public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
-            Long.class, EmployeeId.class, EmployeeId::of, EmployeeId::toLong
+            Long.class, EmployeeId.class, EmployeeId::new, EmployeeId::value
     );
 
     public static final Converter<String, Country> countryConverter = Converter.ofNullable(

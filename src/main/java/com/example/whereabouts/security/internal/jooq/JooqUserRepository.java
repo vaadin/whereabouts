@@ -32,9 +32,9 @@ class JooqUserRepository implements UserRepository {
     @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public UserId insert(String username, @Nullable String password, String displayName, Set<String> roles) {
-        var id = UserId.of(dsl.nextval(APP_USER_ID_SEQ));
+        var id = new UserId(dsl.nextval(APP_USER_ID_SEQ));
         dsl.insertInto(APP_USER)
-                .set(APP_USER.USER_ID, id.toLong())
+                .set(APP_USER.USER_ID, id.value())
                 .set(APP_USER.VERSION, 1L)
                 .set(APP_USER.USERNAME, username)
                 .set(APP_USER.ENCODED_PASSWORD, password)
@@ -54,7 +54,7 @@ class JooqUserRepository implements UserRepository {
         var batch = roles.stream()
                 .map(role -> {
                     var record = dsl.newRecord(APP_USER_ROLE);
-                    record.setUserId(userId.toLong());
+                    record.setUserId(userId.value());
                     record.setRoleName(role);
                     return record;
                 })
@@ -82,7 +82,7 @@ class JooqUserRepository implements UserRepository {
                 .from(APP_USER)
                 .where(APP_USER.USERNAME.eq(username))
                 .fetchOptional(record -> new User(
-                        UserId.of(record.getValue(APP_USER.USER_ID)),
+                        new UserId(record.getValue(APP_USER.USER_ID)),
                         record.getValue(APP_USER.VERSION),
                         record.getValue(APP_USER.USERNAME),
                         record.getValue(APP_USER.ENCODED_PASSWORD),

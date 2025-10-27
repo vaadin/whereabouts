@@ -62,7 +62,7 @@ class EmployeeListView extends MasterDetailLayout implements AfterNavigationObse
     public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
         afterNavigationEvent.getRouteParameters()
                 .getLong(EmployeeDetailsView.PARAM_EMPLOYEE_ID)
-                .map(EmployeeId::of)
+                .map(EmployeeId::new)
                 .flatMap(employeeService::findReferenceById)
                 .ifPresentOrElse(employeeList.grid::select, employeeList.grid::deselectAll);
     }

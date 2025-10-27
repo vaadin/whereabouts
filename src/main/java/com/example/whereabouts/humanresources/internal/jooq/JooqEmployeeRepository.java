@@ -55,9 +55,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         WORK_EMAIL
                 )
                 .from(EMPLOYEE)
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(id.toLong()))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(id.value()))
                 .fetchOptional(record -> new Employee(
-                        EmployeeId.of(record.getValue(EMPLOYEE.EMPLOYEE_ID)),
+                        new EmployeeId(record.getValue(EMPLOYEE.EMPLOYEE_ID)),
                         record.getValue(EMPLOYEE.VERSION),
                         new EmployeeData(
                                 record.getValue(EMPLOYEE.FIRST_NAME),
@@ -80,9 +80,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
     @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public EmployeeId insert(EmployeeData employeeData) {
-        var id = EmployeeId.of(dsl.nextval(EMPLOYEE_ID_SEQ));
+        var id = new EmployeeId(dsl.nextval(EMPLOYEE_ID_SEQ));
         dsl.insertInto(EMPLOYEE)
-                .set(EMPLOYEE.EMPLOYEE_ID, id.toLong())
+                .set(EMPLOYEE.EMPLOYEE_ID, id.value())
                 .set(EMPLOYEE.VERSION, 1L)
                 .set(EMPLOYEE.FIRST_NAME, employeeData.firstName())
                 .set(EMPLOYEE.MIDDLE_NAME, employeeData.middleName())
@@ -121,7 +121,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employee.data().mobilePhone()))
                 .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employee.data().homePhone()))
                 .set(EMPLOYEE.WORK_EMAIL, emailConverter.to(employee.data().workEmail()))
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id().toLong()).and(EMPLOYEE.VERSION.eq(employee.version())))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id().value()).and(EMPLOYEE.VERSION.eq(employee.version())))
                 .execute();
 
         if (rowsUpdated == 0) {

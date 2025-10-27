@@ -274,7 +274,7 @@ class EmployeeDetailsView extends VerticalLayout implements AfterNavigationObser
         editModeSignal.value(false);
         afterNavigationEvent.getRouteParameters()
                 .getLong(PARAM_EMPLOYEE_ID)
-                .map(EmployeeId::of)
+                .map(EmployeeId::new)
                 .flatMap(employeeService::findById)
                 .ifPresentOrElse(employeeSignal::value, HumanResourcesNavigation::navigateToEmployeeList);
     }

@@ -44,14 +44,14 @@ final class JooqConverters {
     );
 
     public static final Converter<Long, TaskId> taskIdConverter = Converter.ofNullable(
-            Long.class, TaskId.class, TaskId::of, TaskId::toLong
+            Long.class, TaskId.class, TaskId::new, TaskId::value
     );
 
     public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
-            Long.class, EmployeeId.class, EmployeeId::of, EmployeeId::toLong
+            Long.class, EmployeeId.class, EmployeeId::new, EmployeeId::value
     );
 
     public static final Converter<Long, ProjectId> projectIdConverter = Converter.ofNullable(
-            Long.class, ProjectId.class, ProjectId::of, ProjectId::toLong
+            Long.class, ProjectId.class, ProjectId::new, ProjectId::value
     );
 }

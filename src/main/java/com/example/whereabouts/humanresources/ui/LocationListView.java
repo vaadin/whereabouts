@@ -55,7 +55,7 @@ class LocationListView extends MasterDetailLayout implements AfterNavigationObse
     public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
         afterNavigationEvent.getRouteParameters()
                 .getLong(LocationDetailsView.PARAM_LOCATION_ID)
-                .map(LocationId::of)
+                .map(LocationId::new)
                 .flatMap(locationService::findLocationNodeById)
                 .ifPresentOrElse(locationList.grid::select, locationList.grid::deselectAll);
     }

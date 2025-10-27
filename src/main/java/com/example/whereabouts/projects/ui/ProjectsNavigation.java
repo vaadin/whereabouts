@@ -17,6 +17,6 @@ public final class ProjectsNavigation {
     }
 
     public static void navigateToProjectDetails(ProjectId id) {
-        UI.getCurrent().navigate(ProjectDetailsView.class, new RouteParam(ProjectDetailsView.PARAM_PROJECT_ID, id.toLong()));
+        UI.getCurrent().navigate(ProjectDetailsView.class, new RouteParam(ProjectDetailsView.PARAM_PROJECT_ID, id.value()));
     }
 }

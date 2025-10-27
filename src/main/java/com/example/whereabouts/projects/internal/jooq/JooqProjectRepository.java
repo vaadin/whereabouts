@@ -35,9 +35,9 @@ class JooqProjectRepository implements ProjectRepository {
                         PROJECT.DESCRIPTION
                 )
                 .from(PROJECT)
-                .where(PROJECT.PROJECT_ID.eq(id.toLong()))
+                .where(PROJECT.PROJECT_ID.eq(id.value()))
                 .fetchOptional(record -> new Project(
-                        ProjectId.of(record.getValue(PROJECT.PROJECT_ID)),
+                        new ProjectId(record.getValue(PROJECT.PROJECT_ID)),
                         record.getValue(PROJECT.VERSION),
                         new ProjectData(
                                 record.getValue(PROJECT.NAME),
@@ -49,9 +49,9 @@ class JooqProjectRepository implements ProjectRepository {
     @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public ProjectId insert(ProjectData data) {
-        var id = ProjectId.of(dsl.nextval(PROJECT_ID_SEQ));
+        var id = new ProjectId(dsl.nextval(PROJECT_ID_SEQ));
         dsl.insertInto(PROJECT)
-                .set(PROJECT.PROJECT_ID, id.toLong())
+                .set(PROJECT.PROJECT_ID, id.value())
                 .set(PROJECT.VERSION, 1L)
                 .set(PROJECT.NAME, data.name())
                 .set(PROJECT.DESCRIPTION, data.description())

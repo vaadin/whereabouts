@@ -111,7 +111,7 @@ class ProjectListView extends MasterDetailLayout implements AfterNavigationObser
     public void afterNavigation(AfterNavigationEvent event) {
         viewModel.selectedProjectId.value(event.getRouteParameters()
                 .getLong(ProjectDetailsView.PARAM_PROJECT_ID)
-                .map(ProjectId::of)
+                .map(ProjectId::new)
                 .orElse(null));
     }
 

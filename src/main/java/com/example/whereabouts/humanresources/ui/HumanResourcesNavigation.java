@@ -14,7 +14,7 @@ public final class HumanResourcesNavigation {
     }
 
     public static void navigateToEmployeeDetails(EmployeeId id) {
-        UI.getCurrent().navigate(EmployeeDetailsView.class, new RouteParam(EmployeeDetailsView.PARAM_EMPLOYEE_ID, id.toLong()));
+        UI.getCurrent().navigate(EmployeeDetailsView.class, new RouteParam(EmployeeDetailsView.PARAM_EMPLOYEE_ID, id.value()));
     }
 
     public static void navigateToEmployeeList() {
@@ -22,7 +22,7 @@ public final class HumanResourcesNavigation {
     }
 
     public static void navigateToLocationDetails(LocationId id) {
-        UI.getCurrent().navigate(LocationDetailsView.class, new RouteParam(LocationDetailsView.PARAM_LOCATION_ID, id.toLong()));
+        UI.getCurrent().navigate(LocationDetailsView.class, new RouteParam(LocationDetailsView.PARAM_LOCATION_ID, id.value()));
     }
 
     public static void navigateToLocationList() {

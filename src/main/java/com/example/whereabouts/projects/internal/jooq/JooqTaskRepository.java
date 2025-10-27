@@ -50,7 +50,7 @@ class JooqTaskRepository implements TaskRepository {
     @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public @NonNull TaskId insert(@NonNull TaskData data) {
-        var id = TaskId.of(dsl.nextval(TASK_ID_SEQ));
+        var id = new TaskId(dsl.nextval(TASK_ID_SEQ));
         dsl.insertInto(TASK)
                 .set(TASK_ID, id)
                 .set(TASK.VERSION, 1L)
