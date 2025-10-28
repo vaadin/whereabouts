@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.*;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.postalAddressConverter;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.zoneIdConverter;
 import static com.example.whereabouts.jooq.Sequences.EMPLOYEE_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 
@@ -32,9 +33,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
     public Optional<Employee> findById(EmployeeId id) {
         var HOME_ADDRESS = EMPLOYEE.HOME_ADDRESS.convert(postalAddressConverter);
         var TIME_ZONE = EMPLOYEE.TIME_ZONE.convert(zoneIdConverter);
-        var WORK_PHONE = EMPLOYEE.WORK_PHONE.convert(phoneNumberConverter);
-        var MOBILE_PHONE = EMPLOYEE.MOBILE_PHONE.convert(phoneNumberConverter);
-        var HOME_PHONE = EMPLOYEE.HOME_PHONE.convert(phoneNumberConverter);
         return dsl
                 .select(EMPLOYEE.EMPLOYEE_ID,
                         EMPLOYEE.VERSION,
@@ -47,9 +45,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         EMPLOYEE.DIETARY_NOTES,
                         TIME_ZONE,
                         HOME_ADDRESS,
-                        WORK_PHONE,
-                        MOBILE_PHONE,
-                        HOME_PHONE,
+                        EMPLOYEE.WORK_PHONE,
+                        EMPLOYEE.MOBILE_PHONE,
+                        EMPLOYEE.HOME_PHONE,
                         EMPLOYEE.WORK_EMAIL
                 )
                 .from(EMPLOYEE)
@@ -67,9 +65,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                                 record.getValue(EMPLOYEE.DIETARY_NOTES),
                                 record.getValue(TIME_ZONE),
                                 record.getValue(HOME_ADDRESS),
-                                record.getValue(WORK_PHONE),
-                                record.getValue(MOBILE_PHONE),
-                                record.getValue(HOME_PHONE),
+                                record.getValue(EMPLOYEE.WORK_PHONE),
+                                record.getValue(EMPLOYEE.MOBILE_PHONE),
+                                record.getValue(EMPLOYEE.HOME_PHONE),
                                 record.getValue(EMPLOYEE.WORK_EMAIL)
                         )
                 ));
@@ -92,9 +90,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employeeData.timeZone()))
                 .set(EMPLOYEE.COUNTRY, employeeData.homeAddress().country())
                 .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employeeData.homeAddress()))
-                .set(EMPLOYEE.WORK_PHONE, phoneNumberConverter.to(employeeData.workPhone()))
-                .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employeeData.mobilePhone()))
-                .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employeeData.homePhone()))
+                .set(EMPLOYEE.WORK_PHONE, employeeData.workPhone())
+                .set(EMPLOYEE.MOBILE_PHONE, employeeData.mobilePhone())
+                .set(EMPLOYEE.HOME_PHONE, employeeData.homePhone())
                 .set(EMPLOYEE.WORK_EMAIL, employeeData.workEmail())
                 .execute();
         return id;
@@ -115,9 +113,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.DIETARY_NOTES, employee.data().dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employee.data().timeZone()))
                 .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employee.data().homeAddress()))
-                .set(EMPLOYEE.WORK_PHONE, phoneNumberConverter.to(employee.data().workPhone()))
-                .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employee.data().mobilePhone()))
-                .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employee.data().homePhone()))
+                .set(EMPLOYEE.WORK_PHONE, employee.data().workPhone())
+                .set(EMPLOYEE.MOBILE_PHONE, employee.data().mobilePhone())
+                .set(EMPLOYEE.HOME_PHONE, employee.data().homePhone())
                 .set(EMPLOYEE.WORK_EMAIL, employee.data().workEmail())
                 .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id()).and(EMPLOYEE.VERSION.eq(employee.version())))
                 .execute();

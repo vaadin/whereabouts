@@ -240,6 +240,14 @@
                                                 </converter>
                                                 <includeExpression>^location_type$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.PhoneNumber
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.PhoneNumberConverter
+                                                </converter>
+                                                <includeExpression>^.*phone$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
