@@ -3,10 +3,8 @@ package com.example.whereabouts.humanresources.internal.jooq;
 import com.example.whereabouts.humanresources.EmployeeId;
 import com.example.whereabouts.humanresources.EmploymentDetails;
 import com.example.whereabouts.humanresources.EmploymentDetailsData;
-import com.example.whereabouts.humanresources.WorkArrangement;
 import com.example.whereabouts.humanresources.internal.EmploymentDetailsRepository;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jspecify.annotations.NonNull;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
@@ -15,13 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.workArrangementConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
 @Component
 class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 
-    private static final Field<WorkArrangement> WORK_ARRANGEMENT = EMPLOYMENT_DETAILS.WORK_ARRANGEMENT.convert(workArrangementConverter);
     private final DSLContext dsl;
 
     JooqEmploymentDetailsRepository(@NonNull DSLContext dsl) {
@@ -37,7 +33,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                         EMPLOYMENT_DETAILS.JOB_TITLE,
                         EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE,
                         EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS,
-                        WORK_ARRANGEMENT,
+                        EMPLOYMENT_DETAILS.WORK_ARRANGEMENT,
                         EMPLOYMENT_DETAILS.LOCATION_ID,
                         EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID,
                         EMPLOYMENT_DETAILS.HIRE_DATE,
@@ -52,7 +48,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                                 record.getValue(EMPLOYMENT_DETAILS.JOB_TITLE),
                                 record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE),
                                 record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS),
-                                record.getValue(WORK_ARRANGEMENT),
+                                record.getValue(EMPLOYMENT_DETAILS.WORK_ARRANGEMENT),
                                 record.getValue(EMPLOYMENT_DETAILS.LOCATION_ID),
                                 record.getValue(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID),
                                 record.getValue(EMPLOYMENT_DETAILS.HIRE_DATE),
@@ -70,7 +66,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.JOB_TITLE, data.jobTitle())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, data.type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, data.status())
-                .set(WORK_ARRANGEMENT, data.workArrangement())
+                .set(EMPLOYMENT_DETAILS.WORK_ARRANGEMENT, data.workArrangement())
                 .set(EMPLOYMENT_DETAILS.LOCATION_ID, data.location())
                 .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, data.manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, data.hireDate())
@@ -88,7 +84,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.JOB_TITLE, employmentDetails.data().jobTitle())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, employmentDetails.data().type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, employmentDetails.data().status())
-                .set(WORK_ARRANGEMENT, employmentDetails.data().workArrangement())
+                .set(EMPLOYMENT_DETAILS.WORK_ARRANGEMENT, employmentDetails.data().workArrangement())
                 .set(EMPLOYMENT_DETAILS.LOCATION_ID, employmentDetails.data().location())
                 .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, employmentDetails.data().manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, employmentDetails.data().hireDate())

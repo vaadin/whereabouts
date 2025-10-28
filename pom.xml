@@ -288,6 +288,14 @@
                                                 </converter>
                                                 <includeExpression>^task_status$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.WorkArrangement
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.WorkArrangementConverter
+                                                </converter>
+                                                <includeExpression>^work_arrangement$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
