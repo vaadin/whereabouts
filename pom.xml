@@ -188,6 +188,12 @@
                                                 </converter>
                                                 <includeExpression>^country$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.EmailAddress</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.EmailConverter
+                                                </converter>
+                                                <includeExpression>^.*email$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

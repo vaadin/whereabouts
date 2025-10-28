@@ -36,7 +36,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
         var WORK_PHONE = EMPLOYEE.WORK_PHONE.convert(phoneNumberConverter);
         var MOBILE_PHONE = EMPLOYEE.MOBILE_PHONE.convert(phoneNumberConverter);
         var HOME_PHONE = EMPLOYEE.HOME_PHONE.convert(phoneNumberConverter);
-        var WORK_EMAIL = EMPLOYEE.WORK_EMAIL.convert(emailConverter);
         return dsl
                 .select(EMPLOYEE.EMPLOYEE_ID,
                         EMPLOYEE.VERSION,
@@ -52,7 +51,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         WORK_PHONE,
                         MOBILE_PHONE,
                         HOME_PHONE,
-                        WORK_EMAIL
+                        EMPLOYEE.WORK_EMAIL
                 )
                 .from(EMPLOYEE)
                 .where(EMPLOYEE.EMPLOYEE_ID.eq(id.value()))
@@ -72,7 +71,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                                 record.getValue(WORK_PHONE),
                                 record.getValue(MOBILE_PHONE),
                                 record.getValue(HOME_PHONE),
-                                record.getValue(WORK_EMAIL)
+                                record.getValue(EMPLOYEE.WORK_EMAIL)
                         )
                 ));
     }
@@ -97,7 +96,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.WORK_PHONE, phoneNumberConverter.to(employeeData.workPhone()))
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employeeData.mobilePhone()))
                 .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employeeData.homePhone()))
-                .set(EMPLOYEE.WORK_EMAIL, emailConverter.to(employeeData.workEmail()))
+                .set(EMPLOYEE.WORK_EMAIL, employeeData.workEmail())
                 .execute();
         return id;
     }
@@ -120,7 +119,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.WORK_PHONE, phoneNumberConverter.to(employee.data().workPhone()))
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employee.data().mobilePhone()))
                 .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employee.data().homePhone()))
-                .set(EMPLOYEE.WORK_EMAIL, emailConverter.to(employee.data().workEmail()))
+                .set(EMPLOYEE.WORK_EMAIL, employee.data().workEmail())
                 .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id().value()).and(EMPLOYEE.VERSION.eq(employee.version())))
                 .execute();
 
