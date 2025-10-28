@@ -1,8 +1,8 @@
 package com.example.whereabouts.humanresources;
 
-import com.example.whereabouts.humanresources.internal.LocationReferenceQuery;
-import com.example.whereabouts.humanresources.internal.LocationRepository;
-import com.example.whereabouts.humanresources.internal.LocationTreeNodeQuery;
+import com.example.whereabouts.humanresources.query.LocationReferenceQuery;
+import com.example.whereabouts.humanresources.query.LocationTreeNodeQuery;
+import com.example.whereabouts.humanresources.repository.LocationRepository;
 import com.example.whereabouts.security.AppRoles;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

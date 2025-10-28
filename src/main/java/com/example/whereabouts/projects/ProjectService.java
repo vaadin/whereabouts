@@ -1,7 +1,7 @@
 package com.example.whereabouts.projects;
 
-import com.example.whereabouts.projects.internal.ProjectQuery;
-import com.example.whereabouts.projects.internal.ProjectRepository;
+import com.example.whereabouts.projects.query.ProjectQuery;
+import com.example.whereabouts.projects.repository.ProjectRepository;
 import com.example.whereabouts.security.AppRoles;
 import com.vaadin.flow.data.provider.SortOrder;
 import org.jspecify.annotations.NullMarked;

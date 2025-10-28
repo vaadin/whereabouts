@@ -1,6 +1,6 @@
 package com.example.whereabouts.security;
 
-import com.example.whereabouts.security.internal.UserRepository;
+import com.example.whereabouts.security.repository.UserRepository;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
