@@ -296,6 +296,14 @@
                                                 </converter>
                                                 <includeExpression>^work_arrangement$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>java.time.ZonedDateTime
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ZonedDateTimeConverter
+                                                </converter>
+                                                <includeExpression>^.*date_time$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
