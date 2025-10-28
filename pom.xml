@@ -254,7 +254,15 @@
                                                 <converter>
                                                     com.example.whereabouts.jooq.converters.PostalAddressConverter
                                                 </converter>
-                                                <includeExpression>^.*postal_address</includeExpression>
+                                                <includeExpression>^.*postal_address$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.ProjectId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ProjectIdConverter
+                                                </converter>
+                                                <includeExpression>^.*project_id$</includeExpression>
                                             </forcedType>
                                         </forcedTypes>
                                     </database>

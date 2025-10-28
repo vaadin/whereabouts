@@ -52,14 +52,14 @@ class JooqProjectQuery implements ProjectQuery {
     @Override
     public Optional<ProjectListItem> findProjectListItemById(ProjectId id) {
         return selectProject()
-                .where(PROJECT.PROJECT_ID.eq(id.value()))
+                .where(PROJECT.PROJECT_ID.eq(id))
                 .groupBy(PROJECT.PROJECT_ID, PROJECT.NAME)
                 .fetchOptional(Records.mapping(ProjectListItem::new));
     }
 
     private SelectOnConditionStep<Record5<ProjectId, String, String, Integer, Integer>> selectProject() {
         return dsl.select(
-                        PROJECT.PROJECT_ID.convertFrom(ProjectId::new),
+                        PROJECT.PROJECT_ID,
                         PROJECT.NAME,
                         PROJECT.DESCRIPTION,
                         DSL.countDistinct(TASK),

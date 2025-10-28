@@ -31,7 +31,6 @@ class JooqTaskRepository implements TaskRepository {
 
     private static final Field<TaskId> ASSIGNEE_TASK_ID = TASK_ASSIGNEE.TASK_ID.convert(taskIdConverter);
     private static final Field<TaskId> TASK_ID = TASK.TASK_ID.convert(taskIdConverter);
-    private static final Field<ProjectId> PROJECT_ID = TASK.PROJECT_ID.convert(projectIdConverter);
     private static final Field<Result<Record1<EmployeeId>>> ASSIGNEES = DSL.multiset(
             DSL.select(TASK_ASSIGNEE.EMPLOYEE_ID).from(TASK_ASSIGNEE).where(TASK_ASSIGNEE.TASK_ID.eq(TASK.TASK_ID))
     );
@@ -53,7 +52,7 @@ class JooqTaskRepository implements TaskRepository {
         dsl.insertInto(TASK)
                 .set(TASK_ID, id)
                 .set(TASK.VERSION, 1L)
-                .set(PROJECT_ID, data.project())
+                .set(TASK.PROJECT_ID, data.project())
                 .set(TASK.DESCRIPTION, data.description())
                 .set(TASK.DUE_DATE, data.dueDate())
                 .set(TASK.DUE_TIME, data.dueTime())
@@ -72,7 +71,7 @@ class JooqTaskRepository implements TaskRepository {
         var newVersion = task.version() + 1;
         var rowsUpdated = dsl.update(TASK)
                 .set(TASK.VERSION, newVersion)
-                .set(PROJECT_ID, task.data().project())
+                .set(TASK.PROJECT_ID, task.data().project())
                 .set(TASK.DESCRIPTION, task.data().description())
                 .set(TASK.DUE_DATE, task.data().dueDate())
                 .set(TASK.DUE_TIME, task.data().dueTime())
@@ -130,7 +129,7 @@ class JooqTaskRepository implements TaskRepository {
         return dsl
                 .select(TASK_ID,
                         TASK.VERSION,
-                        PROJECT_ID,
+                        TASK.PROJECT_ID,
                         TASK.DESCRIPTION,
                         TASK.DUE_DATE,
                         TASK.DUE_TIME,
@@ -160,7 +159,7 @@ class JooqTaskRepository implements TaskRepository {
         return dsl
                 .select(TASK_ID,
                         TASK.VERSION,
-                        PROJECT_ID,
+                        TASK.PROJECT_ID,
                         TASK.DESCRIPTION,
                         TASK.DUE_DATE,
                         TASK.DUE_TIME,
@@ -170,7 +169,7 @@ class JooqTaskRepository implements TaskRepository {
                         ASSIGNEES
                 )
                 .from(TASK)
-                .where(PROJECT_ID.eq(project))
+                .where(TASK.PROJECT_ID.eq(project))
                 .and(condition)
                 .orderBy(sortOrders.stream().map(this::toOrderField).toList())
                 .limit(limit)
@@ -188,7 +187,7 @@ class JooqTaskRepository implements TaskRepository {
 
     private @NonNull TaskData toTaskData(@NonNull Record record) {
         return new TaskData(
-                record.getValue(PROJECT_ID),
+                record.getValue(TASK.PROJECT_ID),
                 record.getValue(TASK.DESCRIPTION),
                 record.getValue(TASK.DUE_DATE),
                 record.getValue(TASK.DUE_TIME),
