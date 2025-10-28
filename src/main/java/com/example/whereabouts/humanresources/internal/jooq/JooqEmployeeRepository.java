@@ -54,9 +54,9 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         EMPLOYEE.WORK_EMAIL
                 )
                 .from(EMPLOYEE)
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(id.value()))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(id))
                 .fetchOptional(record -> new Employee(
-                        new EmployeeId(record.getValue(EMPLOYEE.EMPLOYEE_ID)),
+                        record.getValue(EMPLOYEE.EMPLOYEE_ID),
                         record.getValue(EMPLOYEE.VERSION),
                         new EmployeeData(
                                 record.getValue(EMPLOYEE.FIRST_NAME),
@@ -81,7 +81,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
     public EmployeeId insert(EmployeeData employeeData) {
         var id = new EmployeeId(dsl.nextval(EMPLOYEE_ID_SEQ));
         dsl.insertInto(EMPLOYEE)
-                .set(EMPLOYEE.EMPLOYEE_ID, id.value())
+                .set(EMPLOYEE.EMPLOYEE_ID, id)
                 .set(EMPLOYEE.VERSION, 1L)
                 .set(EMPLOYEE.FIRST_NAME, employeeData.firstName())
                 .set(EMPLOYEE.MIDDLE_NAME, employeeData.middleName())
@@ -120,7 +120,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employee.data().mobilePhone()))
                 .set(EMPLOYEE.HOME_PHONE, phoneNumberConverter.to(employee.data().homePhone()))
                 .set(EMPLOYEE.WORK_EMAIL, employee.data().workEmail())
-                .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id().value()).and(EMPLOYEE.VERSION.eq(employee.version())))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(employee.id()).and(EMPLOYEE.VERSION.eq(employee.version())))
                 .execute();
 
         if (rowsUpdated == 0) {

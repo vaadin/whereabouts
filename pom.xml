@@ -194,6 +194,12 @@
                                                 </converter>
                                                 <includeExpression>^.*email$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmployeeId</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.EmployeeIdConverter
+                                                </converter>
+                                                <includeExpression>^.*employee_id</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

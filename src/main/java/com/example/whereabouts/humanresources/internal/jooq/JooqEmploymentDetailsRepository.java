@@ -18,8 +18,6 @@ import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 @Component
 class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 
-    private static final Field<EmployeeId> EMPLOYEE_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
-    private static final Field<EmployeeId> MANAGER_ID = EMPLOYMENT_DETAILS.MANAGER_ID.convert(employeeIdConverter);
     private static final Field<LocationId> LOCATION_ID = EMPLOYMENT_DETAILS.LOCATION_ID.convert(locationIdConverter);
     private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
     private static final Field<EmploymentStatus> EMPLOYMENT_STATUS = EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.convert(employmentStatusConverter);
@@ -34,21 +32,21 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
     @Override
     public @NonNull Optional<EmploymentDetails> findById(@NonNull EmployeeId id) {
         return dsl
-                .select(EMPLOYEE_ID,
+                .select(EMPLOYMENT_DETAILS.EMPLOYEE_ID,
                         EMPLOYMENT_DETAILS.VERSION,
                         EMPLOYMENT_DETAILS.JOB_TITLE,
                         EMPLOYMENT_TYPE,
                         EMPLOYMENT_STATUS,
                         WORK_ARRANGEMENT,
                         LOCATION_ID,
-                        MANAGER_ID,
+                        EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID,
                         EMPLOYMENT_DETAILS.HIRE_DATE,
                         EMPLOYMENT_DETAILS.TERMINATION_DATE
                 )
                 .from(EMPLOYMENT_DETAILS)
-                .where(EMPLOYEE_ID.eq(id))
+                .where(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(id))
                 .fetchOptional(record -> new EmploymentDetails(
-                        record.getValue(EMPLOYEE_ID),
+                        record.getValue(EMPLOYMENT_DETAILS.EMPLOYEE_ID),
                         record.getValue(EMPLOYMENT_DETAILS.VERSION),
                         new EmploymentDetailsData(
                                 record.getValue(EMPLOYMENT_DETAILS.JOB_TITLE),
@@ -56,7 +54,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                                 record.getValue(EMPLOYMENT_STATUS),
                                 record.getValue(WORK_ARRANGEMENT),
                                 record.getValue(LOCATION_ID),
-                                record.getValue(MANAGER_ID),
+                                record.getValue(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID),
                                 record.getValue(EMPLOYMENT_DETAILS.HIRE_DATE),
                                 record.getValue(EMPLOYMENT_DETAILS.TERMINATION_DATE)
                         )
@@ -67,14 +65,14 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
     @Override
     public @NonNull EmploymentDetails insert(@NonNull EmployeeId id, @NonNull EmploymentDetailsData data) {
         dsl.insertInto(EMPLOYMENT_DETAILS)
-                .set(EMPLOYEE_ID, id)
+                .set(EMPLOYMENT_DETAILS.EMPLOYEE_ID, id)
                 .set(EMPLOYMENT_DETAILS.VERSION, 1L)
                 .set(EMPLOYMENT_DETAILS.JOB_TITLE, data.jobTitle())
                 .set(EMPLOYMENT_TYPE, data.type())
                 .set(EMPLOYMENT_STATUS, data.status())
                 .set(WORK_ARRANGEMENT, data.workArrangement())
                 .set(LOCATION_ID, data.location())
-                .set(MANAGER_ID, data.manager())
+                .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, data.manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, data.hireDate())
                 .set(EMPLOYMENT_DETAILS.TERMINATION_DATE, data.terminationDate())
                 .execute();
@@ -92,10 +90,10 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_STATUS, employmentDetails.data().status())
                 .set(WORK_ARRANGEMENT, employmentDetails.data().workArrangement())
                 .set(LOCATION_ID, employmentDetails.data().location())
-                .set(MANAGER_ID, employmentDetails.data().manager())
+                .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, employmentDetails.data().manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, employmentDetails.data().hireDate())
                 .set(EMPLOYMENT_DETAILS.TERMINATION_DATE, employmentDetails.data().terminationDate())
-                .where(EMPLOYEE_ID.eq(employmentDetails.id()))
+                .where(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(employmentDetails.id()))
                 .and(EMPLOYMENT_DETAILS.VERSION.eq(employmentDetails.version()))
                 .execute();
 

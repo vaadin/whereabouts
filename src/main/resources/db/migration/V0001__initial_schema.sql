@@ -97,26 +97,26 @@ create index employee_user_last_name_idx on employee (last_name);
 
 create table employment_details
 (
-    employee_id       bigint            not null,
-    version           bigint            not null,
-    job_title         text              not null,
-    employment_type   employment_type   not null,
-    employment_status employment_status not null,
-    work_arrangement  work_arrangement  not null,
-    location_id       bigint            not null,
-    manager_id bigint,
-    hire_date         date              not null,
-    termination_date  date,
+    employee_id         bigint            not null,
+    version             bigint            not null,
+    job_title           text              not null,
+    employment_type     employment_type   not null,
+    employment_status   employment_status not null,
+    work_arrangement    work_arrangement  not null,
+    location_id         bigint            not null,
+    manager_employee_id bigint,
+    hire_date           date              not null,
+    termination_date    date,
     primary key (employee_id),
     foreign key (employee_id) references employee (employee_id),
     foreign key (location_id) references location (location_id),
-    foreign key (manager_id) references employee (employee_id),
+    foreign key (manager_employee_id) references employee (employee_id),
     constraint termination_date_matches_status check ((termination_date is null and not employment_status = 'TERMINATED') or
                                                       (termination_date is not null and employment_status = 'TERMINATED'))
 );
 
 create index employment_details_location_id_idx on employment_details (location_id);
-create index employment_details_manager_id_idx on employment_details (manager_id);
+create index employment_details_manager_employee_id_idx on employment_details (manager_employee_id);
 create index employment_details_type_idx on employment_details (employment_type);
 create index employment_details_status_idx on employment_details (employment_status);
 

@@ -29,12 +29,11 @@ import static com.example.whereabouts.projects.internal.jooq.JooqConverters.*;
 @Component
 class JooqTaskRepository implements TaskRepository {
 
-    private static final Field<EmployeeId> ASSIGNEE_EMPLOYEE_ID = TASK_ASSIGNEE.EMPLOYEE_ID.convert(employeeIdConverter);
     private static final Field<TaskId> ASSIGNEE_TASK_ID = TASK_ASSIGNEE.TASK_ID.convert(taskIdConverter);
     private static final Field<TaskId> TASK_ID = TASK.TASK_ID.convert(taskIdConverter);
     private static final Field<ProjectId> PROJECT_ID = TASK.PROJECT_ID.convert(projectIdConverter);
     private static final Field<Result<Record1<EmployeeId>>> ASSIGNEES = DSL.multiset(
-            DSL.select(ASSIGNEE_EMPLOYEE_ID).from(TASK_ASSIGNEE).where(TASK_ASSIGNEE.TASK_ID.eq(TASK.TASK_ID))
+            DSL.select(TASK_ASSIGNEE.EMPLOYEE_ID).from(TASK_ASSIGNEE).where(TASK_ASSIGNEE.TASK_ID.eq(TASK.TASK_ID))
     );
     private static final Field<ZoneId> TIME_ZONE = TASK.TIME_ZONE.convert(zoneIdConverter);
     private static final Field<TaskStatus> TASK_STATUS = TASK.TASK_STATUS.convert(taskStatusConverter);
@@ -107,7 +106,7 @@ class JooqTaskRepository implements TaskRepository {
                 .map(assignee -> {
                     var record = dsl.newRecord(TASK_ASSIGNEE);
                     record.setTaskId(taskIdConverter.to(taskId));
-                    record.setEmployeeId(employeeIdConverter.to(assignee));
+                    record.setEmployeeId(assignee);
                     return record;
                 }).toList();
 
@@ -196,7 +195,7 @@ class JooqTaskRepository implements TaskRepository {
                 record.getValue(TIME_ZONE),
                 record.getValue(TASK_STATUS),
                 record.getValue(TASK_PRIORITY),
-                record.getValue(ASSIGNEES).intoSet(ASSIGNEE_EMPLOYEE_ID)
+                record.getValue(ASSIGNEES).intoSet(TASK_ASSIGNEE.EMPLOYEE_ID)
         );
     }
 

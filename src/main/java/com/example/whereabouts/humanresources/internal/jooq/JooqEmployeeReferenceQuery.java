@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.*;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.employmentStatusConverter;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.employmentTypeConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
@@ -23,8 +24,6 @@ import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 @NullMarked
 class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
 
-    private static final Field<EmployeeId> EMPLOYEE_ID = EMPLOYEE.EMPLOYEE_ID.convert(employeeIdConverter);
-    private static final Field<EmployeeId> EMPLOYMENT_DETAILS_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
     private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
     private static final Field<EmploymentStatus> EMPLOYMENT_STATUS = EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.convert(employmentStatusConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
@@ -63,20 +62,20 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
     @Override
     public Set<EmployeeReference> findByIds(Set<EmployeeId> ids) {
         return selectEmployee()
-                .where(EMPLOYEE_ID.in(ids))
+                .where(EMPLOYEE.EMPLOYEE_ID.in(ids))
                 .fetchSet(Records.mapping(EmployeeReference::new));
     }
 
     private SelectOnConditionStep<Record6<EmployeeId, String, String, String, Country, String>> selectEmployee() {
         return dsl.select(
-                        EMPLOYEE_ID,
+                        EMPLOYEE.EMPLOYEE_ID,
                         EMPLOYEE.FIRST_NAME,
                         EMPLOYEE.MIDDLE_NAME,
                         EMPLOYEE.LAST_NAME,
                         EMPLOYEE.COUNTRY,
                         EMPLOYMENT_DETAILS.JOB_TITLE)
                 .from(EMPLOYEE)
-                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS_ID.eq(EMPLOYEE_ID));
+                .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID));
     }
 
     private List<? extends OrderField<?>> toOrderFields(Sort sort) {
