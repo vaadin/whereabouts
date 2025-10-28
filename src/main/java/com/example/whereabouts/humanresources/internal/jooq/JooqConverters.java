@@ -4,75 +4,51 @@ import com.example.whereabouts.common.Country;
 import com.example.whereabouts.common.EmailAddress;
 import com.example.whereabouts.common.Gender;
 import com.example.whereabouts.common.PhoneNumber;
-import com.example.whereabouts.common.address.JooqPostalAddressConverter;
 import com.example.whereabouts.humanresources.*;
+import com.example.whereabouts.jooq.converters.*;
 import org.jooq.Converter;
 
 import java.time.ZoneId;
 
+@Deprecated
 final class JooqConverters {
 
     private JooqConverters() {
     }
 
-    public static final Converter<com.example.whereabouts.jooq.enums.EmploymentStatus, EmploymentStatus> employmentStatusConverter = Converter.ofNullable(
-            com.example.whereabouts.jooq.enums.EmploymentStatus.class,
-            EmploymentStatus.class,
-            dbType -> EmploymentStatus.valueOf(dbType.name()),
-            domainType -> com.example.whereabouts.jooq.enums.EmploymentStatus.valueOf(domainType.name())
-    );
+    @Deprecated
+    public static final Converter<com.example.whereabouts.jooq.enums.EmploymentStatus, EmploymentStatus> employmentStatusConverter = new EmploymentStatusConverter();
 
-    public static final Converter<com.example.whereabouts.jooq.enums.EmploymentType, EmploymentType> employmentTypeConverter = Converter.ofNullable(
-            com.example.whereabouts.jooq.enums.EmploymentType.class,
-            EmploymentType.class,
-            dbType -> EmploymentType.valueOf(dbType.name()),
-            domainType -> com.example.whereabouts.jooq.enums.EmploymentType.valueOf(domainType.name())
-    );
+    @Deprecated
+    public static final Converter<com.example.whereabouts.jooq.enums.EmploymentType, EmploymentType> employmentTypeConverter = new EmploymentTypeConverter();
 
-    public static final Converter<com.example.whereabouts.jooq.enums.WorkArrangement, WorkArrangement> workArrangementConverter = Converter.ofNullable(
-            com.example.whereabouts.jooq.enums.WorkArrangement.class,
-            WorkArrangement.class,
-            dbType -> WorkArrangement.valueOf(dbType.name()),
-            domainType -> com.example.whereabouts.jooq.enums.WorkArrangement.valueOf(domainType.name())
-    );
+    @Deprecated
+    public static final Converter<com.example.whereabouts.jooq.enums.WorkArrangement, WorkArrangement> workArrangementConverter = new WorkArrangementConverter();
 
-    public static final Converter<com.example.whereabouts.jooq.enums.Gender, Gender> genderConverter = Converter.ofNullable(
-            com.example.whereabouts.jooq.enums.Gender.class,
-            Gender.class,
-            dbType -> Gender.valueOf(dbType.name()),
-            domainType -> com.example.whereabouts.jooq.enums.Gender.valueOf(domainType.name())
-    );
+    @Deprecated
+    public static final Converter<com.example.whereabouts.jooq.enums.Gender, Gender> genderConverter = new GenderConverter();
 
-    public static final Converter<com.example.whereabouts.jooq.enums.LocationType, LocationType> locationTypeConverter = Converter.ofNullable(
-            com.example.whereabouts.jooq.enums.LocationType.class,
-            LocationType.class,
-            dbType -> LocationType.valueOf(dbType.name()),
-            domainType -> com.example.whereabouts.jooq.enums.LocationType.valueOf(domainType.name())
-    );
+    @Deprecated
+    public static final Converter<com.example.whereabouts.jooq.enums.LocationType, LocationType> locationTypeConverter = new LocationTypeConverter();
 
-    public static final JooqPostalAddressConverter postalAddressConverter = new JooqPostalAddressConverter();
+    @Deprecated
+    public static final PostalAddressConverter postalAddressConverter = new PostalAddressConverter();
 
-    public static final Converter<String, ZoneId> zoneIdConverter = Converter.ofNullable(
-            String.class, ZoneId.class, ZoneId::of, ZoneId::getId
-    );
+    @Deprecated
+    public static final Converter<String, ZoneId> zoneIdConverter = new ZoneIdConverter();
 
-    public static final Converter<String, PhoneNumber> phoneNumberConverter = Converter.ofNullable(
-            String.class, PhoneNumber.class, PhoneNumber::of, PhoneNumber::toString
-    );
+    @Deprecated
+    public static final Converter<String, PhoneNumber> phoneNumberConverter = new PhoneNumberConverter();
 
-    public static final Converter<String, EmailAddress> emailConverter = Converter.ofNullable(
-            String.class, EmailAddress.class, EmailAddress::of, EmailAddress::toString
-    );
+    @Deprecated
+    public static final Converter<String, EmailAddress> emailConverter = new EmailConverter();
 
-    public static final Converter<Long, LocationId> locationIdConverter = Converter.ofNullable(
-            Long.class, LocationId.class, LocationId::new, LocationId::value
-    );
+    @Deprecated
+    public static final Converter<Long, LocationId> locationIdConverter = new LocationIdConverter();
 
-    public static final Converter<Long, EmployeeId> employeeIdConverter = Converter.ofNullable(
-            Long.class, EmployeeId.class, EmployeeId::new, EmployeeId::value
-    );
+    @Deprecated
+    public static final Converter<Long, EmployeeId> employeeIdConverter = new EmployeeIdConverter();
 
-    public static final Converter<String, Country> countryConverter = Converter.ofNullable(
-            String.class, Country.class, Country::ofIsoCode, Country::toString
-    );
+    @Deprecated
+    public static final Converter<String, Country> countryConverter = new CountryConverter();
 }
