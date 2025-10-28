@@ -304,6 +304,14 @@
                                                 </converter>
                                                 <includeExpression>^.*date_time$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>java.time.ZoneId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ZoneIdConverter
+                                                </converter>
+                                                <includeExpression>^.*time_zone$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

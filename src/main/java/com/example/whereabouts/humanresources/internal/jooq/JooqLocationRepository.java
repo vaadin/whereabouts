@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.zoneIdConverter;
 import static com.example.whereabouts.jooq.Sequences.LOCATION_ID_SEQ;
 import static com.example.whereabouts.jooq.tables.Location.LOCATION;
 import static com.example.whereabouts.jooq.tables.LocationFacility.LOCATION_FACILITY;
@@ -40,7 +39,6 @@ class JooqLocationRepository implements LocationRepository {
                 DSL.selectFrom(LOCATION_FACILITY)
                         .where(LOCATION_FACILITY.LOCATION_ID.eq(LOCATION.LOCATION_ID))
         );
-        var TIME_ZONE = LOCATION.TIME_ZONE.convert(zoneIdConverter);
         return dsl
                 .select(LOCATION.LOCATION_ID,
                         LOCATION.VERSION,
@@ -49,7 +47,7 @@ class JooqLocationRepository implements LocationRepository {
                         LOCATION.POSTAL_ADDRESS,
                         LOCATION.ESTABLISHED,
                         LOCATION.ABOUT,
-                        TIME_ZONE,
+                        LOCATION.TIME_ZONE,
                         FACILITIES
                 )
                 .from(LOCATION)
@@ -63,7 +61,7 @@ class JooqLocationRepository implements LocationRepository {
                                 record.getValue(LOCATION.POSTAL_ADDRESS),
                                 record.getValue(LOCATION.ESTABLISHED),
                                 record.getValue(LOCATION.ABOUT),
-                                record.getValue(TIME_ZONE),
+                                record.getValue(LOCATION.TIME_ZONE),
                                 record.getValue(FACILITIES).map(this::fromRecord)
                         )
                 ));
@@ -82,7 +80,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.COUNTRY, locationData.address().country())
                 .set(LOCATION.ESTABLISHED, locationData.established())
                 .set(LOCATION.ABOUT, locationData.about())
-                .set(LOCATION.TIME_ZONE, zoneIdConverter.to(locationData.timeZone()))
+                .set(LOCATION.TIME_ZONE, locationData.timeZone())
                 .execute();
 
         insertFacilities(id, locationData.facilities());
@@ -101,7 +99,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.COUNTRY, location.data().address().country())
                 .set(LOCATION.ESTABLISHED, location.data().established())
                 .set(LOCATION.ABOUT, location.data().about())
-                .set(LOCATION.TIME_ZONE, zoneIdConverter.to(location.data().timeZone()))
+                .set(LOCATION.TIME_ZONE, location.data().timeZone())
                 .where(LOCATION.LOCATION_ID.eq(location.id()))
                 .and(LOCATION.VERSION.eq(location.version()))
                 .execute();

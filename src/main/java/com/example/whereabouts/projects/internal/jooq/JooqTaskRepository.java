@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import java.util.stream.Stream;
 import static com.example.whereabouts.jooq.Sequences.TASK_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.TASK;
 import static com.example.whereabouts.jooq.Tables.TASK_ASSIGNEE;
-import static com.example.whereabouts.projects.internal.jooq.JooqConverters.zoneIdConverter;
 
 @Component
 class JooqTaskRepository implements TaskRepository {
@@ -31,8 +29,6 @@ class JooqTaskRepository implements TaskRepository {
     private static final Field<Result<Record1<EmployeeId>>> ASSIGNEES = DSL.multiset(
             DSL.select(TASK_ASSIGNEE.EMPLOYEE_ID).from(TASK_ASSIGNEE).where(TASK_ASSIGNEE.TASK_ID.eq(TASK.TASK_ID))
     );
-    private static final Field<ZoneId> TIME_ZONE = TASK.TIME_ZONE.convert(zoneIdConverter);
-
     private final DSLContext dsl;
 
     JooqTaskRepository(@NonNull DSLContext dsl) {
@@ -50,7 +46,7 @@ class JooqTaskRepository implements TaskRepository {
                 .set(TASK.DESCRIPTION, data.description())
                 .set(TASK.DUE_DATE, data.dueDate())
                 .set(TASK.DUE_TIME, data.dueTime())
-                .set(TIME_ZONE, data.timeZone())
+                .set(TASK.TIME_ZONE, data.timeZone())
                 .set(TASK.DUE_DATE_TIME, data.dueDateTime())
                 .set(TASK.TASK_STATUS, data.status())
                 .set(TASK.TASK_PRIORITY, data.priority())
@@ -69,7 +65,7 @@ class JooqTaskRepository implements TaskRepository {
                 .set(TASK.DESCRIPTION, task.data().description())
                 .set(TASK.DUE_DATE, task.data().dueDate())
                 .set(TASK.DUE_TIME, task.data().dueTime())
-                .set(TIME_ZONE, task.data().timeZone())
+                .set(TASK.TIME_ZONE, task.data().timeZone())
                 .set(TASK.DUE_DATE_TIME, task.data().dueDateTime())
                 .set(TASK.TASK_STATUS, task.data().status())
                 .set(TASK.TASK_PRIORITY, task.data().priority())
@@ -127,7 +123,7 @@ class JooqTaskRepository implements TaskRepository {
                         TASK.DESCRIPTION,
                         TASK.DUE_DATE,
                         TASK.DUE_TIME,
-                        TIME_ZONE,
+                        TASK.TIME_ZONE,
                         TASK.TASK_STATUS,
                         TASK.TASK_PRIORITY,
                         ASSIGNEES
@@ -157,7 +153,7 @@ class JooqTaskRepository implements TaskRepository {
                         TASK.DESCRIPTION,
                         TASK.DUE_DATE,
                         TASK.DUE_TIME,
-                        TIME_ZONE,
+                        TASK.TIME_ZONE,
                         TASK.TASK_STATUS,
                         TASK.TASK_PRIORITY,
                         ASSIGNEES
@@ -185,7 +181,7 @@ class JooqTaskRepository implements TaskRepository {
                 record.getValue(TASK.DESCRIPTION),
                 record.getValue(TASK.DUE_DATE),
                 record.getValue(TASK.DUE_TIME),
-                record.getValue(TIME_ZONE),
+                record.getValue(TASK.TIME_ZONE),
                 record.getValue(TASK.TASK_STATUS),
                 record.getValue(TASK.TASK_PRIORITY),
                 record.getValue(ASSIGNEES).intoSet(TASK_ASSIGNEE.EMPLOYEE_ID)
