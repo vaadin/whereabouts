@@ -29,8 +29,6 @@ import static com.example.whereabouts.projects.internal.jooq.JooqConverters.*;
 @Component
 class JooqTaskRepository implements TaskRepository {
 
-    private static final Field<TaskId> ASSIGNEE_TASK_ID = TASK_ASSIGNEE.TASK_ID.convert(taskIdConverter);
-    private static final Field<TaskId> TASK_ID = TASK.TASK_ID.convert(taskIdConverter);
     private static final Field<Result<Record1<EmployeeId>>> ASSIGNEES = DSL.multiset(
             DSL.select(TASK_ASSIGNEE.EMPLOYEE_ID).from(TASK_ASSIGNEE).where(TASK_ASSIGNEE.TASK_ID.eq(TASK.TASK_ID))
     );
@@ -50,7 +48,7 @@ class JooqTaskRepository implements TaskRepository {
     public @NonNull TaskId insert(@NonNull TaskData data) {
         var id = new TaskId(dsl.nextval(TASK_ID_SEQ));
         dsl.insertInto(TASK)
-                .set(TASK_ID, id)
+                .set(TASK.TASK_ID, id)
                 .set(TASK.VERSION, 1L)
                 .set(TASK.PROJECT_ID, data.project())
                 .set(TASK.DESCRIPTION, data.description())
@@ -79,7 +77,7 @@ class JooqTaskRepository implements TaskRepository {
                 .set(DUE_DATE_TIME, task.data().dueDateTime())
                 .set(TASK_STATUS, task.data().status())
                 .set(TASK_PRIORITY, task.data().priority())
-                .where(TASK_ID.eq(task.id()))
+                .where(TASK.TASK_ID.eq(task.id()))
                 .and(TASK.VERSION.eq(task.version()))
                 .execute();
 
@@ -88,7 +86,7 @@ class JooqTaskRepository implements TaskRepository {
         }
 
         dsl.deleteFrom(TASK_ASSIGNEE)
-                .where(ASSIGNEE_TASK_ID.eq(task.id()))
+                .where(TASK_ASSIGNEE.TASK_ID.eq(task.id()))
                 .execute();
 
         insertAssignees(task.id(), task.data().assignees());
@@ -104,7 +102,7 @@ class JooqTaskRepository implements TaskRepository {
         var batch = assignees.stream()
                 .map(assignee -> {
                     var record = dsl.newRecord(TASK_ASSIGNEE);
-                    record.setTaskId(taskIdConverter.to(taskId));
+                    record.setTaskId(taskId);
                     record.setEmployeeId(assignee);
                     return record;
                 }).toList();
@@ -116,10 +114,10 @@ class JooqTaskRepository implements TaskRepository {
     @Override
     public void deleteById(@NonNull TaskId id) {
         dsl.deleteFrom(TASK_ASSIGNEE)
-                .where(ASSIGNEE_TASK_ID.eq(id))
+                .where(TASK_ASSIGNEE.TASK_ID.eq(id))
                 .execute();
         dsl.deleteFrom(TASK)
-                .where(TASK_ID.eq(id))
+                .where(TASK.TASK_ID.eq(id))
                 .execute();
     }
 
@@ -127,7 +125,7 @@ class JooqTaskRepository implements TaskRepository {
     @Override
     public @NonNull Optional<Task> findById(@NonNull TaskId id) {
         return dsl
-                .select(TASK_ID,
+                .select(TASK.TASK_ID,
                         TASK.VERSION,
                         TASK.PROJECT_ID,
                         TASK.DESCRIPTION,
@@ -139,7 +137,7 @@ class JooqTaskRepository implements TaskRepository {
                         ASSIGNEES
                 )
                 .from(TASK)
-                .where(TASK_ID.eq(id))
+                .where(TASK.TASK_ID.eq(id))
                 .fetchOptional(this::toTask);
     }
 
@@ -157,7 +155,7 @@ class JooqTaskRepository implements TaskRepository {
             condition = condition.and(TASK_PRIORITY.in(filter.priorities()));
         }
         return dsl
-                .select(TASK_ID,
+                .select(TASK.TASK_ID,
                         TASK.VERSION,
                         TASK.PROJECT_ID,
                         TASK.DESCRIPTION,
@@ -180,7 +178,7 @@ class JooqTaskRepository implements TaskRepository {
 
     private @NonNull Task toTask(@NonNull Record record) {
         return new Task(
-                record.getValue(TASK_ID),
+                record.getValue(TASK.TASK_ID),
                 record.getValue(TASK.VERSION),
                 toTaskData(record));
     }

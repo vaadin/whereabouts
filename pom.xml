@@ -264,6 +264,14 @@
                                                 </converter>
                                                 <includeExpression>^.*project_id$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskIdConverter
+                                                </converter>
+                                                <includeExpression>^.*task_id$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
