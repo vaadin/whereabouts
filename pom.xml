@@ -181,6 +181,14 @@
                                         <excludes>flyway_schema_history</excludes>
                                         <inputSchema>public</inputSchema>
                                         <recordVersionFields>version</recordVersionFields>
+                                        <forcedTypes>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.Country</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.CountryConverter
+                                                </converter>
+                                                <includeExpression>^country$</includeExpression>
+                                            </forcedType>
+                                        </forcedTypes>
                                     </database>
                                     <target>
                                         <packageName>com.example.whereabouts.jooq</packageName>

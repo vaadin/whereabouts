@@ -92,7 +92,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.GENDER, genderConverter.to(employeeData.gender()))
                 .set(EMPLOYEE.DIETARY_NOTES, employeeData.dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employeeData.timeZone()))
-                .set(EMPLOYEE.COUNTRY, employeeData.homeAddress().country().isoCode())
+                .set(EMPLOYEE.COUNTRY, employeeData.homeAddress().country())
                 .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employeeData.homeAddress()))
                 .set(EMPLOYEE.WORK_PHONE, phoneNumberConverter.to(employeeData.workPhone()))
                 .set(EMPLOYEE.MOBILE_PHONE, phoneNumberConverter.to(employeeData.mobilePhone()))

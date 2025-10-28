@@ -31,7 +31,6 @@ import static org.jooq.impl.DSL.countDistinct;
 @NullMarked
 class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
 
-    public static final Field<Country> COUNTRY = LOCATION.COUNTRY.convertFrom(Country::ofIsoCode);
     private static final Field<Integer> EMPLOYEES = count(EMPLOYMENT_DETAILS.EMPLOYEE_ID);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, LocationSortableProperty.NAME.name());
 
@@ -52,20 +51,20 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
     @Override
     public int countLocationsInCountry(Country country) {
         var count = count(LOCATION.COUNTRY);
-        return requireNonNull(dsl.select(count).from(LOCATION).where(LOCATION.COUNTRY.eq(country.isoCode())).fetchOne(count));
+        return requireNonNull(dsl.select(count).from(LOCATION).where(LOCATION.COUNTRY.eq(country)).fetchOne(count));
     }
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public List<LocationTreeNode> findCountries(Pageable pageable) {
         return dsl.select(
-                        COUNTRY,
+                        LOCATION.COUNTRY,
                         EMPLOYEES
                 )
                 .from(LOCATION)
                 .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.LOCATION_ID.eq(LOCATION.LOCATION_ID)
                         .and(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.eq(EmploymentStatus.ACTIVE)))
-                .groupBy(COUNTRY)
+                .groupBy(LOCATION.COUNTRY)
                 .orderBy(toCountryNodeOrderFields(pageable.getSortOr(DEFAULT_SORT)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -76,7 +75,7 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
     @Override
     public List<LocationTreeNode> findLocations(Country country, Pageable pageable) {
         return selectLocation()
-                .where(LOCATION.COUNTRY.eq(country.isoCode()))
+                .where(LOCATION.COUNTRY.eq(country))
                 .groupBy(LOCATION.LOCATION_ID)
                 .orderBy(toLocationNodeOrderFields(pageable.getSortOr(DEFAULT_SORT)))
                 .offset(pageable.getOffset())
@@ -126,7 +125,7 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
         var property = LocationSortableProperty.valueOf(order.getProperty());
         return switch (property) {
             case NAME, LOCATION_TYPE ->
-                    order.isAscending() ? COUNTRY.asc() : COUNTRY.desc(); // TODO This sorts by ISO code, not by display name. It will look wrong in the UI.
+                    order.isAscending() ? LOCATION.COUNTRY.asc() : LOCATION.COUNTRY.desc(); // TODO This sorts by ISO code, not by display name. It will look wrong in the UI.
             case EMPLOYEES -> order.isAscending() ? EMPLOYEES.asc() : EMPLOYEES.desc();
         };
     }

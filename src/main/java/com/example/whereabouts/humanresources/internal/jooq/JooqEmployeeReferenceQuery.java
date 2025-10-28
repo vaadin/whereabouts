@@ -27,7 +27,6 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
     private static final Field<EmployeeId> EMPLOYMENT_DETAILS_ID = EMPLOYMENT_DETAILS.EMPLOYEE_ID.convert(employeeIdConverter);
     private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
     private static final Field<EmploymentStatus> EMPLOYMENT_STATUS = EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.convert(employmentStatusConverter);
-    private static final Field<Country> COUNTRY = EMPLOYEE.COUNTRY.convert(countryConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
             EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
@@ -74,7 +73,7 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
                         EMPLOYEE.FIRST_NAME,
                         EMPLOYEE.MIDDLE_NAME,
                         EMPLOYEE.LAST_NAME,
-                        COUNTRY,
+                        EMPLOYEE.COUNTRY,
                         EMPLOYMENT_DETAILS.JOB_TITLE)
                 .from(EMPLOYEE)
                 .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS_ID.eq(EMPLOYEE_ID));

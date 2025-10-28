@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.countryConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.locationIdConverter;
 import static com.example.whereabouts.jooq.Tables.LOCATION;
 
@@ -25,7 +24,6 @@ import static com.example.whereabouts.jooq.Tables.LOCATION;
 class JooqLocationReferenceQuery implements LocationReferenceQuery {
 
     private static final Field<LocationId> LOCATION_ID = LOCATION.LOCATION_ID.convert(locationIdConverter);
-    private static final Field<Country> COUNTRY = LOCATION.COUNTRY.convert(countryConverter);
 
     private final DSLContext dsl;
 
@@ -58,7 +56,7 @@ class JooqLocationReferenceQuery implements LocationReferenceQuery {
         return dsl.select(
                         LOCATION_ID,
                         LOCATION.NAME,
-                        COUNTRY)
+                        LOCATION.COUNTRY)
                 .from(LOCATION);
     }
 }
