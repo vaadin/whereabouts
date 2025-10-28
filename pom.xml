@@ -216,6 +216,14 @@
                                                 </converter>
                                                 <includeExpression>employment_type</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.Gender
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.GenderConverter
+                                                </converter>
+                                                <includeExpression>gender</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

@@ -30,7 +30,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Employee> findById(EmployeeId id) {
-        var GENDER = EMPLOYEE.GENDER.convert(genderConverter);
         var HOME_ADDRESS = EMPLOYEE.HOME_ADDRESS.convert(postalAddressConverter);
         var TIME_ZONE = EMPLOYEE.TIME_ZONE.convert(zoneIdConverter);
         var WORK_PHONE = EMPLOYEE.WORK_PHONE.convert(phoneNumberConverter);
@@ -44,7 +43,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         EMPLOYEE.LAST_NAME,
                         EMPLOYEE.PREFERRED_NAME,
                         EMPLOYEE.BIRTH_DATE,
-                        GENDER,
+                        EMPLOYEE.GENDER,
                         EMPLOYEE.DIETARY_NOTES,
                         TIME_ZONE,
                         HOME_ADDRESS,
@@ -64,7 +63,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                                 record.getValue(EMPLOYEE.LAST_NAME),
                                 record.getValue(EMPLOYEE.PREFERRED_NAME),
                                 record.getValue(EMPLOYEE.BIRTH_DATE),
-                                record.getValue(GENDER),
+                                record.getValue(EMPLOYEE.GENDER),
                                 record.getValue(EMPLOYEE.DIETARY_NOTES),
                                 record.getValue(TIME_ZONE),
                                 record.getValue(HOME_ADDRESS),
@@ -88,7 +87,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.LAST_NAME, employeeData.lastName())
                 .set(EMPLOYEE.PREFERRED_NAME, employeeData.preferredName())
                 .set(EMPLOYEE.BIRTH_DATE, employeeData.birthDate())
-                .set(EMPLOYEE.GENDER, genderConverter.to(employeeData.gender()))
+                .set(EMPLOYEE.GENDER, employeeData.gender())
                 .set(EMPLOYEE.DIETARY_NOTES, employeeData.dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employeeData.timeZone()))
                 .set(EMPLOYEE.COUNTRY, employeeData.homeAddress().country())
@@ -112,7 +111,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.LAST_NAME, employee.data().lastName())
                 .set(EMPLOYEE.PREFERRED_NAME, employee.data().preferredName())
                 .set(EMPLOYEE.BIRTH_DATE, employee.data().birthDate())
-                .set(EMPLOYEE.GENDER, genderConverter.to(employee.data().gender()))
+                .set(EMPLOYEE.GENDER, employee.data().gender())
                 .set(EMPLOYEE.DIETARY_NOTES, employee.data().dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employee.data().timeZone()))
                 .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employee.data().homeAddress()))
