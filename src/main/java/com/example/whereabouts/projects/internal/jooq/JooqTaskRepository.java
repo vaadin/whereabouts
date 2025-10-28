@@ -34,7 +34,6 @@ class JooqTaskRepository implements TaskRepository {
     );
     private static final Field<ZoneId> TIME_ZONE = TASK.TIME_ZONE.convert(zoneIdConverter);
     private static final Field<TaskStatus> TASK_STATUS = TASK.TASK_STATUS.convert(taskStatusConverter);
-    private static final Field<TaskPriority> TASK_PRIORITY = TASK.TASK_PRIORITY.convert(taskPriorityConverter);
     private static final Field<ZonedDateTime> DUE_DATE_TIME = TASK.DUE_DATE_TIME.convert(zonedDateTimeConverter);
 
     private final DSLContext dsl;
@@ -57,7 +56,7 @@ class JooqTaskRepository implements TaskRepository {
                 .set(TIME_ZONE, data.timeZone())
                 .set(DUE_DATE_TIME, data.dueDateTime())
                 .set(TASK_STATUS, data.status())
-                .set(TASK_PRIORITY, data.priority())
+                .set(TASK.TASK_PRIORITY, data.priority())
                 .execute();
         insertAssignees(id, data.assignees());
         return id;
@@ -76,7 +75,7 @@ class JooqTaskRepository implements TaskRepository {
                 .set(TIME_ZONE, task.data().timeZone())
                 .set(DUE_DATE_TIME, task.data().dueDateTime())
                 .set(TASK_STATUS, task.data().status())
-                .set(TASK_PRIORITY, task.data().priority())
+                .set(TASK.TASK_PRIORITY, task.data().priority())
                 .where(TASK.TASK_ID.eq(task.id()))
                 .and(TASK.VERSION.eq(task.version()))
                 .execute();
@@ -133,7 +132,7 @@ class JooqTaskRepository implements TaskRepository {
                         TASK.DUE_TIME,
                         TIME_ZONE,
                         TASK_STATUS,
-                        TASK_PRIORITY,
+                        TASK.TASK_PRIORITY,
                         ASSIGNEES
                 )
                 .from(TASK)
@@ -152,7 +151,7 @@ class JooqTaskRepository implements TaskRepository {
             condition = condition.and(TASK_STATUS.in(filter.statuses()));
         }
         if (!filter.priorities().isEmpty()) {
-            condition = condition.and(TASK_PRIORITY.in(filter.priorities()));
+            condition = condition.and(TASK.TASK_PRIORITY.in(filter.priorities()));
         }
         return dsl
                 .select(TASK.TASK_ID,
@@ -163,7 +162,7 @@ class JooqTaskRepository implements TaskRepository {
                         TASK.DUE_TIME,
                         TIME_ZONE,
                         TASK_STATUS,
-                        TASK_PRIORITY,
+                        TASK.TASK_PRIORITY,
                         ASSIGNEES
                 )
                 .from(TASK)
@@ -191,7 +190,7 @@ class JooqTaskRepository implements TaskRepository {
                 record.getValue(TASK.DUE_TIME),
                 record.getValue(TIME_ZONE),
                 record.getValue(TASK_STATUS),
-                record.getValue(TASK_PRIORITY),
+                record.getValue(TASK.TASK_PRIORITY),
                 record.getValue(ASSIGNEES).intoSet(TASK_ASSIGNEE.EMPLOYEE_ID)
         );
     }
@@ -204,7 +203,7 @@ class JooqTaskRepository implements TaskRepository {
             case DUE_DATE ->
                     sortOrder.getDirection() == SortDirection.ASCENDING ? DUE_DATE_TIME.asc() : DUE_DATE_TIME.desc();
             case PRIORITY ->
-                    sortOrder.getDirection() == SortDirection.ASCENDING ? TASK_PRIORITY.asc() : TASK_PRIORITY.desc();
+                    sortOrder.getDirection() == SortDirection.ASCENDING ? TASK.TASK_PRIORITY.asc() : TASK.TASK_PRIORITY.desc();
         };
     }
 }

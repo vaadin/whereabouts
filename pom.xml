@@ -272,6 +272,14 @@
                                                 </converter>
                                                 <includeExpression>^.*task_id$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskPriority
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskPriorityConverter
+                                                </converter>
+                                                <includeExpression>^task_priority$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
