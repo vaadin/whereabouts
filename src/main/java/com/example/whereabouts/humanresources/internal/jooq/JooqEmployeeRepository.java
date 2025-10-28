@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.postalAddressConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.zoneIdConverter;
 import static com.example.whereabouts.jooq.Sequences.EMPLOYEE_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
@@ -31,7 +30,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Employee> findById(EmployeeId id) {
-        var HOME_ADDRESS = EMPLOYEE.HOME_ADDRESS.convert(postalAddressConverter);
         var TIME_ZONE = EMPLOYEE.TIME_ZONE.convert(zoneIdConverter);
         return dsl
                 .select(EMPLOYEE.EMPLOYEE_ID,
@@ -44,7 +42,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                         EMPLOYEE.GENDER,
                         EMPLOYEE.DIETARY_NOTES,
                         TIME_ZONE,
-                        HOME_ADDRESS,
+                        EMPLOYEE.HOME_POSTAL_ADDRESS,
                         EMPLOYEE.WORK_PHONE,
                         EMPLOYEE.MOBILE_PHONE,
                         EMPLOYEE.HOME_PHONE,
@@ -64,7 +62,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                                 record.getValue(EMPLOYEE.GENDER),
                                 record.getValue(EMPLOYEE.DIETARY_NOTES),
                                 record.getValue(TIME_ZONE),
-                                record.getValue(HOME_ADDRESS),
+                                record.getValue(EMPLOYEE.HOME_POSTAL_ADDRESS),
                                 record.getValue(EMPLOYEE.WORK_PHONE),
                                 record.getValue(EMPLOYEE.MOBILE_PHONE),
                                 record.getValue(EMPLOYEE.HOME_PHONE),
@@ -89,7 +87,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.DIETARY_NOTES, employeeData.dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employeeData.timeZone()))
                 .set(EMPLOYEE.COUNTRY, employeeData.homeAddress().country())
-                .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employeeData.homeAddress()))
+                .set(EMPLOYEE.HOME_POSTAL_ADDRESS, employeeData.homeAddress())
                 .set(EMPLOYEE.WORK_PHONE, employeeData.workPhone())
                 .set(EMPLOYEE.MOBILE_PHONE, employeeData.mobilePhone())
                 .set(EMPLOYEE.HOME_PHONE, employeeData.homePhone())
@@ -112,7 +110,7 @@ class JooqEmployeeRepository implements EmployeeRepository {
                 .set(EMPLOYEE.GENDER, employee.data().gender())
                 .set(EMPLOYEE.DIETARY_NOTES, employee.data().dietaryNotes())
                 .set(EMPLOYEE.TIME_ZONE, zoneIdConverter.to(employee.data().timeZone()))
-                .set(EMPLOYEE.HOME_ADDRESS, postalAddressConverter.to(employee.data().homeAddress()))
+                .set(EMPLOYEE.HOME_POSTAL_ADDRESS, employee.data().homeAddress())
                 .set(EMPLOYEE.WORK_PHONE, employee.data().workPhone())
                 .set(EMPLOYEE.MOBILE_PHONE, employee.data().mobilePhone())
                 .set(EMPLOYEE.HOME_PHONE, employee.data().homePhone())

@@ -248,6 +248,14 @@
                                                 </converter>
                                                 <includeExpression>^.*phone$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.address.PostalAddress
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.PostalAddressConverter
+                                                </converter>
+                                                <includeExpression>^.*postal_address</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.postalAddressConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.zoneIdConverter;
 import static com.example.whereabouts.jooq.Sequences.LOCATION_ID_SEQ;
 import static com.example.whereabouts.jooq.tables.Location.LOCATION;
@@ -41,14 +40,13 @@ class JooqLocationRepository implements LocationRepository {
                 DSL.selectFrom(LOCATION_FACILITY)
                         .where(LOCATION_FACILITY.LOCATION_ID.eq(LOCATION.LOCATION_ID))
         );
-        var ADDRESS = LOCATION.ADDRESS.convert(postalAddressConverter);
         var TIME_ZONE = LOCATION.TIME_ZONE.convert(zoneIdConverter);
         return dsl
                 .select(LOCATION.LOCATION_ID,
                         LOCATION.VERSION,
                         LOCATION.NAME,
                         LOCATION.LOCATION_TYPE,
-                        ADDRESS,
+                        LOCATION.POSTAL_ADDRESS,
                         LOCATION.ESTABLISHED,
                         LOCATION.ABOUT,
                         TIME_ZONE,
@@ -62,7 +60,7 @@ class JooqLocationRepository implements LocationRepository {
                         new LocationData(
                                 record.getValue(LOCATION.NAME),
                                 record.getValue(LOCATION.LOCATION_TYPE),
-                                record.getValue(ADDRESS),
+                                record.getValue(LOCATION.POSTAL_ADDRESS),
                                 record.getValue(LOCATION.ESTABLISHED),
                                 record.getValue(LOCATION.ABOUT),
                                 record.getValue(TIME_ZONE),
@@ -80,7 +78,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.VERSION, 1L)
                 .set(LOCATION.NAME, locationData.name())
                 .set(LOCATION.LOCATION_TYPE, locationData.locationType())
-                .set(LOCATION.ADDRESS, postalAddressConverter.to(locationData.address()))
+                .set(LOCATION.POSTAL_ADDRESS, locationData.address())
                 .set(LOCATION.COUNTRY, locationData.address().country())
                 .set(LOCATION.ESTABLISHED, locationData.established())
                 .set(LOCATION.ABOUT, locationData.about())
@@ -99,7 +97,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.VERSION, newVersion)
                 .set(LOCATION.NAME, location.data().name())
                 .set(LOCATION.LOCATION_TYPE, location.data().locationType())
-                .set(LOCATION.ADDRESS, postalAddressConverter.to(location.data().address()))
+                .set(LOCATION.POSTAL_ADDRESS, location.data().address())
                 .set(LOCATION.COUNTRY, location.data().address().country())
                 .set(LOCATION.ESTABLISHED, location.data().established())
                 .set(LOCATION.ABOUT, location.data().about())
