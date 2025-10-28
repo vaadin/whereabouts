@@ -12,14 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.*;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.locationIdConverter;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.workArrangementConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
 @Component
 class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 
     private static final Field<LocationId> LOCATION_ID = EMPLOYMENT_DETAILS.LOCATION_ID.convert(locationIdConverter);
-    private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
     private static final Field<WorkArrangement> WORK_ARRANGEMENT = EMPLOYMENT_DETAILS.WORK_ARRANGEMENT.convert(workArrangementConverter);
     private final DSLContext dsl;
 
@@ -34,7 +34,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .select(EMPLOYMENT_DETAILS.EMPLOYEE_ID,
                         EMPLOYMENT_DETAILS.VERSION,
                         EMPLOYMENT_DETAILS.JOB_TITLE,
-                        EMPLOYMENT_TYPE,
+                        EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE,
                         EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS,
                         WORK_ARRANGEMENT,
                         LOCATION_ID,
@@ -49,7 +49,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                         record.getValue(EMPLOYMENT_DETAILS.VERSION),
                         new EmploymentDetailsData(
                                 record.getValue(EMPLOYMENT_DETAILS.JOB_TITLE),
-                                record.getValue(EMPLOYMENT_TYPE),
+                                record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE),
                                 record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS),
                                 record.getValue(WORK_ARRANGEMENT),
                                 record.getValue(LOCATION_ID),
@@ -67,7 +67,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.EMPLOYEE_ID, id)
                 .set(EMPLOYMENT_DETAILS.VERSION, 1L)
                 .set(EMPLOYMENT_DETAILS.JOB_TITLE, data.jobTitle())
-                .set(EMPLOYMENT_TYPE, data.type())
+                .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, data.type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, data.status())
                 .set(WORK_ARRANGEMENT, data.workArrangement())
                 .set(LOCATION_ID, data.location())
@@ -85,7 +85,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
         var rowsUpdated = dsl.update(EMPLOYMENT_DETAILS)
                 .set(EMPLOYMENT_DETAILS.VERSION, newVersion)
                 .set(EMPLOYMENT_DETAILS.JOB_TITLE, employmentDetails.data().jobTitle())
-                .set(EMPLOYMENT_TYPE, employmentDetails.data().type())
+                .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, employmentDetails.data().type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, employmentDetails.data().status())
                 .set(WORK_ARRANGEMENT, employmentDetails.data().workArrangement())
                 .set(LOCATION_ID, employmentDetails.data().location())

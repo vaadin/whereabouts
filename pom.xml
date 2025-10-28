@@ -208,6 +208,14 @@
                                                 </converter>
                                                 <includeExpression>employment_status</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmploymentType
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.EmploymentTypeConverter
+                                                </converter>
+                                                <includeExpression>employment_type</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

@@ -1,7 +1,10 @@
 package com.example.whereabouts.humanresources.internal.jooq;
 
 import com.example.whereabouts.common.Country;
-import com.example.whereabouts.humanresources.*;
+import com.example.whereabouts.humanresources.EmployeeFilter;
+import com.example.whereabouts.humanresources.EmployeeId;
+import com.example.whereabouts.humanresources.EmployeeReference;
+import com.example.whereabouts.humanresources.EmployeeSortableProperty;
 import com.example.whereabouts.humanresources.internal.EmployeeReferenceQuery;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -15,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.employmentTypeConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
@@ -23,7 +25,6 @@ import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 @NullMarked
 class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
 
-    private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
             EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
@@ -46,7 +47,7 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
             condition = condition.and(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.in(filter.statuses()));
         }
         if (!filter.types().isEmpty()) {
-            condition = condition.and(EMPLOYMENT_TYPE.in(filter.types()));
+            condition = condition.and(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.in(filter.types()));
         }
         return selectEmployee()
                 .where(condition)
