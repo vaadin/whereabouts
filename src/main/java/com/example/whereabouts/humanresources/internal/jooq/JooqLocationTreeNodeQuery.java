@@ -2,12 +2,8 @@ package com.example.whereabouts.humanresources.internal.jooq;
 
 import com.example.whereabouts.common.Country;
 import com.example.whereabouts.common.address.PostalAddress;
-import com.example.whereabouts.humanresources.LocationId;
-import com.example.whereabouts.humanresources.LocationSortableProperty;
-import com.example.whereabouts.humanresources.LocationTreeNode;
-import com.example.whereabouts.humanresources.LocationType;
+import com.example.whereabouts.humanresources.*;
 import com.example.whereabouts.humanresources.internal.LocationTreeNodeQuery;
-import com.example.whereabouts.jooq.enums.EmploymentStatus;
 import org.jooq.*;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.Pageable;

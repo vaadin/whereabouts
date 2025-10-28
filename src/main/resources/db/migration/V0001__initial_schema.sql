@@ -95,6 +95,8 @@ create index employee_user_first_name_idx on employee (first_name);
 create index employee_user_middle_name_idx on employee (middle_name);
 create index employee_user_last_name_idx on employee (last_name);
 
+-- TODO Should 'employee' and 'employment_details' be a single table?
+
 create table employment_details
 (
     employee_id         bigint            not null,

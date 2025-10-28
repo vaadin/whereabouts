@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.employmentStatusConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.employmentTypeConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
@@ -25,7 +24,6 @@ import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
 
     private static final Field<EmploymentType> EMPLOYMENT_TYPE = EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE.convert(employmentTypeConverter);
-    private static final Field<EmploymentStatus> EMPLOYMENT_STATUS = EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.convert(employmentStatusConverter);
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, EmployeeSortableProperty.LAST_NAME.name(),
             EmployeeSortableProperty.FIRST_NAME.name());
     private final DSLContext dsl;
@@ -45,7 +43,7 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
                     .or(EMPLOYEE.LAST_NAME.containsIgnoreCase(filter.searchTerm())));
         }
         if (!filter.statuses().isEmpty()) {
-            condition = condition.and(EMPLOYMENT_STATUS.in(filter.statuses()));
+            condition = condition.and(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS.in(filter.statuses()));
         }
         if (!filter.types().isEmpty()) {
             condition = condition.and(EMPLOYMENT_TYPE.in(filter.types()));

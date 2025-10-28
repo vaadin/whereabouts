@@ -200,6 +200,14 @@
                                                 </converter>
                                                 <includeExpression>^.*employee_id</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmploymentStatus
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.EmploymentStatusConverter
+                                                </converter>
+                                                <includeExpression>employment_status</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
