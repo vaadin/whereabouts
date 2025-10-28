@@ -2,7 +2,7 @@
 
 ## ⚠️ Advanced Reference Architecture - Not for Beginners
 
-This is a **production-grade reference architecture** demonstrating advanced patterns for building
+This **aims to become a production-grade reference architecture** demonstrating advanced patterns for building
 enterprise Vaadin applications. It assumes significant experience with:
 
 - Java and Spring Boot
