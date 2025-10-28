@@ -232,6 +232,14 @@
                                                 </converter>
                                                 <includeExpression>^.*location_id$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.LocationType
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.LocationTypeConverter
+                                                </converter>
+                                                <includeExpression>^location_type$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>

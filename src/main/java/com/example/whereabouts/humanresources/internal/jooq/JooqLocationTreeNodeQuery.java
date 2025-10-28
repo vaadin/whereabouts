@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.locationTypeConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.postalAddressConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 import static com.example.whereabouts.jooq.Tables.LOCATION;
@@ -93,7 +92,7 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
                         LOCATION.LOCATION_ID,
                         LOCATION.NAME,
                         EMPLOYEES,
-                        LOCATION.LOCATION_TYPE.convert(locationTypeConverter),
+                        LOCATION.LOCATION_TYPE,
                         LOCATION.ADDRESS.convert(postalAddressConverter))
                 .from(LOCATION)
                 .leftJoin(EMPLOYMENT_DETAILS).on(EMPLOYMENT_DETAILS.LOCATION_ID.eq(LOCATION.LOCATION_ID)

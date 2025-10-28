@@ -18,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.*;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.postalAddressConverter;
+import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.zoneIdConverter;
 import static com.example.whereabouts.jooq.Sequences.LOCATION_ID_SEQ;
 import static com.example.whereabouts.jooq.tables.Location.LOCATION;
 import static com.example.whereabouts.jooq.tables.LocationFacility.LOCATION_FACILITY;
@@ -36,7 +37,6 @@ class JooqLocationRepository implements LocationRepository {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Location> findById(LocationId id) {
-        var LOCATION_TYPE = LOCATION.LOCATION_TYPE.convert(locationTypeConverter);
         var FACILITIES = DSL.multiset(
                 DSL.selectFrom(LOCATION_FACILITY)
                         .where(LOCATION_FACILITY.LOCATION_ID.eq(LOCATION.LOCATION_ID))
@@ -47,7 +47,7 @@ class JooqLocationRepository implements LocationRepository {
                 .select(LOCATION.LOCATION_ID,
                         LOCATION.VERSION,
                         LOCATION.NAME,
-                        LOCATION_TYPE,
+                        LOCATION.LOCATION_TYPE,
                         ADDRESS,
                         LOCATION.ESTABLISHED,
                         LOCATION.ABOUT,
@@ -61,7 +61,7 @@ class JooqLocationRepository implements LocationRepository {
                         record.getValue(LOCATION.VERSION),
                         new LocationData(
                                 record.getValue(LOCATION.NAME),
-                                record.getValue(LOCATION_TYPE),
+                                record.getValue(LOCATION.LOCATION_TYPE),
                                 record.getValue(ADDRESS),
                                 record.getValue(LOCATION.ESTABLISHED),
                                 record.getValue(LOCATION.ABOUT),
@@ -79,7 +79,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.LOCATION_ID, id)
                 .set(LOCATION.VERSION, 1L)
                 .set(LOCATION.NAME, locationData.name())
-                .set(LOCATION.LOCATION_TYPE, locationTypeConverter.to(locationData.locationType()))
+                .set(LOCATION.LOCATION_TYPE, locationData.locationType())
                 .set(LOCATION.ADDRESS, postalAddressConverter.to(locationData.address()))
                 .set(LOCATION.COUNTRY, locationData.address().country())
                 .set(LOCATION.ESTABLISHED, locationData.established())
@@ -98,7 +98,7 @@ class JooqLocationRepository implements LocationRepository {
         var rowsUpdated = dsl.update(LOCATION)
                 .set(LOCATION.VERSION, newVersion)
                 .set(LOCATION.NAME, location.data().name())
-                .set(LOCATION.LOCATION_TYPE, locationTypeConverter.to(location.data().locationType()))
+                .set(LOCATION.LOCATION_TYPE, location.data().locationType())
                 .set(LOCATION.ADDRESS, postalAddressConverter.to(location.data().address()))
                 .set(LOCATION.COUNTRY, location.data().address().country())
                 .set(LOCATION.ESTABLISHED, location.data().established())
