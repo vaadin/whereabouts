@@ -280,6 +280,14 @@
                                                 </converter>
                                                 <includeExpression>^task_priority$</includeExpression>
                                             </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskStatus
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskStatusConverter
+                                                </converter>
+                                                <includeExpression>^task_status$</includeExpression>
+                                            </forcedType>
                                         </forcedTypes>
                                     </database>
                                     <target>
