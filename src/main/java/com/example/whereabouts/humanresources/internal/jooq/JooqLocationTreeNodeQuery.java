@@ -83,14 +83,14 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
     @Override
     public Optional<LocationTreeNode.LocationNode> findLocationById(LocationId id) {
         return selectLocation()
-                .where(LOCATION.LOCATION_ID.eq(id.value()))
+                .where(LOCATION.LOCATION_ID.eq(id))
                 .groupBy(LOCATION.LOCATION_ID)
                 .fetchOptional(Records.mapping(LocationTreeNode.LocationNode::new));
     }
 
     private SelectOnConditionStep<Record5<LocationId, String, Integer, LocationType, PostalAddress>> selectLocation() {
         return dsl.select(
-                        LOCATION.LOCATION_ID.convertFrom(LocationId::new),
+                        LOCATION.LOCATION_ID,
                         LOCATION.NAME,
                         EMPLOYEES,
                         LOCATION.LOCATION_TYPE.convert(locationTypeConverter),

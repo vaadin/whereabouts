@@ -55,9 +55,9 @@ class JooqLocationRepository implements LocationRepository {
                         FACILITIES
                 )
                 .from(LOCATION)
-                .where(LOCATION.LOCATION_ID.eq(id.value()))
+                .where(LOCATION.LOCATION_ID.eq(id))
                 .fetchOptional(record -> new Location(
-                        new LocationId(record.getValue(LOCATION.LOCATION_ID)),
+                        record.getValue(LOCATION.LOCATION_ID),
                         record.getValue(LOCATION.VERSION),
                         new LocationData(
                                 record.getValue(LOCATION.NAME),
@@ -76,7 +76,7 @@ class JooqLocationRepository implements LocationRepository {
     public LocationId insert(LocationData locationData) {
         var id = new LocationId(dsl.nextval(LOCATION_ID_SEQ));
         dsl.insertInto(LOCATION)
-                .set(LOCATION.LOCATION_ID, id.value())
+                .set(LOCATION.LOCATION_ID, id)
                 .set(LOCATION.VERSION, 1L)
                 .set(LOCATION.NAME, locationData.name())
                 .set(LOCATION.LOCATION_TYPE, locationTypeConverter.to(locationData.locationType()))
@@ -104,7 +104,7 @@ class JooqLocationRepository implements LocationRepository {
                 .set(LOCATION.ESTABLISHED, location.data().established())
                 .set(LOCATION.ABOUT, location.data().about())
                 .set(LOCATION.TIME_ZONE, zoneIdConverter.to(location.data().timeZone()))
-                .where(LOCATION.LOCATION_ID.eq(location.id().value()))
+                .where(LOCATION.LOCATION_ID.eq(location.id()))
                 .and(LOCATION.VERSION.eq(location.version()))
                 .execute();
 
@@ -113,7 +113,7 @@ class JooqLocationRepository implements LocationRepository {
         }
 
         dsl.deleteFrom(LOCATION_FACILITY)
-                .where(LOCATION_FACILITY.LOCATION_ID.eq(location.id().value()))
+                .where(LOCATION_FACILITY.LOCATION_ID.eq(location.id()))
                 .execute();
 
         insertFacilities(location.id(), location.data().facilities());
@@ -129,7 +129,7 @@ class JooqLocationRepository implements LocationRepository {
         var batch = facilities.stream()
                 .map(facility -> {
                     var record = dsl.newRecord(LOCATION_FACILITY);
-                    record.setLocationId(locationId.value());
+                    record.setLocationId(locationId);
                     toRecord(record, facility);
                     return record;
                 })

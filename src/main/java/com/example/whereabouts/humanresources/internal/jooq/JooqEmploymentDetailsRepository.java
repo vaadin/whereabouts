@@ -1,6 +1,9 @@
 package com.example.whereabouts.humanresources.internal.jooq;
 
-import com.example.whereabouts.humanresources.*;
+import com.example.whereabouts.humanresources.EmployeeId;
+import com.example.whereabouts.humanresources.EmploymentDetails;
+import com.example.whereabouts.humanresources.EmploymentDetailsData;
+import com.example.whereabouts.humanresources.WorkArrangement;
 import com.example.whereabouts.humanresources.internal.EmploymentDetailsRepository;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -12,14 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.locationIdConverter;
 import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.workArrangementConverter;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
 @Component
 class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 
-    private static final Field<LocationId> LOCATION_ID = EMPLOYMENT_DETAILS.LOCATION_ID.convert(locationIdConverter);
     private static final Field<WorkArrangement> WORK_ARRANGEMENT = EMPLOYMENT_DETAILS.WORK_ARRANGEMENT.convert(workArrangementConverter);
     private final DSLContext dsl;
 
@@ -37,7 +38,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                         EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE,
                         EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS,
                         WORK_ARRANGEMENT,
-                        LOCATION_ID,
+                        EMPLOYMENT_DETAILS.LOCATION_ID,
                         EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID,
                         EMPLOYMENT_DETAILS.HIRE_DATE,
                         EMPLOYMENT_DETAILS.TERMINATION_DATE
@@ -52,7 +53,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                                 record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE),
                                 record.getValue(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS),
                                 record.getValue(WORK_ARRANGEMENT),
-                                record.getValue(LOCATION_ID),
+                                record.getValue(EMPLOYMENT_DETAILS.LOCATION_ID),
                                 record.getValue(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID),
                                 record.getValue(EMPLOYMENT_DETAILS.HIRE_DATE),
                                 record.getValue(EMPLOYMENT_DETAILS.TERMINATION_DATE)
@@ -70,7 +71,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, data.type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, data.status())
                 .set(WORK_ARRANGEMENT, data.workArrangement())
-                .set(LOCATION_ID, data.location())
+                .set(EMPLOYMENT_DETAILS.LOCATION_ID, data.location())
                 .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, data.manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, data.hireDate())
                 .set(EMPLOYMENT_DETAILS.TERMINATION_DATE, data.terminationDate())
@@ -88,7 +89,7 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_TYPE, employmentDetails.data().type())
                 .set(EMPLOYMENT_DETAILS.EMPLOYMENT_STATUS, employmentDetails.data().status())
                 .set(WORK_ARRANGEMENT, employmentDetails.data().workArrangement())
-                .set(LOCATION_ID, employmentDetails.data().location())
+                .set(EMPLOYMENT_DETAILS.LOCATION_ID, employmentDetails.data().location())
                 .set(EMPLOYMENT_DETAILS.MANAGER_EMPLOYEE_ID, employmentDetails.data().manager())
                 .set(EMPLOYMENT_DETAILS.HIRE_DATE, employmentDetails.data().hireDate())
                 .set(EMPLOYMENT_DETAILS.TERMINATION_DATE, employmentDetails.data().terminationDate())

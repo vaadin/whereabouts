@@ -16,14 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.whereabouts.humanresources.internal.jooq.JooqConverters.locationIdConverter;
 import static com.example.whereabouts.jooq.Tables.LOCATION;
 
 @Component
 @NullMarked
 class JooqLocationReferenceQuery implements LocationReferenceQuery {
-
-    private static final Field<LocationId> LOCATION_ID = LOCATION.LOCATION_ID.convert(locationIdConverter);
 
     private final DSLContext dsl;
 
@@ -48,13 +45,13 @@ class JooqLocationReferenceQuery implements LocationReferenceQuery {
     @Override
     public Set<LocationReference> findByIds(Set<LocationId> ids) {
         return selectLocation()
-                .where(LOCATION_ID.in(ids))
+                .where(LOCATION.LOCATION_ID.in(ids))
                 .fetchSet(Records.mapping(LocationReference::new));
     }
 
     private SelectJoinStep<Record3<LocationId, String, Country>> selectLocation() {
         return dsl.select(
-                        LOCATION_ID,
+                        LOCATION.LOCATION_ID,
                         LOCATION.NAME,
                         LOCATION.COUNTRY)
                 .from(LOCATION);

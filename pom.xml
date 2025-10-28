@@ -198,7 +198,7 @@
                                                 <userType>com.example.whereabouts.humanresources.EmployeeId</userType>
                                                 <converter>com.example.whereabouts.jooq.converters.EmployeeIdConverter
                                                 </converter>
-                                                <includeExpression>^.*employee_id</includeExpression>
+                                                <includeExpression>^.*employee_id$</includeExpression>
                                             </forcedType>
                                             <forcedType>
                                                 <userType>com.example.whereabouts.humanresources.EmploymentStatus
@@ -206,7 +206,7 @@
                                                 <converter>
                                                     com.example.whereabouts.jooq.converters.EmploymentStatusConverter
                                                 </converter>
-                                                <includeExpression>employment_status</includeExpression>
+                                                <includeExpression>^employment_status$</includeExpression>
                                             </forcedType>
                                             <forcedType>
                                                 <userType>com.example.whereabouts.humanresources.EmploymentType
@@ -214,7 +214,7 @@
                                                 <converter>
                                                     com.example.whereabouts.jooq.converters.EmploymentTypeConverter
                                                 </converter>
-                                                <includeExpression>employment_type</includeExpression>
+                                                <includeExpression>^employment_type$</includeExpression>
                                             </forcedType>
                                             <forcedType>
                                                 <userType>com.example.whereabouts.common.Gender
@@ -222,7 +222,15 @@
                                                 <converter>
                                                     com.example.whereabouts.jooq.converters.GenderConverter
                                                 </converter>
-                                                <includeExpression>gender</includeExpression>
+                                                <includeExpression>^gender$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.LocationId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.LocationIdConverter
+                                                </converter>
+                                                <includeExpression>^.*location_id$</includeExpression>
                                             </forcedType>
                                         </forcedTypes>
                                     </database>
