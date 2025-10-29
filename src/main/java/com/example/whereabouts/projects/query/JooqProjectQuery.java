@@ -10,8 +10,6 @@ import org.jooq.impl.DSL;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,7 +32,6 @@ class JooqProjectQuery implements ProjectQuery {
     // TODO If we return a "live stream", it has to be closed afterwards. Not sure Vaadin does this.
     //  Therefore, we fetch a list and return a stream of it.
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Stream<ProjectListItem> findProjectListItemsBySearchTerm(@Nullable String searchTerm, int limit, int offset, SortOrder<ProjectSortableProperty> sortOrder) {
         var condition = searchTerm != null && !searchTerm.isBlank()
@@ -50,7 +47,6 @@ class JooqProjectQuery implements ProjectQuery {
                 .stream();
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Optional<ProjectListItem> findProjectListItemById(ProjectId id) {
         return selectProject()

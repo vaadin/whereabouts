@@ -9,8 +9,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +28,6 @@ class JooqLocationReferenceQuery implements LocationReferenceQuery {
         this.dsl = dsl;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public List<LocationReference> findBySearchTerm(Pageable pageable, @Nullable String searchTerm) {
         Condition condition = DSL.trueCondition();
@@ -43,7 +40,6 @@ class JooqLocationReferenceQuery implements LocationReferenceQuery {
                 .fetch(Records.mapping(LocationReference::new));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Set<LocationReference> findByIds(Set<LocationId> ids) {
         return selectLocation()

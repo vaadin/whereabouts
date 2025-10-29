@@ -11,8 +11,6 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +33,6 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
         this.dsl = dsl;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public List<EmployeeReference> findByFilter(Pageable pageable, EmployeeFilter filter) {
         Condition condition = DSL.trueCondition();
@@ -59,7 +56,6 @@ class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {
                 .fetch(Records.mapping(EmployeeReference::new));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Set<EmployeeReference> findByIds(Set<EmployeeId> ids) {
         return selectEmployee()

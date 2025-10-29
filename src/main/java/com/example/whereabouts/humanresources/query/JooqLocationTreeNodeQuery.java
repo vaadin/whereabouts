@@ -8,8 +8,6 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,21 +34,18 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
         this.dsl = dsl;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public int countCountriesWithLocations() {
         var count = countDistinct(LOCATION.COUNTRY);
         return requireNonNull(dsl.select(count).from(LOCATION).fetchOne(count));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public int countLocationsInCountry(Country country) {
         var count = count(LOCATION.COUNTRY);
         return requireNonNull(dsl.select(count).from(LOCATION).where(LOCATION.COUNTRY.eq(country)).fetchOne(count));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public List<LocationTreeNode> findCountries(Pageable pageable) {
         return dsl.select(
@@ -67,7 +62,6 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
                 .fetch(Records.mapping(LocationTreeNode.CountryNode::new));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public List<LocationTreeNode> findLocations(Country country, Pageable pageable) {
         return selectLocation()
@@ -79,7 +73,6 @@ class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {
                 .fetch(Records.mapping(LocationTreeNode.LocationNode::new));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Optional<LocationTreeNode.LocationNode> findLocationById(LocationId id) {
         return selectLocation()
