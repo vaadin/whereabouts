@@ -2,7 +2,7 @@ package com.example.whereabouts.humanresources;
 
 import com.example.whereabouts.common.Country;
 import com.example.whereabouts.common.address.*;
-import com.example.whereabouts.humanresources.internal.LocationRepository;
+import com.example.whereabouts.humanresources.repository.LocationRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

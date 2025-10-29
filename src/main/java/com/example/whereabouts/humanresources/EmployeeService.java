@@ -1,8 +1,8 @@
 package com.example.whereabouts.humanresources;
 
-import com.example.whereabouts.humanresources.internal.EmployeeReferenceQuery;
-import com.example.whereabouts.humanresources.internal.EmployeeRepository;
-import com.example.whereabouts.humanresources.internal.EmploymentDetailsRepository;
+import com.example.whereabouts.humanresources.query.EmployeeReferenceQuery;
+import com.example.whereabouts.humanresources.repository.EmployeeRepository;
+import com.example.whereabouts.humanresources.repository.EmploymentDetailsRepository;
 import com.example.whereabouts.security.AppRoles;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.Pageable;

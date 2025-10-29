@@ -32,15 +32,15 @@ create sequence location_id_seq start 100 increment 1;
 
 create table location
 (
-    location_id   bigint        not null,
-    version       bigint        not null,
-    name          text          not null,
-    location_type location_type not null,
-    time_zone     varchar(64)   not null,
-    country       varchar(3)    not null,
-    address       json          not null,
-    about         text          not null,
-    established   date          not null,
+    location_id    bigint        not null,
+    version        bigint        not null,
+    name           text          not null,
+    location_type  location_type not null,
+    time_zone      varchar(64)   not null,
+    country        varchar(3)    not null,
+    postal_address json          not null,
+    about          text          not null,
+    established    date          not null,
     primary key (location_id)
 );
 
@@ -67,23 +67,23 @@ create type work_arrangement as enum ('ONSITE', 'REMOTE', 'HYBRID');
 
 create table employee
 (
-    employee_id    bigint       not null,
-    version        bigint       not null,
-    first_name     text         not null,
-    middle_name    text,
-    last_name      text         not null,
-    preferred_name text         not null,
-    birth_date     date         not null,
-    gender         gender       not null,
-    dietary_notes  text,
-    country        varchar(3)   not null,
-    time_zone      varchar(64)  not null,
-    home_address   json,
-    work_phone     varchar(16),
-    mobile_phone   varchar(16),
-    home_phone     varchar(16),
-    work_email     varchar(320) not null,
-    user_id bigint,
+    employee_id         bigint       not null,
+    version             bigint       not null,
+    first_name          text         not null,
+    middle_name         text,
+    last_name           text         not null,
+    preferred_name      text         not null,
+    birth_date          date         not null,
+    gender              gender       not null,
+    dietary_notes       text,
+    country             varchar(3)   not null,
+    time_zone           varchar(64)  not null,
+    home_postal_address json,
+    work_phone          varchar(16),
+    mobile_phone        varchar(16),
+    home_phone          varchar(16),
+    work_email          varchar(320) not null,
+    user_id             bigint,
     primary key (employee_id),
     unique (user_id),
     unique (work_email),
@@ -95,28 +95,30 @@ create index employee_user_first_name_idx on employee (first_name);
 create index employee_user_middle_name_idx on employee (middle_name);
 create index employee_user_last_name_idx on employee (last_name);
 
+-- TODO Should 'employee' and 'employment_details' be a single table?
+
 create table employment_details
 (
-    employee_id       bigint            not null,
-    version           bigint            not null,
-    job_title         text              not null,
-    employment_type   employment_type   not null,
-    employment_status employment_status not null,
-    work_arrangement  work_arrangement  not null,
-    location_id       bigint            not null,
-    manager_id bigint,
-    hire_date         date              not null,
-    termination_date  date,
+    employee_id         bigint            not null,
+    version             bigint            not null,
+    job_title           text              not null,
+    employment_type     employment_type   not null,
+    employment_status   employment_status not null,
+    work_arrangement    work_arrangement  not null,
+    location_id         bigint            not null,
+    manager_employee_id bigint,
+    hire_date           date              not null,
+    termination_date    date,
     primary key (employee_id),
     foreign key (employee_id) references employee (employee_id),
     foreign key (location_id) references location (location_id),
-    foreign key (manager_id) references employee (employee_id),
+    foreign key (manager_employee_id) references employee (employee_id),
     constraint termination_date_matches_status check ((termination_date is null and not employment_status = 'TERMINATED') or
                                                       (termination_date is not null and employment_status = 'TERMINATED'))
 );
 
 create index employment_details_location_id_idx on employment_details (location_id);
-create index employment_details_manager_id_idx on employment_details (manager_id);
+create index employment_details_manager_employee_id_idx on employment_details (manager_employee_id);
 create index employment_details_type_idx on employment_details (employment_type);
 create index employment_details_status_idx on employment_details (employment_status);
 

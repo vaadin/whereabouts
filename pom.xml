@@ -14,9 +14,7 @@
         <java.version>21</java.version>
         <vaadin.version>25.0.0-beta2</vaadin.version>
         <jooq.version>3.20.7</jooq.version>
-        <archunit.version>1.4.1</archunit.version>
         <testcontainers-jooq-codegen-maven-plugin.version>0.0.4</testcontainers-jooq-codegen-maven-plugin.version>
-        <spring-modulith.version>2.0.0-M3</spring-modulith.version>
     </properties>
 
     <parent>
@@ -48,13 +46,6 @@
                 <version>${vaadin.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.modulith</groupId>
-                <artifactId>spring-modulith-bom</artifactId>
-                <version>${spring-modulith.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -102,10 +93,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.modulith</groupId>
-            <artifactId>spring-modulith-core</artifactId>
-        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -131,12 +118,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-testcontainers</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5</artifactId>
-            <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -200,6 +181,139 @@
                                         <excludes>flyway_schema_history</excludes>
                                         <inputSchema>public</inputSchema>
                                         <recordVersionFields>version</recordVersionFields>
+                                        <forcedTypes>
+                                            <!-- See Design Decision: DD009-20251029-jooq-user-types.md -->
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.Country</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.CountryConverter
+                                                </converter>
+                                                <includeExpression>^country$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.EmailAddress</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.EmailConverter
+                                                </converter>
+                                                <includeExpression>^.*email$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmployeeId</userType>
+                                                <converter>com.example.whereabouts.jooq.converters.EmployeeIdConverter
+                                                </converter>
+                                                <includeExpression>^.*employee_id$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmploymentStatus
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.EmploymentStatusConverter
+                                                </converter>
+                                                <includeExpression>^employment_status$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.EmploymentType
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.EmploymentTypeConverter
+                                                </converter>
+                                                <includeExpression>^employment_type$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.Gender
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.GenderConverter
+                                                </converter>
+                                                <includeExpression>^gender$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.LocationId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.LocationIdConverter
+                                                </converter>
+                                                <includeExpression>^.*location_id$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.LocationType
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.LocationTypeConverter
+                                                </converter>
+                                                <includeExpression>^location_type$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.PhoneNumber
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.PhoneNumberConverter
+                                                </converter>
+                                                <includeExpression>^.*phone$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.common.address.PostalAddress
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.PostalAddressConverter
+                                                </converter>
+                                                <includeExpression>^.*postal_address$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.ProjectId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ProjectIdConverter
+                                                </converter>
+                                                <includeExpression>^.*project_id$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskIdConverter
+                                                </converter>
+                                                <includeExpression>^.*task_id$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskPriority
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskPriorityConverter
+                                                </converter>
+                                                <includeExpression>^task_priority$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.projects.TaskStatus
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.TaskStatusConverter
+                                                </converter>
+                                                <includeExpression>^task_status$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>com.example.whereabouts.humanresources.WorkArrangement
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.WorkArrangementConverter
+                                                </converter>
+                                                <includeExpression>^work_arrangement$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>java.time.ZonedDateTime
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ZonedDateTimeConverter
+                                                </converter>
+                                                <includeExpression>^.*date_time$</includeExpression>
+                                            </forcedType>
+                                            <forcedType>
+                                                <userType>java.time.ZoneId
+                                                </userType>
+                                                <converter>
+                                                    com.example.whereabouts.jooq.converters.ZoneIdConverter
+                                                </converter>
+                                                <includeExpression>^.*time_zone$</includeExpression>
+                                            </forcedType>
+                                        </forcedTypes>
                                     </database>
                                     <target>
                                         <packageName>com.example.whereabouts.jooq</packageName>
