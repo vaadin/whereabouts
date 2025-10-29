@@ -22,6 +22,9 @@ import static com.example.whereabouts.jooq.Sequences.TASK_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.TASK;
 import static com.example.whereabouts.jooq.Tables.TASK_ASSIGNEE;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 class JooqTaskRepository implements TaskRepository {
 

@@ -10,6 +10,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @NullMarked
 public interface ProjectQuery {
 

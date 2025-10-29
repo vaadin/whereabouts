@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 /**
  * @see "Design decision: DD005-20251024-records-as-entities.md"
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
  */
 @NullMarked
 public interface TaskRepository extends Repository {

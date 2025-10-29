@@ -20,6 +20,9 @@ import java.util.Set;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqEmployeeReferenceQuery implements EmployeeReferenceQuery {

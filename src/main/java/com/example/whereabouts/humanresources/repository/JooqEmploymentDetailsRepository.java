@@ -14,6 +14,9 @@ import java.util.Optional;
 
 import static com.example.whereabouts.jooq.Tables.EMPLOYMENT_DETAILS;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
 

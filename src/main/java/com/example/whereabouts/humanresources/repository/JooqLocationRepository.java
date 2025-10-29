@@ -21,6 +21,9 @@ import static com.example.whereabouts.jooq.Sequences.LOCATION_ID_SEQ;
 import static com.example.whereabouts.jooq.tables.Location.LOCATION;
 import static com.example.whereabouts.jooq.tables.LocationFacility.LOCATION_FACILITY;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqLocationRepository implements LocationRepository {

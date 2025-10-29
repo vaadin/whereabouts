@@ -18,6 +18,9 @@ import java.util.stream.Stream;
 
 import static com.example.whereabouts.jooq.Tables.*;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqProjectQuery implements ProjectQuery {

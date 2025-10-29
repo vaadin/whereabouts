@@ -17,6 +17,9 @@ import java.util.Set;
 
 import static com.example.whereabouts.jooq.Tables.LOCATION;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqLocationReferenceQuery implements LocationReferenceQuery {

@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @NullMarked
 public interface LocationTreeNodeQuery {
     int countCountriesWithLocations();

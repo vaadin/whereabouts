@@ -15,6 +15,9 @@ import java.util.Optional;
 import static com.example.whereabouts.jooq.Sequences.EMPLOYEE_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.EMPLOYEE;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqEmployeeRepository implements EmployeeRepository {

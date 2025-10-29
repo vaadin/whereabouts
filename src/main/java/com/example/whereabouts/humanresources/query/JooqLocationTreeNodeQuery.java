@@ -20,6 +20,9 @@ import static java.util.Objects.requireNonNull;
 import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.countDistinct;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqLocationTreeNodeQuery implements LocationTreeNodeQuery {

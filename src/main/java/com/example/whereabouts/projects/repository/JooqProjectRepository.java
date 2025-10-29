@@ -14,6 +14,9 @@ import java.util.Optional;
 import static com.example.whereabouts.jooq.Sequences.PROJECT_ID_SEQ;
 import static com.example.whereabouts.jooq.Tables.PROJECT;
 
+/**
+ * @see "Design Decision: DD009-20251029-jooq-user-types.md"
+ */
 @Component
 @NullMarked
 class JooqProjectRepository implements ProjectRepository {

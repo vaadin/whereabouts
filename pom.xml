@@ -182,6 +182,7 @@
                                         <inputSchema>public</inputSchema>
                                         <recordVersionFields>version</recordVersionFields>
                                         <forcedTypes>
+                                            <!-- See Design Decision: DD009-20251029-jooq-user-types.md -->
                                             <forcedType>
                                                 <userType>com.example.whereabouts.common.Country</userType>
                                                 <converter>com.example.whereabouts.jooq.converters.CountryConverter
