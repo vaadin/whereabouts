@@ -27,7 +27,6 @@ class JooqProjectRepository implements ProjectRepository {
         this.dsl = dsl;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     public Optional<Project> findById(ProjectId id) {
         return dsl

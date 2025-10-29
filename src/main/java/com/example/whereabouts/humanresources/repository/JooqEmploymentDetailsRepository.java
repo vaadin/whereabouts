@@ -26,7 +26,6 @@ class JooqEmploymentDetailsRepository implements EmploymentDetailsRepository {
         this.dsl = dsl;
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public @NonNull Optional<EmploymentDetails> findById(@NonNull EmployeeId id) {
         return dsl

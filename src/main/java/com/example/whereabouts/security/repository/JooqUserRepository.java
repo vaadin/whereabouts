@@ -62,7 +62,6 @@ class JooqUserRepository implements UserRepository {
         dsl.batchInsert(batch).execute();
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<User> findByUsername(String username) {
         var ROLES = DSL.multiset(

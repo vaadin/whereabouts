@@ -34,7 +34,6 @@ class JooqLocationRepository implements LocationRepository {
         this.dsl = dsl;
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Location> findById(LocationId id) {
         var FACILITIES = DSL.multiset(

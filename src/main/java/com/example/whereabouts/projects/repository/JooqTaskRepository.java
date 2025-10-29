@@ -115,7 +115,6 @@ class JooqTaskRepository implements TaskRepository {
                 .execute();
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public @NonNull Optional<Task> findById(@NonNull TaskId id) {
         return dsl
@@ -135,7 +134,6 @@ class JooqTaskRepository implements TaskRepository {
                 .fetchOptional(this::toTask);
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public @NonNull Stream<Task> findByFilter(@NonNull ProjectId project, @NonNull TaskFilter filter, int limit, int offset, @NonNull List<SortOrder<TaskSortableProperty>> sortOrders) {
         Condition condition = DSL.trueCondition();

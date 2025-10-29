@@ -28,7 +28,6 @@ class JooqEmployeeRepository implements EmployeeRepository {
         this.dsl = dsl;
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     @Override
     public Optional<Employee> findById(EmployeeId id) {
         return dsl
