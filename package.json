@@ -6,12 +6,15 @@
     "@vaadin/aura": "25.0.0-beta1",
     "@vaadin/common-frontend": "0.0.19",
     "@vaadin/react-components": "25.0.0-beta1",
+    "@vaadin/react-components-pro": "25.0.0-beta1",
     "@vaadin/vaadin-development-mode-detector": "2.0.7",
     "@vaadin/vaadin-lumo-styles": "25.0.0-beta1",
     "@vaadin/vaadin-themable-mixin": "25.0.0-beta1",
     "@vaadin/vaadin-usage-statistics": "2.1.3",
     "date-fns": "4.1.0",
     "lit": "3.3.1",
+    "ol": "10.6.1",
+    "proj4": "2.17.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-router": "7.9.4"
@@ -37,14 +40,7 @@
   },
   "overrides": {
     "@vaadin/router": "2.0.0",
-    "@vaadin/board": "25.0.0-alpha8",
-    "@vaadin/charts": "25.0.0-alpha8",
     "@vaadin/cookie-consent": "25.0.0-alpha8",
-    "@vaadin/crud": "25.0.0-alpha8",
-    "@vaadin/dashboard": "25.0.0-alpha8",
-    "@vaadin/grid-pro": "25.0.0-alpha8",
-    "@vaadin/map": "25.0.0-alpha8",
-    "@vaadin/rich-text-editor": "25.0.0-alpha8",
     "@vaadin/vaadin-development-mode-detector": "$@vaadin/vaadin-development-mode-detector",
     "@vaadin/vaadin-usage-statistics": "$@vaadin/vaadin-usage-statistics",
     "@vaadin/react-components": "$@vaadin/react-components",
@@ -114,19 +110,32 @@
     "@vaadin/tooltip": "25.0.0-beta1",
     "@vaadin/upload": "25.0.0-beta1",
     "@vaadin/vertical-layout": "25.0.0-beta1",
-    "@vaadin/virtual-list": "25.0.0-beta1"
+    "@vaadin/virtual-list": "25.0.0-beta1",
+    "@vaadin/react-components-pro": "$@vaadin/react-components-pro",
+    "proj4": "$proj4",
+    "ol": "$ol",
+    "@vaadin/board": "25.0.0-beta1",
+    "@vaadin/charts": "25.0.0-beta1",
+    "@vaadin/crud": "25.0.0-beta1",
+    "@vaadin/dashboard": "25.0.0-beta1",
+    "@vaadin/grid-pro": "25.0.0-beta1",
+    "@vaadin/map": "25.0.0-beta1",
+    "@vaadin/rich-text-editor": "25.0.0-beta1"
   },
   "vaadin": {
     "dependencies": {
       "@vaadin/aura": "25.0.0-beta1",
       "@vaadin/common-frontend": "0.0.19",
       "@vaadin/react-components": "25.0.0-beta1",
+      "@vaadin/react-components-pro": "25.0.0-beta1",
       "@vaadin/vaadin-development-mode-detector": "2.0.7",
       "@vaadin/vaadin-lumo-styles": "25.0.0-beta1",
       "@vaadin/vaadin-themable-mixin": "25.0.0-beta1",
       "@vaadin/vaadin-usage-statistics": "2.1.3",
       "date-fns": "4.1.0",
       "lit": "3.3.1",
+      "ol": "10.6.1",
+      "proj4": "2.17.0",
       "react": "19.2.0",
       "react-dom": "19.2.0",
       "react-router": "7.9.4"
@@ -150,6 +159,6 @@
       "vite-plugin-checker": "0.11.0",
       "workbox-build": "7.3.0"
     },
-    "hash": "742051eddd8311b17796fed4f49fca6c5e0e20dc63899d4078dc0203dfbc156d"
+    "hash": "e6fb0469d14b2cd0cbcc9af2d206638f3da0bd018fa7da28a8b957afcf85ec9a"
   }
 }
